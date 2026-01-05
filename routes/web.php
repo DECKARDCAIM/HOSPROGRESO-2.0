@@ -6,6 +6,7 @@ use App\Http\Controllers\Auth\LoginController;
 use App\Http\Controllers\HomeController;
 use App\Http\Controllers\UserController;
 use App\Http\Controllers\ProfileController;
+use App\Http\Controllers\PatientController;
 
 Route::get('/', function () {
     if (Auth::check()) {
@@ -32,4 +33,18 @@ Route::middleware('auth')->group(function () {
     Route::post('/profile/update-banner', [ProfileController::class, 'updateBanner'])->name('profile.update-banner');
     Route::delete('/profile/delete-avatar', [ProfileController::class, 'deleteAvatar'])->name('profile.delete-avatar');
     Route::delete('/profile/delete-banner', [ProfileController::class, 'deleteBanner'])->name('profile.delete-banner');
+
+
+
+    // Rutas AJAX para ubicaciones
+    Route::get('/patients/get-departments-by-country', [PatientController::class, 'getDepartmentsByCountry'])->name('patients.get-departments-by-country');
+    Route::get('/patients/get-municipalities-by-department', [PatientController::class, 'getMunicipalitiesByDepartment'])->name('patients.get-municipalities-by-department');
+    // Rutas Resource de Pacientes
+    Route::resource('patients', PatientController::class);
+    Route::get('/patients/export/excel', [PatientController::class, 'exportExcel'])->name('patients.export.excel');
+    Route::get('/patients/export/csv', [PatientController::class, 'exportCSV'])->name('patients.export.csv');
+    Route::get('/patients/export/pdf', [PatientController::class, 'exportPDF'])->name('patients.export.pdf');
+    Route::post('/patients/destroy-multiple', [PatientController::class, 'destroyMultiple'])->name('patients.destroy-multiple');
+    Route::post('/patients/{id}/restore', [PatientController::class, 'restore'])->name('patients.restore');
+
 });

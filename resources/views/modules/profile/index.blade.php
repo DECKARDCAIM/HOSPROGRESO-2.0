@@ -1,4 +1,4 @@
-@extends('layouts.app')
+@extends('layouts.panel')
 
 @section('content')
 <main id="content" role="main" class="main">
@@ -43,7 +43,7 @@
                 </div>
               </div>
             @else
-              <div class="avatar avatar-xxl avatar-circle avatar-soft-primary profile-cover-avatar">
+              <div class="avatar avatar-xxl avatar-circle avatar-soft-primary profile-cover-avatar" style="border:none !important;">
                 <span class="avatar-initials">{{ $iniciales }}</span>
               </div>
             @endif
@@ -313,106 +313,8 @@
 
 <script>
 document.addEventListener('DOMContentLoaded', function() {
-    // Función para cargar imágenes con múltiples intentos
-    function loadImageWithRetry(imgElement, maxRetries = 3, retryDelay = 1000) {
-        let retryCount = 0;
-        const originalSrc = imgElement.getAttribute('data-src');
-        
-        if (!originalSrc) {
-            hideLoadingPlaceholder(imgElement);
-            return;
-        }
 
-        function tryLoad() {
-            // Generar URL basada en la URL actual
-            let imageUrl = originalSrc;
-            
-            // Normalizar URL basada en la URL actual
-            const currentHost = window.location.hostname;
-            const currentOrigin = window.location.origin;
-            
-            // Si la URL original contiene localhost o 127.0.0.1, o no coincide con el host actual
-            if (originalSrc.includes('localhost') || originalSrc.includes('127.0.0.1') || 
-                !originalSrc.includes(currentHost)) {
-                
-                // Extraer el nombre del archivo
-                const pathMatch = originalSrc.match(/\/storage\/([^\/]+\/[^\/]+)$/);
-                if (pathMatch) {
-                    // Intentar diferentes variaciones según el hostname
-                    if (currentHost === '192.168.1.219') {
-                        // Primero intentar sin subdirectorio
-                        imageUrl = currentOrigin + '/storage/' + pathMatch[1];
-                    } else if (currentHost === 'hospro-workstation.test') {
-                        imageUrl = currentOrigin + '/storage/' + pathMatch[1];
-                    } else {
-                        imageUrl = currentOrigin + '/storage/' + pathMatch[1];
-                    }
-                }
-            }
-            
-            // Si la URL no es absoluta, hacerla absoluta
-            if (!imageUrl.startsWith('http://') && !imageUrl.startsWith('https://')) {
-                imageUrl = currentOrigin + '/' + imageUrl.replace(/^\//, '');
-            }
-
-            const testImg = new Image();
-            
-            testImg.onload = function() {
-                imgElement.src = imageUrl;
-                hideLoadingPlaceholder(imgElement);
-            };
-            
-            testImg.onerror = function() {
-                retryCount++;
-                
-                if (retryCount < maxRetries) {
-                    // Intentar con diferentes variaciones de URL
-                    setTimeout(() => {
-                        // Intentar con diferentes variaciones de URL
-                        const pathMatch = originalSrc.match(/\/storage\/([^\/]+\/[^\/]+)$/);
-                        if (pathMatch) {
-                            const fallbackUrls = [];
-                            const hostname = window.location.hostname;
-                            
-                            if (hostname === '192.168.1.219') {
-                                // Para IP, intentar ambas variaciones
-                                fallbackUrls.push(
-                                    window.location.origin + '/storage/' + pathMatch[1],
-                                    window.location.origin + '/HOSPRO-WorkStation/public/storage/' + pathMatch[1]
-                                );
-                            } else if (hostname === 'hospro-workstation.test') {
-                                fallbackUrls.push(
-                                    window.location.origin + '/storage/' + pathMatch[1]
-                                );
-                            } else {
-                                // Para otros dominios, intentar con el path actual
-                                fallbackUrls.push(window.location.origin + '/storage/' + pathMatch[1]);
-                            }
-                            
-                            const fallbackIndex = retryCount - 1;
-                            if (fallbackIndex < fallbackUrls.length) {
-                                testImg.src = fallbackUrls[fallbackIndex];
-                            } else {
-                                // Si se agotaron las URLs de fallback, reintentar con delay
-                                setTimeout(() => tryLoad(), retryDelay * retryCount);
-                            }
-                        } else {
-                            setTimeout(() => tryLoad(), retryDelay * retryCount);
-                        }
-                    }, retryDelay * retryCount);
-                } else {
-                    // Máximo de intentos alcanzado, mostrar placeholder o iniciales
-                    hideLoadingPlaceholder(imgElement);
-                    showImageError(imgElement);
-                }
-            };
-            
-            testImg.src = imageUrl;
-        }
-        
-        tryLoad();
-    }
-
+    // Función para ocultar el loading de la imagen
     function hideLoadingPlaceholder(imgElement) {
         const loadingId = imgElement.id === 'profileCoverImg' ? 'banner-loading' : 'avatar-loading';
         const loadingPlaceholder = document.getElementById(loadingId);

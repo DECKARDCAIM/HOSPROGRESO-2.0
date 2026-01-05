@@ -15,17 +15,17 @@
     <script src="{{ asset('js/app.js') }}"></script>
 </head>
 
-<body class="has-navbar-vertical-aside navbar-vertical-aside-show-xl   footer-offset">
+<body class="has-navbar-vertical-aside navbar-vertical-aside-show-xl footer-offset">
     <script src="{{ asset('js/hs.theme-appearance.js') }}"></script>
     <script src="{{ asset('vendor/hs-navbar-vertical-aside/dist/hs-navbar-vertical-aside-mini-cache.js') }}"></script>
 
-@include('includes.app.userOptions')
+@include('includes.panel.userOptions')
 
-@include('includes.app.menu')
+@include('includes.panel.menu')
  
 @yield('content')
 
-@include('includes.app.activity')
+@include('includes.panel.activity')
 
   <script src="{{ asset('vendor/jquery/dist/jquery.min.js') }}"></script>
   <script src="{{ asset('vendor/jquery-migrate/dist/jquery-migrate.min.js') }}"></script>
@@ -43,6 +43,7 @@
   <script src="{{ asset('vendor/datatables.net.extensions/select/select.min.js') }}"></script>
   <script src="{{ asset('js/theme.min.js') }}"></script>
   <script src="{{ asset('js/hs.theme-appearance-charts.js') }}"></script>
+  @stack('scripts')
 
   <script>
     $(document).on('ready', function () {
@@ -472,6 +473,6 @@
         }
     });
   </script>
-</body>
 
+</body>
 </html>

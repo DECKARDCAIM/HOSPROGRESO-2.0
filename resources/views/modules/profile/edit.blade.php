@@ -1,4 +1,4 @@
-@extends('layouts.app')
+@extends('layouts.panel')
 
 @section('content')
 <main id="content" role="main" class="main">
@@ -68,7 +68,7 @@
                   </button>
                 </label>
               @else
-                <label class="avatar avatar-xxl avatar-circle avatar-soft-primary avatar-uploader profile-cover-avatar" for="profile-photo-input" style="position: relative;">
+                <label class="avatar avatar-xxl avatar-circle avatar-soft-primary avatar-uploader profile-cover-avatar" for="profile-photo-input" style="position: relative; border:none !important;">
                   <span class="avatar-initials" id="avatar-initials-container">{{ $iniciales }}</span>
                   <input type="file" class="avatar-uploader-input" id="profile-photo-input" name="profile_photo" accept="image/png,image/jpeg,image/jpg" style="display: none;">
                   <span class="avatar-uploader-trigger" id="upload-avatar-trigger" style="position: absolute; bottom: 0; right: 0; z-index: 10;">

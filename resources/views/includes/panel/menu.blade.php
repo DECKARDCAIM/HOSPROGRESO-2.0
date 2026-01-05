@@ -82,9 +82,8 @@
 
                          <div id="navbarVerticalMenuPacientes" class="nav-collapse collapse"
                              data-bs-parent="#navbarVerticalMenu">
-                             <a class="nav-link" href="/pacientes">Listado</a>
-                             <a class="nav-link" href="/pacientes/crear">Nuevo Paciente</a>
-                             <a class="nav-link" href="/pacientes/buscar">Buscar</a>
+                             <a class="nav-link" href="{{ route('patients.create') }}">Nuevo Paciente</a>
+                             <a class="nav-link" href="{{ route('patients.index') }}">Listado</a>
                          </div>
                      </div>
 

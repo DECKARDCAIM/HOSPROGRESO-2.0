@@ -1,9 +1,4 @@
-@php
-use Illuminate\Support\Facades\Storage;
-@endphp
-
-<header id="header"
-    class="navbar navbar-expand-lg navbar-fixed navbar-height navbar-container navbar-bordered bg-white">
+<header id="header" class="navbar navbar-expand-lg navbar-fixed navbar-height navbar-container navbar-bordered bg-white">
     <div class="navbar-nav-wrap">
         <a class="navbar-brand" href="/" aria-label="Front">
             <img class="navbar-brand-logo" src="{{ asset('img/logotipo.svg') }}" alt="Logo" data-hs-theme-appearance="default">
@@ -824,63 +819,3 @@ use Illuminate\Support\Facades\Storage;
         </div>
     </div>
 </header>
-
-<script>
-// Función para reintentar carga de imágenes del navbar
-function retryNavbarImage(imgElement) {
-    if (!imgElement.dataset.retryCount) {
-        imgElement.dataset.retryCount = '0';
-    }
-    
-    imgElement.dataset.retryCount = parseInt(imgElement.dataset.retryCount) + 1;
-    
-    if (parseInt(imgElement.dataset.retryCount) <= 3) {
-        const originalSrc = imgElement.src;
-        let newSrc = originalSrc;
-        
-        // Intentar con diferentes variaciones de URL
-        if (window.location.hostname === '192.168.1.219') {
-            const pathMatch = originalSrc.match(/\/storage\/avatars\/(.+)$/);
-            if (pathMatch) {
-                const fallbackUrls = [
-                    window.location.origin + '/storage/avatars/' + pathMatch[1],
-                    window.location.origin + '/HOSPRO-WorkStation/public/storage/avatars/' + pathMatch[1],
-                ];
-                newSrc = fallbackUrls[parseInt(imgElement.dataset.retryCount) - 1] || fallbackUrls[0];
-            }
-        } else if (window.location.hostname === 'hospro-workstation.test') {
-            const pathMatch = originalSrc.match(/\/storage\/avatars\/(.+)$/);
-            if (pathMatch) {
-                newSrc = window.location.origin + '/storage/avatars/' + pathMatch[1];
-            }
-        } else {
-            // Reemplazar localhost o 127.0.0.1 con el hostname actual
-            newSrc = originalSrc.replace(/https?:\/\/[^\/]+/, window.location.origin);
-        }
-        
-        const testImg = new Image();
-        testImg.onload = function() {
-            imgElement.src = newSrc;
-        };
-        testImg.onerror = function() {
-            if (parseInt(imgElement.dataset.retryCount) < 3) {
-                setTimeout(() => retryNavbarImage(imgElement), 1000 * parseInt(imgElement.dataset.retryCount));
-            } else {
-                // Ocultar imagen y mostrar iniciales si es posible
-                imgElement.style.display = 'none';
-                const container = imgElement.closest('.avatar');
-                if (container) {
-                    const initials = container.querySelector('.avatar-initials');
-                    if (!initials) {
-                        const initialsDiv = document.createElement('div');
-                        initialsDiv.className = 'avatar-img avatar-soft-primary';
-                        initialsDiv.innerHTML = '<span class="avatar-initials">' + (imgElement.alt.charAt(0) || 'U') + '</span>';
-                        container.appendChild(initialsDiv);
-                    }
-                }
-            }
-        };
-        testImg.src = newSrc;
-    }
-}
-</script>

@@ -1,4 +1,4 @@
-@extends('layouts.app')
+@extends('layouts.panel')
 
 @section('content')
     <main id="content" role="main" class="main">
@@ -7,8 +7,12 @@
                 <div class="col-sm-7 col-md-5">
                     <img class="img-fluid mb-5" src="{{ asset('img/logotipo.svg') }}" alt="Image Description" data-hs-theme-appearance="default">
                     <img class="img-fluid mb-5" src="{{ asset('img/logotipo-white.svg') }}" alt="Image Description" data-hs-theme-appearance="dark">
-                    <h1>Bienvenido al sistema de gestión de inventarios y solicitudes de mantenimiento</h1>
-                    <p>Este sistema te permitirá gestionar los inventarios y solicitudes de mantenimiento del hospital</p>
+                    
+                    <h1 class="mb-3">Bienvenido, {{ Auth::user()->name }}</h1>
+
+                    <p class="text-muted fs-5"> Al sistema {{ config('app.name') }} - Sistema de Registro de Pacientes.</p>
+
+                    <p class="mt-3">Este sistema te permitirá registrar y dar seguimiento a la atención de los pacientes, desde la valoración inicial por enfermería, la atención médica, hasta la hospitalización y control del paciente.</p>
                 </div>
             </div>
         </div>
