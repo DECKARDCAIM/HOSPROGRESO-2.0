@@ -10,20 +10,30 @@ return new class extends Migration
     {
         Schema::create('users', function (Blueprint $table) {
             $table->id();
-            $table->string('name');
+            $table->string('first_name');
+            $table->string('second_name')->nullable();
+            $table->string('third_name')->nullable();
+            $table->string('first_last_name');
+            $table->string('second_last_name')->nullable();
+            $table->string('married_last_name')->nullable();
+            
             $table->string('email')->unique();
             $table->timestamp('email_verified_at')->nullable();
             $table->string('password');
-            $table->enum('estado', ['disponible', 'ocupado', 'ausente', 'privado'])->default('disponible');
-            $table->string('avatar')->nullable();
-            $table->string('avatar_url')->nullable();
-            $table->string('banner')->nullable();
-            $table->string('banner_url')->nullable();
+            $table->boolean('is_active')->default(true);
+
+            $table->string('profile_photo_path', 2048)->nullable();
+            $table->string('banner_photo_path', 2048)->nullable();
+            $table->string('cui', 13)->nullable()->unique();
+            $table->string('nit')->nullable()->unique();
+            $table->enum('marital_status', ['soltero','casado','divorciado','viudo','union_libre'])->nullable();
             $table->string('phone')->nullable();
             $table->string('department')->nullable();
-            $table->string('company')->nullable();
-            $table->string('location')->nullable();
-            $table->text('about')->nullable();
+            $table->text('address')->nullable();
+            $table->date('birth_date')->nullable();
+            $table->string('gender')->nullable();
+
+            $table->enum('estado', ['disponible', 'ocupado', 'ausente', 'privado'])->default('disponible');
             $table->string('theme_preference')->nullable()->default('auto');
             $table->rememberToken();
             $table->timestamps();

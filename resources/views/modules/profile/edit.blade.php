@@ -8,8 +8,8 @@
           <div class="profile-cover">
             <div class="profile-cover-img-wrapper" style="position: relative;">
               <img id="profileCoverImg" class="profile-cover-img" 
-                   src="{{ $user->banner_url ?? ($user->banner ? asset('storage/banners/' . basename($user->banner)) : asset('img/1920x400/img2.jpg')) }}"
-                   data-src="{{ $user->banner_url ?? ($user->banner ? asset('storage/banners/' . basename($user->banner)) : asset('img/1920x400/img2.jpg')) }}"
+                   src="{{ $user->banner_url ?? ($user->banner_photo_path ? asset('storage/banner_photos/' . basename($user->banner_photo_path)) : asset('img/1920x400/img2.jpg')) }}"
+                   data-src="{{ $user->banner_url ?? ($user->banner_photo_path ? asset('storage/banner_photos/' . basename($user->banner_photo_path)) : asset('img/1920x400/img2.jpg')) }}"
                    alt="Image Description"
                    onerror="this.onerror=null; retryImageLoad(this);"
                    onload="hideBannerLoading();">
@@ -21,13 +21,13 @@
 
               <div class="profile-cover-content profile-cover-uploader p-3">
                 <input type="file" class="profile-cover-uploader-input" id="banner-photo-input" name="banner_photo" accept="image/png,image/jpeg,image/jpg" style="display: none;">
-                @if(!$user->banner_url && !$user->banner)
+                @if(!$user->banner_url && !$user->banner_photo_path)
                 <label class="profile-cover-uploader-label btn btn-sm btn-white" id="upload-banner-label" for="banner-photo-input">
                   <i class="bi-camera-fill"></i>
                   <span class="d-none d-sm-inline-block ms-1">Subir banner</span>
                 </label>
                 @endif
-                @if($user->banner_url || $user->banner)
+                @if($user->banner_url || $user->banner_photo_path)
                 <button type="button" class="btn btn-sm btn-danger" id="delete-banner-btn" onclick="deleteBanner()">
                   <i class="bi-trash"></i>
                   <span class="d-none d-sm-inline-block ms-1">Eliminar</span>
@@ -40,17 +40,14 @@
           <div class="text-center mb-5">
             <div style="position: relative; display: inline-block; margin-bottom: 10px;">
               @php
-                $nombreCompleto = $user->name ?? 'Usuario';
-                $nombres = explode(' ', $nombreCompleto);
-                $primerNombre = $nombres[0] ?? '';
-                $segundoApellido = isset($nombres[2]) ? $nombres[2] : (isset($nombres[1]) ? $nombres[1] : '');
-                $iniciales = strtoupper(substr($primerNombre, 0, 1) . substr($segundoApellido, 0, 1));
+                $nombreCompleto = $user->first_name . ' ' . $user->first_last_name . ' ' . $user->second_last_name . ' ' . $user->married_last_name;
+                $iniciales = strtoupper(substr($user->first_name, 0, 1) . substr($user->first_last_name, 0, 1) . substr($user->second_last_name, 0, 1) . substr($user->married_last_name, 0, 1));
               @endphp
-              @if($user->avatar_url || $user->avatar)
+              @if($user->profile_photo_path || $user->profile_photo_path)
                 <label class="avatar avatar-xxl avatar-circle avatar-uploader profile-cover-avatar" for="profile-photo-input" style="position: relative;">
                   <img id="editAvatarImgModal" class="avatar-img" 
-                       src="{{ $user->avatar_url ?? asset('storage/avatars/' . basename($user->avatar)) }}"
-                       data-src="{{ $user->avatar_url ?? asset('storage/avatars/' . basename($user->avatar)) }}"
+                       src="{{ $user->profile_photo_path ?? asset('storage/profile_photos/' . basename($user->profile_photo_path)) }}"
+                       data-src="{{ $user->profile_photo_path ?? asset('storage/profile_photos/' . basename($user->profile_photo_path)) }}"
                        alt="Image Description"
                        onerror="this.onerror=null; retryImageLoad(this);"
                        onload="hideAvatarLoading();">
@@ -81,7 +78,7 @@
               @endif
             </div>
 
-            <h1 class="page-header-title">{{ $user->name }} <i class="bi-patch-check-fill fs-2 text-primary" data-bs-toggle="tooltip" data-bs-placement="top" title="Verificado"></i></h1>
+            <h1 class="page-header-title">{{ $nombreCompleto }} <i class="bi-patch-check-fill fs-2 text-primary" data-bs-toggle="tooltip" data-bs-placement="top" title="Verificado"></i></h1>
           </div>
 
           <div class="row">
@@ -97,40 +94,64 @@
 
                     <div class="row mb-4">
                       <div class="col-md-6">
-                        <label class="form-label" for="name">Nombre completo</label>
-                        <input type="text" class="form-control" id="name" name="name" value="{{ old('name', $user->name) }}" required>
+                        <label class="form-label" for="first_name">Nombre</label>
+                        <input type="text" class="form-control" id="first_name" name="first_name" value="{{ old('first_name', $user->first_name) }}" required>
                       </div>
                       <div class="col-md-6">
-                        <label class="form-label" for="email">Correo electrónico</label>
-                        <input type="email" class="form-control" id="email" name="email" value="{{ old('email', $user->email) }}" required>
+                        <label class="form-label" for="second_name">Segundo nombre</label>
+                        <input type="text" class="form-control" id="second_name" name="second_name" value="{{ old('second_name', $user->second_name) }}">
+                      </div>
+                      <div class="col-md-6">
+                        <label class="form-label" for="third_name">Tercer nombre</label>
+                        <input type="text" class="form-control" id="third_name" name="third_name" value="{{ old('third_name', $user->third_name) }}">
+                      </div>
+                      <div class="col-md-6">
+                        <label class="form-label" for="first_last_name">Primer apellido</label>
+                        <input type="text" class="form-control" id="first_last_name" name="first_last_name" value="{{ old('first_last_name', $user->first_last_name) }}">
+                      </div>
+                      <div class="col-md-6">
+                        <label class="form-label" for="second_last_name">Segundo apellido</label>
+                        <input type="text" class="form-control" id="second_last_name" name="second_last_name" value="{{ old('second_last_name', $user->second_last_name) }}">
+                      </div>
+                      <div class="col-md-6">
+                        <label class="form-label" for="married_last_name">Apellido de casada</label>
+                        <input type="text" class="form-control" id="married_last_name" name="married_last_name" value="{{ old('married_last_name', $user->married_last_name) }}">
                       </div>
                     </div>
 
                     <div class="row mb-4">
                       <div class="col-md-6">
+                        <label class="form-label" for="email">Correo electrónico</label>
+                        <input type="email" class="form-control" id="email" name="email" value="{{ old('email', $user->email) }}" required>
+                      </div>
+                      <div class="col-md-6">
                         <label class="form-label" for="phone">Teléfono</label>
                         <input type="text" class="form-control" id="phone" name="phone" value="{{ old('phone', $user->phone) }}">
                       </div>
+                    </div>
+
+                    <div class="row mb-4">
                       <div class="col-md-6">
                         <label class="form-label" for="department">Departamento</label>
                         <input type="text" class="form-control" id="department" name="department" value="{{ old('department', $user->department) }}">
                       </div>
                     </div>
 
-                    <div class="row mb-4">
                       <div class="col-md-6">
-                        <label class="form-label" for="company">Empresa</label>
-                        <input type="text" class="form-control" id="company" name="company" value="{{ old('company', $user->company) }}">
+                        <label class="form-label" for="address">Dirección</label>
+                        <input type="text" class="form-control" id="address" name="address" value="{{ old('address', $user->address) }}">
                       </div>
                       <div class="col-md-6">
-                        <label class="form-label" for="location">Ubicación</label>
-                        <input type="text" class="form-control" id="location" name="location" value="{{ old('location', $user->location) }}">
+                        <label class="form-label" for="birth_date">Fecha de nacimiento</label>
+                        <input type="date" class="form-control" id="birth_date" name="birth_date" value="{{ old('birth_date', $user->birth_date) }}">
                       </div>
-                    </div>
-
-                    <div class="mb-4">
-                      <label class="form-label" for="about">Acerca de</label>
-                      <textarea class="form-control" id="about" name="about" rows="4">{{ old('about', $user->about) }}</textarea>
+                      <div class="col-md-6">
+                        <label class="form-label" for="gender">Género</label>
+                        <select class="form-control" id="gender" name="gender">
+                          <option value="masculino" {{ old('gender', $user->gender) == 'masculino' ? 'selected' : '' }}>Masculino</option>
+                          <option value="femenino" {{ old('gender', $user->gender) == 'femenino' ? 'selected' : '' }}>Femenino</option>
+                        </select>
+                      </div>
                     </div>
 
                     <div class="d-flex justify-content-end gap-2">
@@ -204,7 +225,7 @@ document.addEventListener('DOMContentLoaded', function () {
 
             // Subir inmediatamente
             const formData = new FormData();
-            formData.append('profile_photo', file);
+            formData.append('profile_photo_path', file);
             formData.append('_token', document.querySelector('meta[name="csrf-token"]').getAttribute('content'));
 
             fetch('{{ route("profile.update-avatar") }}', {
@@ -273,7 +294,7 @@ document.addEventListener('DOMContentLoaded', function () {
 
             // Subir inmediatamente
             const formData = new FormData();
-            formData.append('banner_photo', file);
+            formData.append('banner_photo_path', file);
             formData.append('_token', document.querySelector('meta[name="csrf-token"]').getAttribute('content'));
 
             fetch('{{ route("profile.update-banner") }}', {
@@ -339,11 +360,8 @@ document.addEventListener('DOMContentLoaded', function () {
                 const label = avatarImg ? avatarImg.closest('.avatar-uploader') : null;
                 if (avatarImg && label) {
                     @php
-                        $nombreCompleto = $user->name ?? 'Usuario';
-                        $nombres = explode(' ', $nombreCompleto);
-                        $primerNombre = $nombres[0] ?? '';
-                        $segundoApellido = isset($nombres[2]) ? $nombres[2] : (isset($nombres[1]) ? $nombres[1] : '');
-                        $iniciales = strtoupper(substr($primerNombre, 0, 1) . substr($segundoApellido, 0, 1));
+                        $nombreCompleto = $user->first_name . ' ' . $user->first_last_name . ' ' . $user->second_last_name . ' ' . $user->married_last_name;
+                        $iniciales = strtoupper(substr($user->first_name, 0, 1) . substr($user->first_last_name, 0, 1) . substr($user->second_last_name, 0, 1) . substr($user->married_last_name, 0, 1));
                     @endphp
                     
                     // Agregar clase avatar-soft-primary al label

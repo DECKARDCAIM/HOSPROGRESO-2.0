@@ -194,7 +194,19 @@
                                      <button type="button" class="btn btn-ghost-secondary btn-icon rounded-circle"
                                          id="selectThemeDropdown" data-bs-toggle="dropdown" aria-expanded="false"
                                          data-bs-dropdown-animation>
-
+                                         @php
+                                             $userTheme =
+                                                 Auth::check() && Auth::user()->theme_preference
+                                                     ? Auth::user()->theme_preference
+                                                     : 'auto';
+                                             $iconMap = [
+                                                 'auto' => 'bi-moon-stars',
+                                                 'default' => 'bi-brightness-high',
+                                                 'dark' => 'bi-moon'
+                                             ];
+                                             $currentIcon = $iconMap[$userTheme] ?? $iconMap['auto'];
+                                         @endphp
+                                         <i class="{{ $currentIcon }}"></i>
                                      </button>
 
                                      <div class="dropdown-menu navbar-dropdown-menu navbar-dropdown-menu-borderless"

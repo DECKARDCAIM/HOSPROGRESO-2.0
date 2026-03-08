@@ -35,13 +35,23 @@ class ProfileController extends Controller
     public function update(Request $request)
     {
         $request->validate([
-            'name' => 'required|string|max:255',
+            'first_name' => 'required|string|max:255',
+            'second_name' => 'nullable|string|max:255',
+            'third_name' => 'nullable|string|max:255',
+            'first_last_name' => 'required|string|max:255',
+            'second_last_name' => 'nullable|string|max:255',
+            'married_last_name' => 'nullable|string|max:255',
+
             'email' => 'required|email|max:255|unique:users,email,' . Auth::id(),
-            'phone' => 'nullable|string|max:20',
+            'cui' => 'nullable|string|max:13|unique:users,cui,' . Auth::id(),
+            'nit' => 'nullable|string|max:9|unique:users,nit,' . Auth::id(),
+
+            'marital_status' => 'nullable|string|in:soltero,casado,divorciado,viudo,union_libre',
+            'phone' => 'nullable|string|max:8',
             'department' => 'nullable|string|max:255',
-            'company' => 'nullable|string|max:255',
-            'location' => 'nullable|string|max:255',
-            'about' => 'nullable|string',
+            'address' => 'nullable|string|max:255',
+            'birth_date' => 'nullable|date',
+            'gender' => 'nullable|string|in:masculino,femenino',
         ]);
 
         try {
@@ -50,13 +60,21 @@ class ProfileController extends Controller
             DB::table('users')
                 ->where('id', $user->id)
                 ->update([
-                    'name' => $request->name,
+                    'first_name' => $request->first_name,
+                    'second_name' => $request->second_name,
+                    'third_name' => $request->third_name,
+                    'first_last_name' => $request->first_last_name,
+                    'second_last_name' => $request->second_last_name,
+                    'married_last_name' => $request->married_last_name,
                     'email' => $request->email,
+                    'cui' => $request->cui,
+                    'nit' => $request->nit,
+                    'marital_status' => $request->marital_status,
                     'phone' => $request->phone,
                     'department' => $request->department,
-                    'company' => $request->company,
-                    'location' => $request->location,
-                    'about' => $request->about,
+                    'address' => $request->address,
+                    'birth_date' => $request->birth_date,
+                    'gender' => $request->gender,
                 ]);
             
             $user->refresh();
@@ -103,21 +121,20 @@ class ProfileController extends Controller
         }
 
         $request->validate([
-            'avatar' => 'nullable|image|mimes:jpeg,png,jpg',
-            'profile_photo' => 'nullable|image|mimes:jpeg,png,jpg'
+            'profile_photo_path' => 'nullable|image|mimes:jpeg,png,jpg'
         ]);
 
         try {
             $user = Auth::user();
             
             // Eliminar avatar anterior si existe
-            if ($user->avatar) {
+            if ($user->profile_photo_path) {
                 // Eliminar de storage
-                if (Storage::disk('public')->exists($user->avatar)) {
-                    Storage::disk('public')->delete($user->avatar);
+                if (Storage::disk('public')->exists($user->profile_photo_path)) {
+                    Storage::disk('public')->delete($user->profile_photo_path);
                 }
                 // Eliminar de public/storage
-                $oldFileName = basename($user->avatar);
+                $oldFileName = basename($user->profile_photo_path);
                 $oldPublicFile = public_path('storage/avatars/' . $oldFileName);
                 if (File::exists($oldPublicFile)) {
                     File::delete($oldPublicFile);
@@ -125,14 +142,14 @@ class ProfileController extends Controller
             }
 
             // Guardar nuevo avatar en storage
-            $avatarPath = $file->store('avatars', 'public');
+            $profilePhotoPath = $file->store('profile_photos', 'public');
             
             // Copiar también a public/storage para acceso directo
             $publicStoragePath = public_path('storage');
             if (!File::exists($publicStoragePath)) {
                 File::makeDirectory($publicStoragePath, 0755, true);
             }
-            $publicAvatarsPath = $publicStoragePath . '/avatars';
+            $publicProfilePhotosPath = $publicStoragePath . '/profile_photos';
             if (!File::exists($publicAvatarsPath)) {
                 File::makeDirectory($publicAvatarsPath, 0755, true);
             }
@@ -178,7 +195,7 @@ class ProfileController extends Controller
     public function updateBanner(Request $request)
     {
         // Validar que haya un archivo (puede ser 'banner' o 'banner_photo')
-        $file = $request->hasFile('banner') ? $request->file('banner') : $request->file('banner_photo');
+        $file = $request->hasFile('banner_photo_path') ? $request->file('banner_photo_path') : $request->file('banner_photo_path');
         
         if (!$file) {
             return response()->json([
@@ -188,18 +205,17 @@ class ProfileController extends Controller
         }
 
         $request->validate([
-            'banner' => 'nullable|image|mimes:jpeg,png,jpg',
-            'banner_photo' => 'nullable|image|mimes:jpeg,png,jpg'
+            'banner_photo_path' => 'nullable|image|mimes:jpeg,png,jpg'
         ]);
 
         try {
             $user = Auth::user();
             
             // Eliminar banner anterior si existe
-            if ($user->banner) {
+            if ($user->banner_photo_path) {
                 // Eliminar de storage
-                if (Storage::disk('public')->exists($user->banner)) {
-                    Storage::disk('public')->delete($user->banner);
+                if (Storage::disk('public')->exists($user->banner_photo_path)) {
+                    Storage::disk('public')->delete($user->banner_photo_path);
                 }
                 // Eliminar de public/storage
                 $oldFileName = basename($user->banner);
@@ -210,7 +226,7 @@ class ProfileController extends Controller
             }
 
             // Guardar nuevo banner en storage
-            $bannerPath = $file->store('banners', 'public');
+            $bannerPhotoPath = $file->store('banner_photos', 'public');
             
             // Copiar también a public/storage para acceso directo
             $publicStoragePath = public_path('storage');
@@ -265,13 +281,13 @@ class ProfileController extends Controller
         try {
             $user = Auth::user();
             
-            if ($user->avatar) {
+            if ($user->profile_photo_path) {
                 // Eliminar de storage
-                if (Storage::disk('public')->exists($user->avatar)) {
-                    Storage::disk('public')->delete($user->avatar);
+                if (Storage::disk('public')->exists($user->profile_photo_path)) {
+                    Storage::disk('public')->delete($user->profile_photo_path);
                 }
                 // Eliminar de public/storage
-                $oldFileName = basename($user->avatar);
+                $oldFileName = basename($user->profile_photo_path);
                 $oldPublicFile = public_path('storage/avatars/' . $oldFileName);
                 if (File::exists($oldPublicFile)) {
                     File::delete($oldPublicFile);
@@ -282,15 +298,14 @@ class ProfileController extends Controller
             DB::table('users')
                 ->where('id', $user->id)
                 ->update([
-                    'avatar' => null,
-                    'avatar_url' => null
+                    'profile_photo_path' => null
                 ]);
             
             $user->refresh();
 
             return response()->json([
                 'success' => true,
-                'message' => 'Avatar eliminado correctamente'
+                'message' => 'Foto de perfil eliminada correctamente'
             ]);
         } catch (\Exception $e) {
             \Log::error('Error al eliminar avatar: ' . $e->getMessage());
@@ -309,10 +324,10 @@ class ProfileController extends Controller
         try {
             $user = Auth::user();
             
-            if ($user->banner) {
+            if ($user->banner_photo_path) {
                 // Eliminar de storage
-                if (Storage::disk('public')->exists($user->banner)) {
-                    Storage::disk('public')->delete($user->banner);
+                if (Storage::disk('public')->exists($user->banner_photo_path)) {
+                    Storage::disk('public')->delete($user->banner_photo_path);
                 }
                 // Eliminar de public/storage
                 $oldFileName = basename($user->banner);
@@ -326,8 +341,7 @@ class ProfileController extends Controller
             DB::table('users')
                 ->where('id', $user->id)
                 ->update([
-                    'banner' => null,
-                    'banner_url' => null
+                    'banner_photo_path' => null
                 ]);
             
             $user->refresh();

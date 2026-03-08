@@ -8,8 +8,8 @@
           <div class="profile-cover">
             <div class="profile-cover-img-wrapper" style="position: relative;">
               <img id="profileCoverImg" class="profile-cover-img" 
-                   src="{{ $user->banner_url ?? ($user->banner ? asset('storage/banners/' . basename($user->banner)) : asset('img/1920x400/img2.jpg')) }}"
-                   data-src="{{ $user->banner_url ?? ($user->banner ? asset('storage/banners/' . basename($user->banner)) : asset('img/1920x400/img2.jpg')) }}"
+                   src="{{ $user->banner_url ?? ($user->banner_photo_path ? asset('storage/banner_photos/' . basename($user->banner_photo_path)) : asset('img/1920x400/img2.jpg')) }}"
+                   data-src="{{ $user->banner_url ?? ($user->banner_photo_path ? asset('storage/banner_photos/' . basename($user->banner_photo_path)) : asset('img/1920x400/img2.jpg')) }}"
                    alt="Image Description"
                    onerror="this.onerror=null; retryImageLoad(this);">
               <div class="image-loading-placeholder" id="banner-loading" style="position: absolute; top: 0; left: 0; right: 0; bottom: 0; display: flex; align-items: center; justify-content: center; background: #f8f9fa; z-index: 1;">
@@ -22,20 +22,16 @@
 
           <div class="text-center mb-5">
             @php
-              $nombreCompleto = $user->name ?? 'Usuario';
-              $nombres = explode(' ', $nombreCompleto);
-              $primerNombre = $nombres[0] ?? '';
-              $segundoApellido = isset($nombres[2]) ? $nombres[2] : (isset($nombres[1]) ? $nombres[1] : '');
-              $iniciales = strtoupper(substr($primerNombre, 0, 1) . substr($segundoApellido, 0, 1));
+              $nombreCompleto = $user->first_name . ' ' . $user->first_last_name . ' ' . $user->second_last_name . ' ' . $user->married_last_name;
+              $iniciales = strtoupper(substr($user->first_name, 0, 1) . substr($user->first_last_name, 0, 1) . substr($user->second_last_name, 0, 1) . substr($user->married_last_name, 0, 1));
             @endphp
-            @if($user->avatar_url || $user->avatar)
+            @if($user->profile_photo_path || $user->profile_photo_path)
               <div class="avatar avatar-xxl avatar-circle profile-cover-avatar" style="position: relative;">
                 <img class="avatar-img" id="profile-avatar-img" 
-                     src="{{ $user->avatar_url ?? asset('storage/avatars/' . basename($user->avatar)) }}"
-                     data-src="{{ $user->avatar_url ?? asset('storage/avatars/' . basename($user->avatar)) }}"
+                     src="{{ $user->profile_photo_path ?? asset('storage/profile_photos/' . basename($user->profile_photo_path)) }}"
+                     data-src="{{ $user->profile_photo_path ?? asset('storage/profile_photos/' . basename($user->profile_photo_path)) }}"
                      alt="Image Description"
-                     onerror="this.onerror=null; retryImageLoad(this);"
-                     onload="hideAvatarLoading();">
+                     onerror="this.onerror=null; retryImageLoad(this);">
                 <div class="image-loading-placeholder" id="avatar-loading" style="position: absolute; top: 0; left: 0; right: 0; bottom: 0; display: flex; align-items: center; justify-content: center; background: #f8f9fa; border-radius: 50%; z-index: 1;">
                   <div class="spinner-border spinner-border-sm text-primary" role="status">
                     <span class="visually-hidden">Cargando...</span>
@@ -48,36 +44,44 @@
               </div>
             @endif
 
-            <h1 class="page-header-title">{{ $user->name }} <i class="bi-patch-check-fill fs-2 text-primary" data-bs-toggle="tooltip" data-bs-placement="top" title="Administrador"></i></h1>
+            <h1 class="page-header-title">{{ $nombreCompleto }} <i class="bi-patch-check-fill fs-2 text-primary" data-bs-toggle="tooltip" data-bs-placement="top" title="Administrador"></i></h1>
 
             <ul class="list-inline list-px-2">
-              @if($user->company)
+              @if($user->department)
               <li class="list-inline-item">
                 <i class="bi-building me-1"></i>
-                <span>{{ $user->company }}</span>
+                <span>{{ $user->department }}</span>
               </li>
               @endif
 
-              @if($user->location)
+              @if($user->address)
               <li class="list-inline-item">
                 <i class="bi-geo-alt me-1"></i>
-                <span>{{ $user->location }}</span>
+                <span>{{ $user->address }}</span>
               </li>
               @endif
 
               <li class="list-inline-item">
-                <i class="bi-calendar-week me-1"></i>
-                @php
-                  $meses = [
-                    1 => 'enero', 2 => 'febrero', 3 => 'marzo', 4 => 'abril',
-                    5 => 'mayo', 6 => 'junio', 7 => 'julio', 8 => 'agosto',
-                    9 => 'septiembre', 10 => 'octubre', 11 => 'noviembre', 12 => 'diciembre'
-                  ];
-                  $mes = $meses[$user->created_at->format('n')];
-                  $ano = $user->created_at->format('Y');
-                @endphp
-                <span>Se unió {{ ucfirst($mes) . ' ' . $ano }}</span>
-              </li>
+    <i class="bi-calendar-week me-1"></i>
+
+    @if($user->birth_date)
+        @php
+            $meses = [
+                1 => 'enero', 2 => 'febrero', 3 => 'marzo', 4 => 'abril',
+                5 => 'mayo', 6 => 'junio', 7 => 'julio', 8 => 'agosto',
+                9 => 'septiembre', 10 => 'octubre', 11 => 'noviembre', 12 => 'diciembre'
+            ];
+
+            $mes = $meses[$user->birth_date->format('n')];
+            $ano = $user->birth_date->format('Y');
+        @endphp
+
+        <span>Se unió {{ ucfirst($mes) . ' ' . $ano }}</span>
+    @else
+        <span>Fecha no registrada</span>
+    @endif
+</li>
+
             </ul>
           </div>
 
@@ -156,7 +160,7 @@
                 <div class="card-body">
                   <ul class="list-unstyled list-py-2 text-dark mb-0">
                     <li class="pb-0"><span class="card-subtitle">Acerca de</span></li>
-                    <li><i class="bi-person dropdown-item-icon"></i> {{ $user->name }}</li>
+                    <li><i class="bi-person dropdown-item-icon"></i> {{ $nombreCompleto }}</li>
                     <li><i class="bi-briefcase dropdown-item-icon"></i> {{ $user->department ?? 'Sin departamento' }}</li>
                     @if($user->company)
                     <li><i class="bi-building dropdown-item-icon"></i> {{ $user->company }}</li>
