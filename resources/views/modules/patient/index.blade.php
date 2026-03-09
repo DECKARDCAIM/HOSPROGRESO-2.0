@@ -1,4 +1,5 @@
 @extends('layouts.panel')
+@section('title', 'Listado de Pacientes')
 
 @section('content')
     <main id="content" role="main" class="main">
@@ -29,11 +30,11 @@
                 <div class="col-sm-6 col-lg-3 mb-3 mb-lg-5">
                     <div class="card h-100">
                         <div class="card-body">
-                            <h6 class="card-subtitle mb-2">Pacientes Activos</h6>
+                            <h6 class="card-subtitle mb-2">Pacientes en Total</h6>
 
                             <div class="row align-items-center gx-2">
                                 <div class="col">
-                                    <span class="js-counter display-4 text-dark">{{ $activePatients ?? 0 }}</span>
+                                    <span class="js-counter display-4 text-dark">{{ $totalPatients ?? 0 }}</span>
                                 </div>
                             </div>
                         </div>
@@ -43,10 +44,12 @@
                 <div class="col-sm-6 col-lg-3 mb-3 mb-lg-5">
                     <div class="card h-100">
                         <div class="card-body">
-                            <h6 class="card-subtitle mb-2">Pacientes Pendientes de Migración</h6>
+                            <h6 class="card-subtitle mb-2">Pacientes Registrados Hoy</h6>
                             <div class="row align-items-center gx-2">
                                 <div class="col">
-                                    <span class="js-counter display-4 text-dark">{{ $pendingMigrationPatients ?? 0 }}</span>
+                                    <span class="js-counter display-4 text-dark">
+                                        {{ $todayPatients ?? 0 }}
+                                    </span>
                                 </div>
                             </div>
                         </div>
@@ -60,7 +63,7 @@
 
                             <div class="row align-items-center gx-2">
                                 <div class="col">
-                                    <span class="js-counter display-4 text-dark">{{ $maleCount ?? 0 }}</span>
+                                    <span class="js-counter display-4 text-dark">{{ $malePercentage ?? 0 }}</span>
                                     <span class="display-4 text-dark">%</span>
                                 </div>
                             </div>
@@ -75,7 +78,7 @@
 
                             <div class="row align-items-center gx-2">
                                 <div class="col">
-                                    <span class="js-counter display-4 text-dark">{{ $femaleCount ?? 0 }}</span>
+                                    <span class="js-counter display-4 text-dark">{{ $femalePercentage ?? 0 }}</span>
                                     <span class="display-4 text-dark">%</span>
                                 </div>
                             </div>

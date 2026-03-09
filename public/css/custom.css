@@ -1,0 +1,10 @@
+/* Custom warning color requested by user */
+.bg-warning-custom {
+    background-color: #ffc107 !important;
+    border-color: #ffc107 !important;
+}
+.avatar-status-warning-custom {
+    background-color: #ffc107 !important;
+    border: 2px solid #fff;
+    border-radius: 50%;
+}

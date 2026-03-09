@@ -5,11 +5,14 @@
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
     <meta name="csrf-token" content="{{ csrf_token() }}">
-    <title>{{ config('app.name', 'Sistema de Gestión de Inventarios y Solicitudes de Mantenimiento') }}</title>
+    <link rel="icon" type="image/png" href="{{ asset('img/logo.png') }}">
+    <link rel="apple-touch-icon" href="{{ asset('img/logo.png') }}">
+    <title>{{ config('app.name') }} - @yield('title')</title>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="{{ asset('vendor/bootstrap-icons/font/bootstrap-icons.css') }}">
-    <link rel="stylesheet" href="{{ asset('css/theme.min.css') }}" data-hs-appearance="default">
-    <link rel="stylesheet" href="{{ asset('css/theme-dark.min.css') }}" data-hs-appearance="dark">
+    <link rel="preload" href="{{ asset('css/theme.min.css') }}" data-hs-appearance="default" as="style">
+    <link rel="preload" href="{{ asset('css/theme-dark.min.css') }}" data-hs-appearance="dark" as="style">
+    <link rel="stylesheet" href="{{ asset('css/custom.css') }}">
     @yield('styles')
 
     <style data-hs-appearance-onload-styles>
@@ -126,11 +129,6 @@
   <script src="{{ asset('vendor/hs-navbar-vertical-aside/dist/hs-navbar-vertical-aside.min.js') }}"></script>
   <script src="{{ asset('vendor/hs-form-search/dist/hs-form-search.min.js') }}"></script>
   <script src="{{ asset('js/theme.min.js') }}"></script>
-<<<<<<< Updated upstream:resources/views/layouts/panel.blade.php
-  <script src="{{ asset('js/hs.theme-appearance-charts.js') }}"></script>
-  @stack('scripts')
-=======
->>>>>>> Stashed changes:resources/views/layouts/app.blade.php
 
   <script>
     (function() {
@@ -304,7 +302,7 @@
         const ESTADOS = {
             disponible: { color: 'success', label: 'Disponible' },
             ocupado:    { color: 'danger',  label: 'Ocupado' },
-            ausente:    { color: 'warning', label: 'Ausente' },
+            ausente:    { color: 'warning-custom', label: 'Ausente' },
             privado:    { color: 'secondary', label: 'Privado' }
         };
 
@@ -313,19 +311,15 @@
         const $avatar     = $('#avatar-status-indicator');
         const $dropdown   = $('.navbar-dropdown-sub-menu');
 
-        const BG_CLASSES     = 'bg-success bg-danger bg-warning bg-secondary';
-        const AVATAR_CLASSES = 'avatar-status-success avatar-status-danger avatar-status-warning avatar-status-secondary';
+        const BG_CLASSES     = 'bg-success bg-danger bg-warning bg-warning-custom bg-secondary';
+        const AVATAR_CLASSES = 'avatar-status-success avatar-status-danger avatar-status-warning avatar-status-warning-custom avatar-status-secondary';
 
         function updateEstadoUI(estado) {
             const cfg = ESTADOS[estado];
 
             $legend
                 .removeClass(BG_CLASSES)
-                .addClass(`bg-${cfg.color}`)
-                .css(cfg.color === 'warning'
-                    ? { backgroundColor: '#ffc107', borderColor: '#ffc107' }
-                    : {}
-                );
+                .addClass(`bg-${cfg.color}`);
 
             $toggle.find('span:last').text(cfg.label);
 
@@ -377,5 +371,6 @@
     });
   </script>
 
+@stack('scripts')
 </body>
 </html>

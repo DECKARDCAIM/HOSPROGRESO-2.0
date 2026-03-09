@@ -34,7 +34,7 @@
                 </button>
 
                 <div id="searchDropdownMenu"
-                    class="hs-form-search-menu-content dropdown-menu dropdown-menu-form-search navbar-dropdown-menu-borderless">
+                    class="hs-form-search-menu-content dropdown-menu dropdown-menu-form-search navbar-dropdown-menu-borderless bg-white">
                     <div class="card">
                         <div class="card-body-height">
                             <div class="d-lg-none">
@@ -674,7 +674,7 @@
                                     $estadoAvatarColors = [
                                         'disponible' => 'success',
                                         'ocupado' => 'danger',
-                                        'ausente' => 'warning',
+                                        'ausente' => 'warning-custom',
                                         'privado' => 'secondary'
                                     ];
                                     $nombreCompleto = $user->name ?? 'Usuario';
@@ -697,7 +697,7 @@
                             </div>
                         </a>
 
-                        <div class="dropdown-menu dropdown-menu-end navbar-dropdown-menu navbar-dropdown-menu-borderless navbar-dropdown-account"
+                        <div class="dropdown-menu dropdown-menu-end navbar-dropdown-menu navbar-dropdown-menu-borderless navbar-dropdown-account bg-white"
                             aria-labelledby="accountNavbarDropdown" style="width: 16rem;">
                             <div class="dropdown-item-text">
                                 <div class="d-flex align-items-center">
@@ -748,12 +748,11 @@
                                         $estadoColors = [
                                             'disponible' => 'success',
                                             'ocupado' => 'danger',
-                                            'ausente' => 'warning',
+                                            'ausente' => 'warning-custom',
                                             'privado' => 'secondary'
                                         ];
                                     @endphp
-                                    <span class="legend-indicator bg-{{ $estadoColors[$estadoActual] }} ms-2" 
-                                          @if($estadoColors[$estadoActual] === 'warning') style="background-color: #ffc107 !important; border-color: #ffc107 !important;" @endif></span>
+                                    <span class="legend-indicator bg-{{ $estadoColors[$estadoActual] }} ms-2"></span>
                                     <span class="ms-1">{{ $estadoLabels[$estadoActual] }}</span>
                                 </a>
 
@@ -778,7 +777,7 @@
                                     <a class="dropdown-item estado-option {{ $estadoActual === 'ausente' ? 'active' : '' }}" 
                                        href="javascript:;" 
                                        data-estado="ausente">
-                                        <span class="legend-indicator bg-warning me-1" style="background-color: #ffc107 !important; border-color: #ffc107 !important;"></span> Ausente
+                                        <span class="legend-indicator bg-warning-custom me-1"></span> Ausente
                                         @if($estadoActual === 'ausente')
                                             <i class="bi-check-lg float-end"></i>
                                         @endif

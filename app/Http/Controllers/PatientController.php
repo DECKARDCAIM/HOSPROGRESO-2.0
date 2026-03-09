@@ -31,7 +31,8 @@ class PatientController extends Controller
             'linguisticCommunity',
             'country',
             'department',
-            'municipality'
+            'municipality',
+            'relatives'
         ]);
 
         // Aplicar filtros de búsqueda
@@ -91,17 +92,20 @@ class PatientController extends Controller
 
         // Estadísticas
         $totalPatients = Patient::count();
-        $activePatients = Patient::count(); // Todos están activos si no están eliminados
         $todayPatients = Patient::whereDate('created_at', today())->count();
-        
+
         // Estadísticas por género
-        $maleCount = Patient::whereHas('gender', function($q) {
-            $q->where('code', 'M');
-        })->count();
-        $femaleCount = Patient::whereHas('gender', function($q) {
-            $q->where('code', 'F');
-        })->count();
-        $genderPercentage = $totalPatients > 0 ? round(($maleCount / $totalPatients) * 100, 1) : 0;
+        $genderStats = Patient::selectRaw('gender_id, COUNT(*) as total')
+            ->groupBy('gender_id')
+            ->pluck('total','gender_id');
+        $maleCount = $genderStats[1] ?? 0;
+        $femaleCount = $genderStats[2] ?? 0;
+        $malePercentage = $totalPatients > 0
+            ? round(($maleCount / $totalPatients) * 100, 1)
+            : 0;
+        $femalePercentage = $totalPatients > 0
+            ? round(($femaleCount / $totalPatients) * 100, 1)
+            : 0;
 
         // Cargar catálogos para filtros
         $countries = Country::where('is_active', true)->orderBy('name')->get();
@@ -140,9 +144,9 @@ class PatientController extends Controller
             'ethnicities',
             'linguisticCommunities',
             'totalPatients',
-            'activePatients',
             'todayPatients',
-            'genderPercentage'
+            'malePercentage',
+            'femalePercentage'
         ));
     }
 
@@ -185,9 +189,9 @@ class PatientController extends Controller
             
             // Si es menor de edad, validar que los datos de la madre estén presentes
             if ($age < 18) {
-                if (empty($validated['mother_first_name']) || empty($validated['mother_first_last_name'])) {
+                if (empty($request->mother)) {
                     return back()->withErrors([
-                        'birth_date' => 'Para menores de edad, los datos de la madre son obligatorios.'
+                        'mother' => 'Debe registrar la madre del paciente menor de edad.'
                     ])->withInput();
                 }
             }
@@ -428,7 +432,8 @@ class PatientController extends Controller
             'linguisticCommunity',
             'country',
             'department',
-            'municipality'
+            'municipality',
+            'relatives'
         ]);
 
         // Aplicar mismos filtros que en index

@@ -1,4 +1,5 @@
 @extends('layouts.panel')
+@section('title', ' Mi Perfil')
 
 @section('content')
 <main id="content" role="main" class="main">

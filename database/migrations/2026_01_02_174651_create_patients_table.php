@@ -10,7 +10,10 @@ return new class extends Migration
     {
         Schema::create('patients', function (Blueprint $table) {
             $table->id();
-            
+
+            // Expediente clínico
+            $table->string('clinical_record_number')->unique();
+
             // Datos personales
             $table->string('first_name')->nullable();
             $table->string('second_name')->nullable();
@@ -18,41 +21,32 @@ return new class extends Migration
             $table->string('first_last_name')->nullable();
             $table->string('second_last_name')->nullable();
             $table->string('married_last_name')->nullable();
+            $table->string('email')->nullable()->unique();
+            $table->string('phone', 8)->nullable();
+
             $table->string('dpi', 20)->unique()->nullable();
             $table->date('birth_date')->nullable();
-            
-            // Relaciones con catálogos
-            $table->foreignId('gender_id')->nullable()->constrained('genders')->onDelete('set null');
-            $table->foreignId('civil_status_id')->nullable()->constrained('civil_statuses')->onDelete('set null');
-            $table->foreignId('ethnicity_id')->nullable()->constrained('ethnicities')->onDelete('set null');
-            $table->foreignId('linguistic_community_id')->nullable()->constrained('linguistic_communities')->onDelete('set null');
-            
+
+            // Relaciones
+            $table->foreignId('gender_id')->nullable()->constrained('genders')->nullOnDelete();
+            $table->foreignId('civil_status_id')->nullable()->constrained('civil_statuses')->nullOnDelete();
+            $table->foreignId('ethnicity_id')->nullable()->constrained('ethnicities')->nullOnDelete();
+            $table->foreignId('linguistic_community_id')->nullable()->constrained('linguistic_communities')->nullOnDelete();
+
             // Otros datos
             $table->string('education')->nullable();
             $table->string('occupation')->nullable();
-            
-            // Dirección
-            $table->foreignId('country_id')->nullable()->constrained('countries')->onDelete('set null');
-            $table->foreignId('department_id')->nullable()->constrained('departments')->onDelete('set null');
-            $table->foreignId('municipality_id')->nullable()->constrained('municipalities')->onDelete('set null');
-            $table->string('place')->nullable();
-            
-            // Datos de la madre (para menores de edad)
-            $table->string('mother_first_name')->nullable();
-            $table->string('mother_second_name')->nullable();
-            $table->string('mother_third_name')->nullable();
-            $table->string('mother_first_last_name')->nullable();
-            $table->string('mother_second_last_name')->nullable();
-            $table->string('mother_married_last_name')->nullable();
-            $table->string('mother_dpi', 20)->nullable();
 
-            // Soft delete (eliminación lógica)
+            // Dirección
+            $table->foreignId('country_id')->nullable()->constrained('countries')->nullOnDelete();
+            $table->foreignId('department_id')->nullable()->constrained('departments')->nullOnDelete();
+            $table->foreignId('municipality_id')->nullable()->constrained('municipalities')->nullOnDelete();
+            $table->string('place')->nullable();
+
             $table->softDeletes();
-            
             $table->timestamps();
-            
-            // Índices para búsquedas y filtros
-            $table->index('dpi');
+
+            // Índices
             $table->index('birth_date');
             $table->index('gender_id');
             $table->index('civil_status_id');
@@ -61,11 +55,17 @@ return new class extends Migration
             $table->index('country_id');
             $table->index('department_id');
             $table->index('municipality_id');
-            
-            // Índices compuestos para búsquedas complejas
-            $table->index(['gender_id', 'country_id']);
-            $table->index(['department_id', 'municipality_id']);
-            $table->index(['first_name', 'first_last_name']);
+            $table->index('email');
+            $table->index('phone');
+
+            $table->index(['first_last_name','second_last_name']);
+
+            $table->fullText([
+                'first_name',
+                'second_name',
+                'first_last_name',
+                'second_last_name'
+            ]);
         });
     }
 
