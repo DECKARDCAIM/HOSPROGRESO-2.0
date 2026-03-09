@@ -11,8 +11,7 @@ return new class extends Migration
         Schema::create('patients', function (Blueprint $table) {
             $table->id();
 
-            // Expediente clínico
-            $table->string('clinical_record_number')->unique();
+            // Expediente clínico se movió a su propia tabla
 
             // Datos personales
             $table->string('first_name')->nullable();
@@ -65,7 +64,7 @@ return new class extends Migration
                 'second_name',
                 'first_last_name',
                 'second_last_name'
-            ]);
+            ], 'patients_names_fulltext');
         });
     }
 

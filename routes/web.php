@@ -39,6 +39,9 @@ Route::middleware('auth')->group(function () {
     // Rutas AJAX para ubicaciones
     Route::get('/patients/get-departments-by-country', [PatientController::class, 'getDepartmentsByCountry'])->name('patients.get-departments-by-country');
     Route::get('/patients/get-municipalities-by-department', [PatientController::class, 'getMunicipalitiesByDepartment'])->name('patients.get-municipalities-by-department');
+    // Rutas AJAX para familiares
+    Route::get('/patients/relatives/search', [PatientController::class, 'searchRelatives'])->name('patients.relatives.search');
+    Route::post('/patients/relatives/store-ajax', [PatientController::class, 'storeRelativeAjax'])->name('patients.relatives.store-ajax');
     // Rutas Resource de Pacientes
     Route::resource('patients', PatientController::class);
     Route::get('/patients/export/excel', [PatientController::class, 'exportExcel'])->name('patients.export.excel');

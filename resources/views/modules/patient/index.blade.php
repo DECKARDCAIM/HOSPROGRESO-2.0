@@ -398,6 +398,8 @@
                                 <th>Nombre</th>
                                 <th>Nacimiento</th>
                                 <th>Edad</th>
+                                <th>Expediente</th>
+                                <th>Género</th>
                                 <th>Género</th>
                                 <th>Departamento</th>
                                 <th>Municipio</th>
@@ -434,6 +436,15 @@
                                     </td>
                                     <td>{{ $patient->birth_date ? $patient->birth_date->format('d/m/Y') : '-' }}</td>
                                     <td>{{ $patient->age ?: '-' }}</td>
+                                    <td>
+                                        @if($patient->clinicalRecord)
+                                            <span class="badge bg-soft-info text-info">
+                                                <i class="bi-folder2-open me-1"></i> {{ $patient->clinicalRecord->record_number }}
+                                            </span>
+                                        @else
+                                            <span class="badge bg-soft-secondary text-secondary">Sin Expediente</span>
+                                        @endif
+                                    </td>
                                     <td>{{ $patient->gender ? $patient->gender->name : '-' }}</td>
                                     <td>{{ $patient->department ? $patient->department->name : '-' }}</td>
                                     <td>{{ $patient->municipality ? $patient->municipality->name : '-' }}</td>
@@ -472,7 +483,8 @@
                                 </tr>
                             @empty
                                 <tr>
-                                    <td colspan="8" class="text-center py-4">
+                                    <td colspan="9" class="text-center py-5">
+                                        <img class="mb-3" src="{{ asset('assets/svg/illustrations/oc-error.svg') }}" alt="Image Description" style="width: 10rem;" data-hs-theme-appearance="default">
                                         <p class="text-muted mb-0">No hay pacientes registrados</p>
                                     </td>
                                 </tr>

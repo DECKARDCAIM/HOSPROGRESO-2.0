@@ -25,6 +25,7 @@ class PatientController extends Controller
     public function index(Request $request)
     {
         $query = Patient::with([
+            'clinicalRecord',
             'gender',
             'civilStatus',
             'ethnicity',
@@ -197,7 +198,54 @@ class PatientController extends Controller
             }
         }
 
-        $patient = Patient::create($validated);
+        // Se usa una transacción para asegurar que ambos registros se creen exitosamente
+        \Illuminate\Support\Facades\DB::transaction(function () use ($validated, $request) {
+            $patient = Patient::create($validated);
+            
+            // Generar número de expediente automático: EXP-AÑO-MES-CORRELATIVO
+            $year = date('Y');
+            $month = date('m');
+            
+            // Buscar el último correlativo de ese mes y año
+            $lastRecord = \App\Models\ClinicalRecord::whereYear('created_at', $year)
+                ->whereMonth('created_at', $month)
+                ->orderBy('id', 'desc')
+                ->first();
+                
+            $correlative = 1;
+            if ($lastRecord) {
+                // Extraer el correlativo actual y sumarle 1
+                $parts = explode('-', $lastRecord->record_number);
+                if (count($parts) == 4) {
+                    $correlative = intval($parts[3]) + 1;
+                } else {
+                    $correlative = \App\Models\ClinicalRecord::whereYear('created_at', $year)->whereMonth('created_at', $month)->count() + 1;
+                }
+            }
+            
+            $paddedCorrelative = str_pad($correlative, 4, '0', STR_PAD_LEFT);
+            $newRecordNumber = "EXP-{$year}-{$month}-{$paddedCorrelative}";
+            
+            $patient->clinicalRecord()->create([
+                'record_number' => $newRecordNumber
+            ]);
+            
+            // Guardar familiares dinámicos
+            if ($request->has('relatives') && is_array($request->input('relatives'))) {
+                foreach ($request->input('relatives') as $relativeData) {
+                    $patient->relatives()->create([
+                        'relationship' => $relativeData['relationship'],
+                        'first_name' => $relativeData['first_name'],
+                        'second_name' => $relativeData['second_name'] ?? null,
+                        'third_name' => $relativeData['third_name'] ?? null,
+                        'first_last_name' => $relativeData['first_last_name'],
+                        'second_last_name' => $relativeData['second_last_name'] ?? null,
+                        'married_last_name' => $relativeData['married_last_name'] ?? null,
+                        'dpi' => $relativeData['dpi'] ?? null,
+                    ]);
+                }
+            }
+        });
 
         return redirect()->route('patients.index')
             ->with('success', 'Paciente registrado exitosamente.');
@@ -426,6 +474,7 @@ class PatientController extends Controller
     private function buildExportQuery(Request $request)
     {
         $query = Patient::with([
+            'clinicalRecord',
             'gender',
             'civilStatus',
             'ethnicity',
@@ -505,5 +554,88 @@ class PatientController extends Controller
             ->get();
 
         return response()->json($municipalities);
+    }
+
+    /**
+     * Buscar familiares existentes por nombre o DPI (para AJAX)
+     */
+    public function searchRelatives(Request $request)
+    {
+        $term = $request->input('term', '');
+        
+        if (strlen($term) < 2) {
+            return response()->json([]);
+        }
+
+        // Dividir el término de búsqueda por palabras para permitir búsqueda en cualquier orden
+        $words = explode(' ', $term);
+        $words = array_filter($words); // Eliminar espacios vacíos
+
+        $query = \App\Models\PatientRelative::query();
+
+        foreach ($words as $word) {
+            $query->where(function ($q) use ($word) {
+                $q->where('first_name', 'like', "%{$word}%")
+                  ->orWhere('second_name', 'like', "%{$word}%")
+                  ->orWhere('third_name', 'like', "%{$word}%")
+                  ->orWhere('first_last_name', 'like', "%{$word}%")
+                  ->orWhere('second_last_name', 'like', "%{$word}%")
+                  ->orWhere('married_last_name', 'like', "%{$word}%")
+                  ->orWhere('dpi', 'like', "%{$word}%");
+            });
+        }
+
+        $results = $query
+            ->select('id', 'first_name', 'second_name', 'first_last_name', 'second_last_name', 'married_last_name', 'dpi')
+            ->limit(10)
+            ->get()
+            ->map(function ($r) {
+                $name = trim("{$r->first_name} {$r->second_name} {$r->first_last_name} {$r->second_last_name}");
+                return [
+                    'id'                => $r->id,
+                    'name'              => $name,
+                    'dpi'               => $r->dpi,
+                    'first_name'        => $r->first_name,
+                    'second_name'       => $r->second_name,
+                    'first_last_name'   => $r->first_last_name,
+                    'second_last_name'  => $r->second_last_name,
+                    'married_last_name' => $r->married_last_name,
+                ];
+            });
+
+        return response()->json($results);
+    }
+
+    /**
+     * Crear un familiar en tiempo real (sin salir del formulario)
+     */
+    public function storeRelativeAjax(Request $request)
+    {
+        $request->validate([
+            'first_name'      => 'required|string|max:100',
+            'first_last_name' => 'required|string|max:100',
+        ]);
+
+        // Se guarda temporalmente sin patient_id (se asociará al guardar el paciente)
+        // Usamos una instancia no persistida y la devolvemos al cliente:
+        $data = [
+            'first_name'       => $request->input('first_name'),
+            'second_name'      => $request->input('second_name'),
+            'first_last_name'  => $request->input('first_last_name'),
+            'second_last_name' => $request->input('second_last_name'),
+            'dpi'              => $request->input('dpi'),
+        ];
+        $name = trim("{$data['first_name']} {$data['second_name']} {$data['first_last_name']} {$data['second_last_name']}");
+
+        // Devolvemos el registro para que el frontend pueda seleccionarlo automáticamente
+        return response()->json([
+            'id'        => null, // no persisted yet
+            'name'      => $name,
+            'dpi'       => $data['dpi'],
+            'first_name'       => $data['first_name'],
+            'second_name'      => $data['second_name'],
+            'first_last_name'  => $data['first_last_name'],
+            'second_last_name' => $data['second_last_name'],
+        ]);
     }
 }

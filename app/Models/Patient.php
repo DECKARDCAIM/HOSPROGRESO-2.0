@@ -18,6 +18,8 @@ class Patient extends Model
         'first_last_name',
         'second_last_name',
         'married_last_name',
+        'email',
+        'phone',
         'dpi',
         'birth_date',
         'gender_id',
@@ -39,6 +41,22 @@ class Patient extends Model
         'mother_married_last_name',
         'mother_dpi',
     ];
+
+    /**
+     * Get the clinical record associated with the patient.
+     */
+    public function clinicalRecord()
+    {
+        return $this->hasOne(ClinicalRecord::class);
+    }
+
+    /**
+     * Get the relatives for the patient.
+     */
+    public function relatives()
+    {
+        return $this->hasMany(PatientRelative::class);
+    }
 
     protected $casts = [
         'birth_date' => 'date',
