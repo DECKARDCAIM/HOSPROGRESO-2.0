@@ -4,11 +4,13 @@
 @section('content')
     <main id="content" role="main" class="main">
         <div class="content container-fluid">
+
             <form id="addPatientForm" action="{{ route('patients.store') }}" method="POST" class="js-step-form py-md-5"
                 data-hs-step-form-options='{"progressSelector": "#addUserStepFormProgress","stepsSelector": "#addUserStepFormContent","endSelector": "#addUserFinishBtn","isValidate": false}'>
                 @csrf
                 <div class="row justify-content-lg-center">
                     <div class="col-lg-8">
+
                         <ul id="addUserStepFormProgress"
                             class="js-step-progress step step-sm step-icon-sm step step-inline step-item-between mb-3 mb-md-5">
                             <li class="step-item">
@@ -36,7 +38,7 @@
                                     data-hs-step-form-next-options='{"targetSelector": "#addUserStepFamily"}'>
                                     <span class="step-icon step-icon-soft-dark">3</span>
                                     <div class="step-content">
-                                        <span class="step-title">Datos de Contacto / Familiares</span>
+                                        <span class="step-title">Datos de Familiares</span>
                                     </div>
                                 </a>
                             </li>
@@ -50,7 +52,6 @@
                                     </div>
                                 </a>
                             </li>
-
                         </ul>
 
                         <div id="addUserStepFormContent">
@@ -67,6 +68,12 @@
                                                     value="Generado automáticamente al guardar (EXP-AÑO-MES-CORRELATIVO)"
                                                     readonly disabled>
                                             </div>
+                                        </div>
+                                    </div>
+
+                                    <div class="row mb-4">
+                                        <div class="col-sm-12">
+                                            <hr>
                                         </div>
                                     </div>
 
@@ -110,124 +117,187 @@
                                         </div>
                                     </div>
 
-                                    <div class="row mb-4">
-                                        <label for="dpiLabel" class="col-sm-3 col-form-label form-label">DPI <i
-                                                class="bi-question-circle text-body ms-1" data-bs-toggle="tooltip"
-                                                data-bs-placement="top" title="Rellene el DPI del paciente"></i></label>
-                                        <div class="col-sm-9">
-                                            <input type="text" class="js-input-mask form-control" name="dpi"
-                                                id="dpiLabel" placeholder="0000 00000 0000" aria-label="DPI"
-                                                data-hs-mask-options='{"mask": "0000 00000 0000"}'>
+                                    <div class="row mb-12">
+                                        <div class="row mb-3">
+                                            <div class="col-md-6">
+                                                <label for="dpiLabel" class="col-sm-3 col-form-label form-label">DPI <i
+                                                        class="bi-question-circle text-body ms-1" data-bs-toggle="tooltip"
+                                                        data-bs-placement="top"
+                                                        title="Rellene el DPI del paciente"></i></label>
+                                                <div class="col-sm-9">
+                                                    <input type="text" class="js-input-mask form-control"
+                                                        name="dpi" id="dpiLabel" placeholder="0000 00000 0000"
+                                                        aria-label="DPI"
+                                                        data-hs-mask-options='{"mask": "0000 00000 0000"}'>
+                                                </div>
+                                            </div>
+
+                                            <div class="col-md-6">
+                                                <label for="birthDateLabel"
+                                                    class="col-sm-6 col-form-label form-label">Fecha
+                                                    de
+                                                    nacimiento</label>
+                                                <div class="col-sm-9">
+                                                    <input type="date" class="form-control" name="birth_date"
+                                                        id="birthDateLabel" required>
+                                                </div>
+                                            </div>
                                         </div>
                                     </div>
 
                                     <div class="row mb-4">
-                                        <label for="emailLabel" class="col-sm-3 col-form-label form-label">Correo
-                                            electrónico <span class="form-label-secondary">(Opcional)</span></label>
-                                        <div class="col-sm-9">
-                                            <input type="email" class="form-control" name="email" id="emailLabel"
-                                                placeholder="ejemplo@correo.com" aria-label="ejemplo@correo.com">
+                                        <div class="col-sm-12">
+                                            <hr>
+                                        </div>
+                                    </div>
+
+
+                                    <div class="row mb-12">
+                                        <div class="row mb-3">
+
+                                            <div class="col-md-6">
+                                                <label for="emailLabel" class="col-sm-9 col-form-label form-label">Correo
+                                                    electrónico <span
+                                                        class="form-label-secondary">(Opcional)</span></label>
+                                                <div class="col-sm-9">
+                                                    <input type="email" class="form-control" name="email"
+                                                        id="emailLabel" placeholder="ejemplo@correo.com"
+                                                        aria-label="ejemplo@correo.com">
+                                                </div>
+                                            </div>
+
+                                            <div class="col-md-6">
+                                                <label for="phoneLabel"
+                                                    class="col-sm-9 col-form-label form-label">Teléfono
+                                                    <span class="form-label-secondary">(Opcional)</span></label>
+                                                <div class="col-sm-9">
+                                                    <input type="text" class="js-input-mask form-control"
+                                                        name="phone" id="phoneLabel" placeholder="00000000"
+                                                        aria-label="00000000" data-hs-mask-options='{"mask": "00000000"}'>
+                                                </div>
+                                            </div>
                                         </div>
                                     </div>
 
                                     <div class="row mb-4">
-                                        <label for="phoneLabel" class="col-sm-3 col-form-label form-label">Teléfono <span
-                                                class="form-label-secondary">(Opcional)</span></label>
-                                        <div class="col-sm-9">
-                                            <input type="text" class="js-input-mask form-control" name="phone"
-                                                id="phoneLabel" placeholder="00000000" aria-label="00000000"
-                                                data-hs-mask-options='{"mask": "00000000"}'>
+                                        <div class="col-sm-12">
+                                            <hr>
+                                        </div>
+                                    </div>
+
+                                    <div class="row mb-12">
+
+                                        <div class="row mb-3">
+
+                                            <div class="col-md-6">
+                                                <label for="genderLabel" class="form-label">
+                                                    Género
+                                                </label>
+                                                <select class="form-select form-select-sm" name="gender_id"
+                                                    id="genderLabel">
+                                                    <option value="">Seleccione</option>
+                                                    @foreach ($genders as $gender)
+                                                        <option value="{{ $gender->id }}">{{ $gender->name }}</option>
+                                                    @endforeach
+                                                </select>
+                                            </div>
+
+                                            <div class="col-md-6">
+                                                <label for="civilStatusLabel" class="form-label">
+                                                    Estado civil
+                                                </label>
+                                                <select class="form-select form-select-sm" name="civil_status_id"
+                                                    id="civilStatusLabel">
+                                                    <option value="">Seleccione</option>
+                                                    @foreach ($civilStatuses as $status)
+                                                        <option value="{{ $status->id }}">{{ $status->name }}</option>
+                                                    @endforeach
+                                                </select>
+                                            </div>
+
+                                        </div>
+
+                                        <div class="row mb-3">
+
+                                            <div class="col-md-6">
+                                                <label for="ethnicityLabel" class="form-label">
+                                                    Etnia
+                                                </label>
+                                                <select class="form-select form-select-sm" name="ethnicity_id"
+                                                    id="ethnicityLabel">
+                                                    <option value="">Seleccione</option>
+                                                    @foreach ($ethnicities as $ethnicity)
+                                                        <option value="{{ $ethnicity->id }}">{{ $ethnicity->name }}
+                                                        </option>
+                                                    @endforeach
+                                                </select>
+                                            </div>
+
+                                            <div class="col-md-6">
+                                                <label for="linguisticCommunityLabel" class="form-label">
+                                                    Comunidad lingüística
+                                                </label>
+                                                <select class="form-select form-select-sm" name="linguistic_community_id"
+                                                    id="linguisticCommunityLabel">
+                                                    <option value="">Seleccione</option>
+                                                    @foreach ($linguisticCommunities as $community)
+                                                        <option value="{{ $community->id }}">{{ $community->name }}
+                                                        </option>
+                                                    @endforeach
+                                                </select>
+                                            </div>
+
+                                        </div>
+
+                                    </div>
+
+                                    <div class="row mb-4">
+                                        <div class="col-sm-12">
+                                            <hr>
                                         </div>
                                     </div>
 
                                     <div class="row mb-4">
-                                        <label for="birthDateLabel" class="col-sm-3 col-form-label form-label">Fecha de
-                                            nacimiento</label>
-                                        <div class="col-sm-9">
-                                            <input type="date" class="form-control" name="birth_date"
-                                                id="birthDateLabel" required>
+
+                                        <div class="row mb-3">
+
+                                            <div class="col-md-6">
+                                                <label for="educationLabel" class="form-label">
+                                                    Escolaridad <span class="form-label-secondary">(Opcional)</span>
+                                                </label>
+                                                <select class="form-select form-select-sm" name="education"
+                                                    id="educationLabel">
+                                                    <option value="">Seleccione</option>
+                                                    <option value="ninguna">Ninguna</option>
+                                                    <option value="primaria">Primaria</option>
+                                                    <option value="basico">Básico</option>
+                                                    <option value="diversificado">Diversificado</option>
+                                                    <option value="universitario">Universitario</option>
+                                                    <option value="postgrado">Postgrado</option>
+                                                </select>
+                                            </div>
+
+                                            <div class="col-md-6">
+                                                <label for="occupationLabel" class="form-label">
+                                                    Ocupación <span class="form-label-secondary">(Opcional)</span>
+                                                </label>
+                                                <input type="text" class="form-control form-control-sm"
+                                                    name="occupation" id="occupationLabel"
+                                                    placeholder="Ej: Agricultor, Estudiante, Ama de casa...">
+                                            </div>
+
                                         </div>
-                                                                      <div class="row mb-3">
-                                        <label for="genderLabel" class="col-sm-3 col-form-label form-label">Género</label>
-                                        <div class="col-sm-9">
-                                            <select class="form-select form-select-sm" name="gender_id" id="genderLabel">
-                                                <option value="">Seleccione</option>
-                                                @foreach ($genders as $gender)
-                                                    <option value="{{ $gender->id }}">{{ $gender->name }}</option>
-                                                @endforeach
-                                            </select>
-                                        </div>
+
                                     </div>
 
-                                    <div class="row mb-3">
-                                        <label for="civilStatusLabel" class="col-sm-3 col-form-label form-label">Estado civil</label>
-                                        <div class="col-sm-9">
-                                            <select class="form-select form-select-sm" name="civil_status_id" id="civilStatusLabel">
-                                                <option value="">Seleccione</option>
-                                                @foreach ($civilStatuses as $status)
-                                                    <option value="{{ $status->id }}">{{ $status->name }}</option>
-                                                @endforeach
-                                            </select>
-                                        </div>
+                                    <div class="card-footer d-flex justify-content-end align-items-center">
+                                        <button type="button" class="btn btn-primary"
+                                            data-hs-step-form-next-options='{ "targetSelector": "#addUserStepBillingAddress" }'>
+                                            Siguiente <i class="bi-chevron-right"></i>
+                                        </button>
                                     </div>
-
-                                    <div class="row mb-3">
-                                        <label for="ethnicityLabel" class="col-sm-3 col-form-label form-label">Etnia</label>
-                                        <div class="col-sm-9">
-                                            <select class="form-select form-select-sm" name="ethnicity_id" id="ethnicityLabel">
-                                                <option value="">Seleccione</option>
-                                                @foreach ($ethnicities as $ethnicity)
-                                                    <option value="{{ $ethnicity->id }}">{{ $ethnicity->name }}</option>
-                                                @endforeach
-                                            </select>
-                                        </div>
-                                    </div>
-
-                                    <div class="row mb-3">
-                                        <label for="linguisticCommunityLabel" class="col-sm-3 col-form-label form-label">Comunidad lingüística</label>
-                                        <div class="col-sm-9">
-                                            <select class="form-select form-select-sm" name="linguistic_community_id" id="linguisticCommunityLabel">
-                                                <option value="">Seleccione</option>
-                                                @foreach ($linguisticCommunities as $community)
-                                                    <option value="{{ $community->id }}">{{ $community->name }}</option>
-                                                @endforeach
-                                            </select>
-                                        </div>
-                                    </div>
-
-                                    <div class="row mb-3">
-                                        <label for="educationLabel" class="col-sm-3 col-form-label form-label">Escolaridad <span class="form-label-secondary">(Opcional)</span></label>
-                                        <div class="col-sm-9">
-                                            <select class="form-select form-select-sm" name="education" id="educationLabel">
-                                                <option value="">Seleccione</option>
-                                                <option value="ninguna">Ninguna</option>
-                                                <option value="primaria">Primaria</option>
-                                                <option value="basico">Básico</option>
-                                                <option value="diversificado">Diversificado</option>
-                                                <option value="universitario">Universitario</option>
-                                                <option value="postgrado">Postgrado</option>
-                                            </select>
-                                        </div>
-                                    </div>
-
-                                    <div class="row mb-3">
-                                        <label for="occupationLabel" class="col-sm-3 col-form-label form-label">Ocupación <span class="form-label-secondary">(Opcional)</span></label>
-                                        <div class="col-sm-9">
-                                            <input type="text" class="form-control form-control-sm" name="occupation" id="occupationLabel" placeholder="Ej: Agricultor, Estudiante, Ama de casa...">
-                                        </div>
-                                    </div>        </div>
-                                </div>
-
-                                <div class="card-footer d-flex justify-content-end align-items-center">
-                                    <button type="button" class="btn btn-primary"
-                                        data-hs-step-form-next-options='{
-                            "targetSelector": "#addUserStepBillingAddress"
-                          }'>
-                                        Siguiente <i class="bi-chevron-right"></i>
-                                    </button>
                                 </div>
                             </div>
-
 
 
                             <!-- Step 2 -->
@@ -239,7 +309,8 @@
                                             <select class="form-select" name="country_id" id="countryLabel">
                                                 <option value="">Seleccione un país</option>
                                                 @foreach ($countries as $country)
-                                                    <option value="{{ $country->id }}">{{ $country->name }}</option>
+                                                    <option value="{{ $country->id }}">{{ $country->name }}
+                                                    </option>
                                                 @endforeach
                                             </select>
                                         </div>
@@ -268,7 +339,7 @@
                                     </div>
 
                                     <div class="row mb-4">
-                                        <label for="placeLabel" class="col-sm-3 col-form-label form-label">Lugar /
+                                        <label for="placeLabel" class="col-sm-3 col-form-label form-label">
                                             Dirección</label>
                                         <div class="col-sm-9">
                                             <input type="text" class="form-control" name="place" id="placeLabel"
@@ -300,7 +371,8 @@
                             <div id="addUserStepFamily" class="card card-lg" style="display: none;">
                                 <div class="card-body">
                                     <h4 class="card-header-title mb-1">Familiares</h4>
-                                    <p class="text-muted small mb-4">Busca un familiar por nombre o DPI. Si no existe,
+                                    <p class="text-muted small mb-4">Busca un familiar por nombre o DPI. Si no
+                                        existe,
                                         puedes crearlo desde aquí.</p>
 
                                     {{-- SEARCH BAR --}}
@@ -343,24 +415,29 @@
                                                         id="newRelSecondName" placeholder="Segundo nombre">
                                                 </div>
                                                 <div class="col-md-6">
-                                                    <label class="form-label form-label-sm">Primer Apellido *</label>
+                                                    <label class="form-label form-label-sm">Primer Apellido
+                                                        *</label>
                                                     <input type="text" class="form-control form-control-sm"
                                                         id="newRelFirstLastName" placeholder="Primer apellido">
                                                 </div>
                                                 <div class="col-md-6">
-                                                    <label class="form-label form-label-sm">Segundo Apellido</label>
+                                                    <label class="form-label form-label-sm">Segundo
+                                                        Apellido</label>
                                                     <input type="text" class="form-control form-control-sm"
                                                         id="newRelSecondLastName" placeholder="Segundo apellido">
                                                 </div>
                                                 <div class="col-md-6">
-                                                    <label class="form-label form-label-sm">Apellido de casada</label>
+                                                    <label class="form-label form-label-sm">Apellido de
+                                                        casada</label>
                                                     <input type="text" class="form-control form-control-sm"
                                                         id="newRelMarriedLastName" placeholder="Apellido de casada">
                                                 </div>
                                                 <div class="col-md-6">
                                                     <label class="form-label form-label-sm">DPI</label>
-                                                    <input type="text" class="form-control form-control-sm js-input-mask"
-                                                        id="newRelDpi" placeholder="0000 00000 0000" data-hs-mask-options='{"mask": "0000 00000 0000"}'>
+                                                    <input type="text"
+                                                        class="form-control form-control-sm js-input-mask" id="newRelDpi"
+                                                        placeholder="0000 00000 0000"
+                                                        data-hs-mask-options='{"mask": "0000 00000 0000"}'>
                                                 </div>
                                                 <div class="col-md-6 d-flex align-items-end">
                                                     <button type="button" class="btn btn-primary btn-sm w-100"
@@ -376,7 +453,8 @@
                                     <div id="selectedRelativesContainer">
                                         <div class="text-center py-4" id="noRelativesData">
                                             <i class="bi-people display-4 text-muted"></i>
-                                            <p class="text-muted mt-2 mb-0 small">Aún no has agregado familiares.</p>
+                                            <p class="text-muted mt-2 mb-0 small">Aún no has agregado familiares.
+                                            </p>
                                         </div>
                                     </div>
                                 </div>
@@ -400,114 +478,154 @@
                             </div>
 
                             <!-- Step 4 -->
-                            <div id="addUserStepConfirmation" class="card card-lg" style="display: none;">
-                                {{-- Dynamic initials avatar header --}}
+                            <div id="addUserStepConfirmation" class="card card-lg" style="display:none;">
+
+                                <!-- Avatar y nombre -->
                                 <div class="card-header d-flex align-items-center gap-3 py-4 border-bottom">
-                                    <div id="confirmAvatarCircle" class="avatar avatar-xl avatar-circle flex-shrink-0" style="background: linear-gradient(135deg,#0d6efd,#6610f2);">
+                                    <div id="confirmAvatarCircle" class="avatar avatar-xl avatar-circle flex-shrink-0"
+                                        style="background: linear-gradient(135deg,#0d6efd,#6610f2);">
                                         <span id="confirmAvatarInitials" class="avatar-initials text-white fs-3">?</span>
                                     </div>
                                     <div>
                                         <h5 id="confirmFullName" class="mb-0 fw-bold">—</h5>
-                                        <small id="confirmExpCard" class="text-muted">Expediente generado al guardar</small>
+                                        <small id="confirmExpCard" class="text-muted">El número de expediente se generará
+                                            al guardar</small>
                                     </div>
                                 </div>
 
-                                    <dl class="row small">
-                                        <dt class="col-sm-5 text-sm-end text-muted">Primer Nombre:</dt>
-                                        <dd class="col-sm-7"><span id="confirmFirstName" class="text-danger"><i>Sin especificar</i></span></dd>
+                                <div class="card-body">
 
-                                        <dt class="col-sm-5 text-sm-end text-muted">Segundo Nombre:</dt>
-                                        <dd class="col-sm-7"><span id="confirmSecondName" class="text-danger"><i>Sin especificar</i></span></dd>
+                                    <!-- Datos personales -->
+                                    <h6 class="text-uppercase text-muted mb-3">Datos personales</h6>
 
-                                        <dt class="col-sm-5 text-sm-end text-muted">Tercer Nombre:</dt>
-                                        <dd class="col-sm-7"><span id="confirmThirdName" class="text-danger"><i>Sin especificar</i></span></dd>
+                                    <dl class="row small mb-4">
 
-                                        <dt class="col-sm-5 text-sm-end text-muted">Primer Apellido:</dt>
-                                        <dd class="col-sm-7"><span id="confirmFirstLastName" class="text-danger"><i>Sin especificar</i></span></dd>
+                                        <dt class="col-sm-4 text-sm-end text-muted">Primer nombre</dt>
+                                        <dd class="col-sm-8"><span id="confirmFirstName">—</span></dd>
 
-                                        <dt class="col-sm-5 text-sm-end text-muted">Segundo Apellido:</dt>
-                                        <dd class="col-sm-7"><span id="confirmSecondLastName" class="text-danger"><i>Sin especificar</i></span></dd>
+                                        <dt class="col-sm-4 text-sm-end text-muted">Segundo nombre</dt>
+                                        <dd class="col-sm-8"><span id="confirmSecondName">—</span></dd>
 
-                                        <dt class="col-sm-5 text-sm-end text-muted">Apellido Casada:</dt>
-                                        <dd class="col-sm-7"><span id="confirmMarriedLastName" class="text-danger"><i>Sin especificar</i></span></dd>
+                                        <dt class="col-sm-4 text-sm-end text-muted">Tercer nombre</dt>
+                                        <dd class="col-sm-8"><span id="confirmThirdName">—</span></dd>
 
-                                        <dt class="col-sm-5 text-sm-end text-muted">Correo electrónico:</dt>
-                                        <dd class="col-sm-7"><span id="confirmEmail" class="text-danger"><i>Sin especificar</i></span></dd>
+                                        <dt class="col-sm-4 text-sm-end text-muted">Primer apellido</dt>
+                                        <dd class="col-sm-8"><span id="confirmFirstLastName">—</span></dd>
 
-                                        <dt class="col-sm-5 text-sm-end text-muted">Teléfono:</dt>
-                                        <dd class="col-sm-7"><span id="confirmPhone" class="text-danger"><i>Sin especificar</i></span></dd>
+                                        <dt class="col-sm-4 text-sm-end text-muted">Segundo apellido</dt>
+                                        <dd class="col-sm-8"><span id="confirmSecondLastName">—</span></dd>
 
-                                        <dt class="col-sm-5 text-sm-end text-muted">DPI:</dt>
-                                        <dd class="col-sm-7"><span id="confirmDpi" class="text-danger"><i>Sin especificar</i></span></dd>
+                                        <dt class="col-sm-4 text-sm-end text-muted">Apellido de casada</dt>
+                                        <dd class="col-sm-8"><span id="confirmMarriedLastName">—</span></dd>
 
-                                        <dt class="col-sm-5 text-sm-end text-muted">Fecha de nacimiento:</dt>
-                                        <dd class="col-sm-7"><span id="confirmBirthDate" class="text-danger"><i>Sin especificar</i></span></dd>
-
-                                        <dt class="col-sm-5 text-sm-end text-muted">Género:</dt>
-                                        <dd class="col-sm-7"><span id="confirmGender" class="text-danger"><i>Sin especificar</i></span></dd>
-
-                                        <dt class="col-sm-5 text-sm-end text-muted">Estado civil:</dt>
-                                        <dd class="col-sm-7"><span id="confirmCivilStatus" class="text-danger"><i>Sin especificar</i></span></dd>
-
-                                        <dt class="col-sm-5 text-sm-end text-muted">Escolaridad:</dt>
-                                        <dd class="col-sm-7"><span id="confirmEducation" class="text-danger"><i>Sin especificar</i></span></dd>
-
-                                        <dt class="col-sm-5 text-sm-end text-muted">Ocupación:</dt>
-                                        <dd class="col-sm-7"><span id="confirmOccupation" class="text-danger"><i>Sin especificar</i></span></dd>
-
-                                        <dt class="col-sm-5 text-sm-end text-muted">País:</dt>
-                                        <dd class="col-sm-7"><span id="confirmCountry" class="text-danger"><i>Sin especificar</i></span></dd>
-
-                                        <dt class="col-sm-5 text-sm-end text-muted">Departamento:</dt>
-                                        <dd class="col-sm-7"><span id="confirmDepartment" class="text-danger"><i>Sin especificar</i></span></dd>
-
-                                        <dt class="col-sm-5 text-sm-end text-muted">Municipio:</dt>
-                                        <dd class="col-sm-7"><span id="confirmMunicipality" class="text-danger"><i>Sin especificar</i></span></dd>
-
-                                        <dt class="col-sm-5 text-sm-end text-muted">Dirección:</dt>
-                                        <dd class="col-sm-7"><span id="confirmPlace" class="text-danger"><i>Sin especificar</i></span></dd>
                                     </dl>
 
+                                    <!-- Contacto -->
+                                    <h6 class="text-uppercase text-muted mb-3">Información de contacto</h6>
+
+                                    <dl class="row small mb-4">
+
+                                        <dt class="col-sm-4 text-sm-end text-muted">Correo electrónico</dt>
+                                        <dd class="col-sm-8"><span id="confirmEmail">—</span></dd>
+
+                                        <dt class="col-sm-4 text-sm-end text-muted">Teléfono</dt>
+                                        <dd class="col-sm-8"><span id="confirmPhone">—</span></dd>
+
+                                        <dt class="col-sm-4 text-sm-end text-muted">DPI</dt>
+                                        <dd class="col-sm-8"><span id="confirmDpi">—</span></dd>
+
+                                    </dl>
+
+                                    <!-- Información personal -->
+                                    <h6 class="text-uppercase text-muted mb-3">Información personal</h6>
+
+                                    <dl class="row small mb-4">
+
+                                        <dt class="col-sm-4 text-sm-end text-muted">Fecha de nacimiento</dt>
+                                        <dd class="col-sm-8"><span id="confirmBirthDate">—</span></dd>
+
+                                        <dt class="col-sm-4 text-sm-end text-muted">Género</dt>
+                                        <dd class="col-sm-8"><span id="confirmGender">—</span></dd>
+
+                                        <dt class="col-sm-4 text-sm-end text-muted">Estado civil</dt>
+                                        <dd class="col-sm-8"><span id="confirmCivilStatus">—</span></dd>
+
+                                        <dt class="col-sm-4 text-sm-end text-muted">Escolaridad</dt>
+                                        <dd class="col-sm-8"><span id="confirmEducation">—</span></dd>
+
+                                        <dt class="col-sm-4 text-sm-end text-muted">Ocupación</dt>
+                                        <dd class="col-sm-8"><span id="confirmOccupation">—</span></dd>
+
+                                    </dl>
+
+                                    <!-- Ubicación -->
+                                    <h6 class="text-uppercase text-muted mb-3">Ubicación</h6>
+
+                                    <dl class="row small">
+
+                                        <dt class="col-sm-4 text-sm-end text-muted">País</dt>
+                                        <dd class="col-sm-8"><span id="confirmCountry">—</span></dd>
+
+                                        <dt class="col-sm-4 text-sm-end text-muted">Departamento</dt>
+                                        <dd class="col-sm-8"><span id="confirmDepartment">—</span></dd>
+
+                                        <dt class="col-sm-4 text-sm-end text-muted">Municipio</dt>
+                                        <dd class="col-sm-8"><span id="confirmMunicipality">—</span></dd>
+
+                                        <dt class="col-sm-4 text-sm-end text-muted">Dirección</dt>
+                                        <dd class="col-sm-8"><span id="confirmPlace">—</span></dd>
+
+                                    </dl>
+
+                                </div>
+
                                 <div class="card-footer d-sm-flex align-items-sm-center">
+
                                     <button type="button" class="btn btn-ghost-secondary mb-2 mb-sm-0"
                                         data-hs-step-form-prev-options='{
-                       "targetSelector": "#addUserStepBillingAddress"
-                     }'>
+                "targetSelector": "#addUserStepFamily"
+            }'>
                                         <i class="bi-chevron-left"></i> Anterior
                                     </button>
 
                                     <div class="ms-auto">
                                         <button id="addUserFinishBtn" type="button" class="btn btn-primary"
-                                            onclick="document.getElementById('addPatientForm').submit();">Guardar</button>
+                                            onclick="document.getElementById('addPatientForm').submit();">
+                                            <i class="bi-check-lg me-1"></i> Guardar paciente
+                                        </button>
+                                    </div>
+
+                                </div>
+
+                            </div>
+
+                            <div id="successMessageContent" style="display:none;">
+                                <div class="text-center">
+                                    <img class="img-fluid mb-3" src="{{ asset('svg/illustrations/oc-hi-five.svg') }}"
+                                        alt="Image Description" data-hs-theme-appearance="default"
+                                        style="max-width: 15rem;">
+                                    <img class="img-fluid mb-3"
+                                        src="{{ asset('svg/illustrations-light/oc-hi-five.svg') }}"
+                                        alt="Image Description" data-hs-theme-appearance="dark"
+                                        style="max-width: 15rem;">
+
+                                    <div class="mb-4">
+                                        <h2>¡Exitoso!</h2>
+                                        <p>El paciente ha sido creado exitosamente y guardado en la base de datos.</p>
+                                    </div>
+
+                                    <div class="d-flex justify-content-center">
+                                        <a class="btn btn-white me-3" href="{{ route('patients.index') }}">
+                                            <i class="bi-chevron-left ms-1"></i> Volver a pacientes
+                                        </a>
+                                        <a class="btn btn-primary" href="{{ route('patients.create') }}">
+                                            <i class="bi-person-plus-fill me-1"></i> Agregar nuevo paciente
+                                        </a>
                                     </div>
                                 </div>
                             </div>
                         </div>
-
-                        <div id="successMessageContent" style="display:none;">
-                            <div class="text-center">
-                                <img class="img-fluid mb-3" src="./assets/svg/illustrations/oc-hi-five.svg"
-                                    alt="Image Description" data-hs-theme-appearance="default" style="max-width: 15rem;">
-                                <img class="img-fluid mb-3" src="./assets/svg/illustrations-light/oc-hi-five.svg"
-                                    alt="Image Description" data-hs-theme-appearance="dark" style="max-width: 15rem;">
-
-                                <div class="mb-4">
-                                    <h2>¡Exitoso!</h2>
-                                    <p>El paciente ha sido creado exitosamente y guardado en la base de datos.</p>
-                                </div>
-
-                                <div class="d-flex justify-content-center">
-                                    <a class="btn btn-white me-3" href="{{ route('patients.index') }}">
-                                        <i class="bi-chevron-left ms-1"></i> Volver a pacientes
-                                    </a>
-                                    <a class="btn btn-primary" href="{{ route('patients.create') }}">
-                                        <i class="bi-person-plus-fill me-1"></i> Agregar nuevo paciente
-                                    </a>
-                                </div>
-                            </div>
-                        </div>
                     </div>
-                </div>
             </form>
         </div>
     </main>
@@ -601,10 +719,11 @@
                     };
 
                     // -- Update initials avatar --
-                    const fn  = getVal('firstNameLabel');
+                    const fn = getVal('firstNameLabel');
                     const fln = getVal('firstLastNameLabel');
                     const initials = [(fn[0] || ''), (fln[0] || '')].join('').toUpperCase() || '?';
-                    const fullName = [fn, getVal('secondNameLabel'), fln, getVal('secondLastNameLabel')].filter(Boolean).join(' ');
+                    const fullName = [fn, getVal('secondNameLabel'), fln, getVal('secondLastNameLabel')].filter(
+                        Boolean).join(' ');
                     const initialsEl = document.getElementById('confirmAvatarInitials');
                     const fullNameEl = document.getElementById('confirmFullName');
                     if (initialsEl) initialsEl.textContent = initials;
@@ -736,7 +855,8 @@
                         second_name: document.getElementById('newRelSecondName').value.trim(),
                         first_last_name: firstLastName,
                         second_last_name: document.getElementById('newRelSecondLastName').value.trim(),
-                        married_last_name: document.getElementById('newRelMarriedLastName').value.trim(),
+                        married_last_name: document.getElementById('newRelMarriedLastName').value
+                            .trim(),
                         dpi: document.getElementById('newRelDpi').value.trim(),
                         name: [firstName, document.getElementById('newRelSecondName').value.trim(),
                             firstLastName, document.getElementById('newRelSecondLastName').value
@@ -749,7 +869,8 @@
                 });
 
                 function clearCreateForm() {
-                    ['newRelFirstName', 'newRelSecondName', 'newRelFirstLastName', 'newRelSecondLastName', 'newRelMarriedLastName',
+                    ['newRelFirstName', 'newRelSecondName', 'newRelFirstLastName', 'newRelSecondLastName',
+                        'newRelMarriedLastName',
                         'newRelDpi'
                     ]
                     .forEach(id => {
@@ -856,7 +977,7 @@
                                     resetSelect(departmentSelect, 'Sin departamentos disponibles');
                                 } else {
                                     populateSelect(departmentSelect, data,
-                                    'Seleccione un departamento');
+                                        'Seleccione un departamento');
                                 }
                             })
                             .catch(() => resetSelect(departmentSelect, 'Error al cargar'));

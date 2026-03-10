@@ -4,7 +4,7 @@ use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
 
-return new class extends Migration
+return new class extends Migration 
 {
     public function up(): void
     {
@@ -19,7 +19,14 @@ return new class extends Migration
             $table->enum('relationship', [
                 'madre',
                 'padre',
-                'tutor',
+                'hermano',
+                'hermana',
+                'tío',
+                'tía',
+                'abuelo',
+                'abuela',
+                'primo',
+                'prima',
                 'tutor legal',
                 'otro'
             ]);
@@ -33,7 +40,7 @@ return new class extends Migration
             $table->string('second_last_name')->nullable();
             $table->string('married_last_name')->nullable();
 
-            $table->string('dpi',20)->nullable();
+            $table->string('dpi', 20)->nullable();
 
             $table->timestamps();
 
