@@ -10,7 +10,8 @@
                     <div class="col-sm mb-2 mb-sm-0">
                         <nav aria-label="breadcrumb">
                             <ol class="breadcrumb breadcrumb-no-gutter">
-                                <li class="breadcrumb-item"><a class="breadcrumb-link" href="{{ route('home') }}">Inicio</a></li>
+                                <li class="breadcrumb-item"><a class="breadcrumb-link" href="{{ route('home') }}">Inicio</a>
+                                </li>
                                 <li class="breadcrumb-item active" aria-current="page">Pacientes</li>
                             </ol>
                         </nav>
@@ -400,7 +401,6 @@
                                 <th>Edad</th>
                                 <th>Expediente</th>
                                 <th>Género</th>
-                                <th>Género</th>
                                 <th>Departamento</th>
                                 <th>Municipio</th>
                                 <th>Acciones</th>
@@ -437,9 +437,10 @@
                                     <td>{{ $patient->birth_date ? $patient->birth_date->format('d/m/Y') : '-' }}</td>
                                     <td>{{ $patient->age ?: '-' }}</td>
                                     <td>
-                                        @if($patient->clinicalRecord)
+                                        @if ($patient->clinicalRecord)
                                             <span class="badge bg-soft-info text-info">
-                                                <i class="bi-folder2-open me-1"></i> {{ $patient->clinicalRecord->record_number }}
+                                                <i class="bi-folder2-open me-1"></i>
+                                                {{ $patient->clinicalRecord->record_number }}
                                             </span>
                                         @else
                                             <span class="badge bg-soft-secondary text-secondary">Sin Expediente</span>
@@ -484,7 +485,9 @@
                             @empty
                                 <tr>
                                     <td colspan="9" class="text-center py-5">
-                                        <img class="mb-3" src="{{ asset('assets/svg/illustrations/oc-error.svg') }}" alt="Image Description" style="width: 10rem;" data-hs-theme-appearance="default">
+                                        <img class="mb-3" src="{{ asset('svg/illustrations/oc-error.svg') }}"
+                                            alt="Image Description" style="width: 10rem;"
+                                            data-hs-theme-appearance="default">
                                         <p class="text-muted mb-0">No hay pacientes registrados</p>
                                     </td>
                                 </tr>
@@ -517,41 +520,47 @@
 
 
 @push('scripts')
-<!-- Scripts para filtros de ubicación -->
+    <!-- Scripts para filtros de ubicación -->
     <script>
         $(document).ready(function() {
             $('#filter_country_id').on('change', function() {
-            var countryId = $(this).val();
-            $.ajax({
-                url: '{{ route('patients.get-departments-by-country') }}',
-                type: 'GET',
-                data: { country_id: countryId },
-            }).done(function(response) {
-                $('#filter_department_id').empty();
-                $('#filter_department_id').append('<option value="">Todos</option>');
-                $.each(response, function(index, department) {
-                    $('#filter_department_id').append('<option value="' + department.id + '">' + department.name + '</option>');
+                var countryId = $(this).val();
+                $.ajax({
+                    url: '{{ route('patients.get-departments-by-country') }}',
+                    type: 'GET',
+                    data: {
+                        country_id: countryId
+                    },
+                }).done(function(response) {
+                    $('#filter_department_id').empty();
+                    $('#filter_department_id').append('<option value="">Todos</option>');
+                    $.each(response, function(index, department) {
+                        $('#filter_department_id').append('<option value="' + department
+                            .id + '">' + department.name + '</option>');
+                    });
                 });
             });
-        });
-        $('#filter_department_id').on('change', function() {
-            var departmentId = $(this).val();
-            $.ajax({
-                url: '{{ route('patients.get-municipalities-by-department') }}',
-                type: 'GET',
-                data: { department_id: departmentId },
-            }).done(function(response) {
-                $('#filter_municipality_id').empty();
-                $('#filter_municipality_id').append('<option value="">Todos</option>');
-                $.each(response, function(index, municipality) {
-                    $('#filter_municipality_id').append('<option value="' + municipality.id + '">' + municipality.name + '</option>');
+            $('#filter_department_id').on('change', function() {
+                var departmentId = $(this).val();
+                $.ajax({
+                    url: '{{ route('patients.get-municipalities-by-department') }}',
+                    type: 'GET',
+                    data: {
+                        department_id: departmentId
+                    },
+                }).done(function(response) {
+                    $('#filter_municipality_id').empty();
+                    $('#filter_municipality_id').append('<option value="">Todos</option>');
+                    $.each(response, function(index, municipality) {
+                        $('#filter_municipality_id').append('<option value="' + municipality
+                            .id + '">' + municipality.name + '</option>');
+                    });
                 });
-            });
             });
         });
     </script>
-    
-<!-- Scripts para Exportación y Copiar e Imprimir Unitario o Multiple -->
+
+    <!-- Scripts para Exportación y Copiar e Imprimir Unitario o Multiple -->
     <script>
         $(document).ready(function() {
             $('#export-copy').on('click', function() {

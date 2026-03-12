@@ -803,7 +803,7 @@
 
                             <div class="dropdown-divider"></div>
 
-                            <form method="POST" action="{{ route('logout') }}">
+                            <form method="POST" action="{{ route('logout') }}" onsubmit="this.querySelector('button').disabled=true;">
                                 @csrf
                                 <button type="submit" class="dropdown-item"
                                     style="border: none; background: none; width: 100%; text-align: left; padding: 0.5rem 1rem; cursor: pointer;">
