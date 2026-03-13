@@ -12,6 +12,24 @@ class DatabaseSeeder extends Seeder
 
     public function run(): void
     {
+        $this->call([
+            RoleSeeder::class,
+            UnityExecutionSeeder::class,
+            WorkDepartmentSeeder::class,
+            CountrySeeder::class,
+            GenderSeeder::class,
+            CivilStatusSeeder::class,
+            EthnicitySeeder::class,
+            LinguisticCommunitySeeder::class,
+            DepartmentSeeder::class,
+            MunicipalitySeeder::class,
+            RelationshipTypeSeeder::class,
+        ]);
+
+        $roleId = \App\Models\Role::where('name', 'Administrador')->first()->id ?? null;
+        $unityId = \App\Models\UnityExecution::where('code', '234')->first()->id ?? null;
+        $departmentId = \App\Models\WorkDepartment::where('name', 'Informática')->first()->id ?? null;
+
         User::create([
             'first_name' => 'Cristoffer',
             'second_name' => 'Alexis',
@@ -21,28 +39,20 @@ class DatabaseSeeder extends Seeder
             'email' => 'falla3235@hotmail.com',
             'password' => bcrypt('CAllofduty123@%'),
             'is_active' => true,
+            'role_id' => $roleId,
+            'unity_execution_id' => $unityId,
+            'work_department_id' => $departmentId,
             'profile_photo_path' => null,
             'banner_photo_path' => null,
             'cui' => null,
             'nit' => null,
             'marital_status' => null,
             'phone' => null,
-            'department' => null,
             'address' => null,
             'birth_date' => null,
             'gender' => null,
             'estado' => 'disponible',
             'theme_preference' => 'auto',
-        ]);
-
-        $this->call([
-            CountrySeeder::class,
-            GenderSeeder::class,
-            CivilStatusSeeder::class,
-            EthnicitySeeder::class,
-            LinguisticCommunitySeeder::class,
-            DepartmentSeeder::class,
-            MunicipalitySeeder::class,
         ]);
     }
 }

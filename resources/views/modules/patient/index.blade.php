@@ -400,7 +400,6 @@
                                 <th>Nacimiento</th>
                                 <th>Edad</th>
                                 <th>Expediente</th>
-                                <th>Género</th>
                                 <th>Departamento</th>
                                 <th>Municipio</th>
                                 <th>Acciones</th>
@@ -446,7 +445,6 @@
                                             <span class="badge bg-soft-secondary text-secondary">Sin Expediente</span>
                                         @endif
                                     </td>
-                                    <td>{{ $patient->gender ? $patient->gender->name : '-' }}</td>
                                     <td>{{ $patient->department ? $patient->department->name : '-' }}</td>
                                     <td>{{ $patient->municipality ? $patient->municipality->name : '-' }}</td>
                                     <td>

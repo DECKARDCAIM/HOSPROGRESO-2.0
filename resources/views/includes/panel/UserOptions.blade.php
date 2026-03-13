@@ -1,25 +1,37 @@
-<header id="header" class="navbar navbar-expand-lg navbar-fixed navbar-height navbar-container navbar-bordered bg-white">
+<header id="header"
+    class="navbar navbar-expand-lg navbar-fixed navbar-height navbar-container navbar-bordered bg-white">
     <div class="navbar-nav-wrap">
         <a class="navbar-brand" href="/" aria-label="Front">
-            <img class="navbar-brand-logo" src="{{ asset('img/logotipo.svg') }}" alt="Logo" data-hs-theme-appearance="default">
-            <img class="navbar-brand-logo" src="{{ asset('img/logotipo-white.svg') }}" alt="Logo" data-hs-theme-appearance="dark">
-            <img class="navbar-brand-logo-mini" src="{{ asset('img/logotipo.svg') }}" alt="Logo" data-hs-theme-appearance="default">
-            <img class="navbar-brand-logo-mini" src="{{ asset('img/logotipo-white.svg') }}" alt="Logo" data-hs-theme-appearance="dark">
+            <img class="navbar-brand-logo" src="{{ asset('img/logotipo.svg') }}" alt="Logo"
+                data-hs-theme-appearance="default">
+            <img class="navbar-brand-logo" src="{{ asset('img/logotipo-white.svg') }}" alt="Logo"
+                data-hs-theme-appearance="dark">
+            <img class="navbar-brand-logo-mini" src="{{ asset('img/logotipo.svg') }}" alt="Logo"
+                data-hs-theme-appearance="default">
+            <img class="navbar-brand-logo-mini" src="{{ asset('img/logotipo-white.svg') }}" alt="Logo"
+                data-hs-theme-appearance="dark">
         </a>
 
         <div class="navbar-nav-wrap-content-start">
             <button type="button" class="js-navbar-vertical-aside-toggle-invoker navbar-aside-toggler">
-                <i class="bi-arrow-bar-left navbar-toggler-short-align" data-bs-template='<div class="tooltip d-none d-md-block" role="tooltip"><div class="arrow"></div><div class="tooltip-inner"></div></div>' data-bs-toggle="tooltip" data-bs-placement="right" title="Collapse"></i>
-                <i class="bi-arrow-bar-right navbar-toggler-full-align" data-bs-template='<div class="tooltip d-none d-md-block" role="tooltip"><div class="arrow"></div><div class="tooltip-inner"></div></div>' data-bs-toggle="tooltip" data-bs-placement="right" title="Expand"></i>
+                <i class="bi-arrow-bar-left navbar-toggler-short-align"
+                    data-bs-template='<div class="tooltip d-none d-md-block" role="tooltip"><div class="arrow"></div><div class="tooltip-inner"></div></div>'
+                    data-bs-toggle="tooltip" data-bs-placement="right" title="Collapse"></i>
+                <i class="bi-arrow-bar-right navbar-toggler-full-align"
+                    data-bs-template='<div class="tooltip d-none d-md-block" role="tooltip"><div class="arrow"></div><div class="tooltip-inner"></div></div>'
+                    data-bs-toggle="tooltip" data-bs-placement="right" title="Expand"></i>
             </button>
 
             <div class="dropdown ms-2">
                 <div class="d-none d-lg-block">
-                    <div class="input-group input-group-merge input-group-borderless input-group-hover-light navbar-input-group">
+                    <div
+                        class="input-group input-group-merge input-group-borderless input-group-hover-light navbar-input-group">
                         <div class="input-group-prepend input-group-text">
                             <i class="bi-search"></i>
                         </div>
-                        <input type="search" class="js-form-search form-control" placeholder="Buscar" aria-label="Buscar" data-hs-form-search-options='{"clearIcon": "#clearSearchResultsIcon", "dropMenuElement": "#searchDropdownMenu", "dropMenuOffset": 20, "toggleIconOnFocus": true, "activeClass": "focus" }'>
+                        <input type="search" class="js-form-search form-control" placeholder="Buscar"
+                            aria-label="Buscar"
+                            data-hs-form-search-options='{"clearIcon": "#clearSearchResultsIcon", "dropMenuElement": "#searchDropdownMenu", "dropMenuOffset": 20, "toggleIconOnFocus": true, "activeClass": "focus" }'>
                         <a class="input-group-append input-group-text" href="javascript:;">
                             <i id="clearSearchResultsIcon" class="bi-x-lg" style="display: none;"></i>
                         </a>
@@ -43,7 +55,8 @@
                                         <i class="bi-search"></i>
                                     </div>
                                     <input type="search" class="form-control" placeholder="Buscar" aria-label="Buscar">
-                                    <a class="input-group-append input-group-text" href="javascript:;"> <i class="bi-x-lg"></i></a>
+                                    <a class="input-group-append input-group-text" href="javascript:;"> <i
+                                            class="bi-x-lg"></i></a>
                                 </div>
                             </div>
 
@@ -144,7 +157,8 @@
 
                     <div class="dropdown">
                         <button type="button" class="btn btn-ghost-secondary btn-icon rounded-circle"
-                            id="navbarNotificationsDropdown" data-bs-toggle="dropdown" aria-expanded="false" data-bs-auto-close="outside" data-bs-dropdown-animation>
+                            id="navbarNotificationsDropdown" data-bs-toggle="dropdown" aria-expanded="false"
+                            data-bs-auto-close="outside" data-bs-dropdown-animation>
                             <i class="bi-bell"></i>
                             <span class="btn-status btn-sm-status btn-status-danger"></span>
                         </button>
@@ -170,10 +184,12 @@
                                                 <i class="bi-archive dropdown-item-icon"></i> Archivar todas
                                             </a>
                                             <a class="dropdown-item" href="#">
-                                                <i class="bi-check2-all dropdown-item-icon"></i> Marcar todas como leídas
+                                                <i class="bi-check2-all dropdown-item-icon"></i> Marcar todas como
+                                                leídas
                                             </a>
                                             <a class="dropdown-item" href="#">
-                                                <i class="bi-toggle-off dropdown-item-icon"></i> Deshabilitar notificaciones
+                                                <i class="bi-toggle-off dropdown-item-icon"></i> Deshabilitar
+                                                notificaciones
                                             </a>
                                             <a class="dropdown-item" href="#">
                                                 <i class="bi-gift dropdown-item-icon"></i> Que hay de nuevo?
@@ -589,7 +605,8 @@
                                             </div>
                                             <div class="flex-grow-1 text-truncate ms-3">
                                                 <h5 class="mb-0">Google webdev</h5>
-                                                <p class="card-text text-body">Trabajo involucrado en el desarrollo de un sitio web
+                                                <p class="card-text text-body">Trabajo involucrado en el desarrollo de
+                                                    un sitio web
                                                 </p>
                                             </div>
                                         </div>
@@ -675,25 +692,27 @@
                                         'disponible' => 'success',
                                         'ocupado' => 'danger',
                                         'ausente' => 'warning-custom',
-                                        'privado' => 'secondary'
+                                        'privado' => 'secondary',
                                     ];
-                                    $nombreCompleto = $user->name ?? 'Usuario';
-                                    $nombres = explode(' ', $nombreCompleto);
-                                    $primerNombre = $nombres[0] ?? '';
-                                    $segundoApellido = isset($nombres[2]) ? $nombres[2] : (isset($nombres[1]) ? $nombres[1] : '');
-                                    $iniciales = strtoupper(substr($primerNombre, 0, 1) . substr($segundoApellido, 0, 1));
+                                    $primerNombre = $user->first_name ?? '';
+                                    $primerApellido = $user->first_last_name ?? '';
+                                    $iniciales = '';
+                                    if (!empty($primerNombre)) $iniciales .= strtoupper(substr($primerNombre, 0, 1));
+                                    if (!empty($primerApellido)) $iniciales .= strtoupper(substr($primerApellido, 0, 1));
+                                    if (empty($iniciales)) $iniciales = 'U';
                                 @endphp
-                                @if($user && ($user->avatar_url || $user->avatar))
-                                    <img class="avatar-img" id="navbar-avatar-img" 
-                                         src="{{ $user->avatar_url ?? asset('storage/avatars/' . basename($user->avatar)) }}" 
-                                         alt="Image Description"
-                                         onerror="this.onerror=null; retryNavbarImage(this);">
+                                @if ($user && ($user->avatar_url || $user->avatar))
+                                    <img class="avatar-img" id="navbar-avatar-img"
+                                        src="{{ $user->avatar_url ?? asset('storage/avatars/' . basename($user->avatar)) }}"
+                                        alt="Image Description" onerror="this.onerror=null; retryNavbarImage(this);">
                                 @else
                                     <div class="avatar-img avatar-soft-primary" id="navbar-avatar-initials">
                                         <span class="avatar-initials">{{ $iniciales }}</span>
                                     </div>
                                 @endif
-                                <span class="avatar-status avatar-sm-status avatar-status-{{ $estadoAvatarColors[$estadoActual] }}" id="avatar-status-indicator"></span>
+                                <span
+                                    class="avatar-status avatar-sm-status avatar-status-{{ $estadoAvatarColors[$estadoActual] }}"
+                                    id="avatar-status-indicator"></span>
                             </div>
                         </a>
 
@@ -703,20 +722,20 @@
                                 <div class="d-flex align-items-center">
                                     @php
                                         $user = Auth::user();
-                                        $nombreCompleto = $user->name ?? 'Usuario';
-                                        $nombres = explode(' ', $nombreCompleto);
-                                        $primerNombre = $nombres[0] ?? '';
-                                        $segundoApellido = isset($nombres[2]) ? $nombres[2] : (isset($nombres[1]) ? $nombres[1] : '');
-                                        $iniciales = strtoupper(substr($primerNombre, 0, 1) . substr($segundoApellido, 0, 1));
-                                        $primerApellido = isset($nombres[1]) ? $nombres[1] : '';
-                                        $nombreMostrar = trim($primerNombre . ' ' . $primerApellido) ?: $nombreCompleto;
+                                        $primerNombre = $user->first_name ?? '';
+                                        $primerApellido = $user->first_last_name ?? '';
+                                        $nombreMostrar = trim($primerNombre . ' ' . $primerApellido) ?: ($user->email ?? 'Usuario');
+                                        $iniciales = '';
+                                        if (!empty($primerNombre)) $iniciales .= strtoupper(substr($primerNombre, 0, 1));
+                                        if (!empty($primerApellido)) $iniciales .= strtoupper(substr($primerApellido, 0, 1));
+                                        if (empty($iniciales)) $iniciales = 'U';
                                     @endphp
                                     <div class="avatar avatar-sm avatar-circle">
-                                        @if($user && ($user->avatar_url || $user->avatar))
-                                            <img class="avatar-img" id="dropdown-avatar-img" 
-                                                 src="{{ $user->avatar_url ?? asset('storage/avatars/' . basename($user->avatar)) }}" 
-                                                 alt="Image Description"
-                                                 onerror="this.onerror=null; retryNavbarImage(this);">
+                                        @if ($user && ($user->avatar_url || $user->avatar))
+                                            <img class="avatar-img" id="dropdown-avatar-img"
+                                                src="{{ $user->avatar_url ?? asset('storage/avatars/' . basename($user->avatar)) }}"
+                                                alt="Image Description"
+                                                onerror="this.onerror=null; retryNavbarImage(this);">
                                         @else
                                             <div class="avatar-img avatar-soft-primary" id="dropdown-avatar-initials">
                                                 <span class="avatar-initials">{{ $iniciales }}</span>
@@ -743,13 +762,13 @@
                                             'disponible' => 'Disponible',
                                             'ocupado' => 'Ocupado',
                                             'ausente' => 'Ausente',
-                                            'privado' => 'Privado'
+                                            'privado' => 'Privado',
                                         ];
                                         $estadoColors = [
                                             'disponible' => 'success',
                                             'ocupado' => 'danger',
                                             'ausente' => 'warning-custom',
-                                            'privado' => 'secondary'
+                                            'privado' => 'secondary',
                                         ];
                                     @endphp
                                     <span class="legend-indicator bg-{{ $estadoColors[$estadoActual] }} ms-2"></span>
@@ -758,35 +777,31 @@
 
                                 <div class="dropdown-menu dropdown-menu-end navbar-dropdown-menu navbar-dropdown-menu-borderless navbar-dropdown-sub-menu"
                                     aria-labelledby="navSubmenuPagesAccountDropdown1">
-                                    <a class="dropdown-item estado-option {{ $estadoActual === 'disponible' ? 'active' : '' }}" 
-                                       href="javascript:;" 
-                                       data-estado="disponible">
+                                    <a class="dropdown-item estado-option {{ $estadoActual === 'disponible' ? 'active' : '' }}"
+                                        href="javascript:;" data-estado="disponible">
                                         <span class="legend-indicator bg-success me-1"></span> Disponible
-                                        @if($estadoActual === 'disponible')
+                                        @if ($estadoActual === 'disponible')
                                             <i class="bi-check-lg float-end"></i>
                                         @endif
                                     </a>
-                                    <a class="dropdown-item estado-option {{ $estadoActual === 'ocupado' ? 'active' : '' }}" 
-                                       href="javascript:;" 
-                                       data-estado="ocupado">
+                                    <a class="dropdown-item estado-option {{ $estadoActual === 'ocupado' ? 'active' : '' }}"
+                                        href="javascript:;" data-estado="ocupado">
                                         <span class="legend-indicator bg-danger me-1"></span> Ocupado
-                                        @if($estadoActual === 'ocupado')
+                                        @if ($estadoActual === 'ocupado')
                                             <i class="bi-check-lg float-end"></i>
                                         @endif
                                     </a>
-                                    <a class="dropdown-item estado-option {{ $estadoActual === 'ausente' ? 'active' : '' }}" 
-                                       href="javascript:;" 
-                                       data-estado="ausente">
+                                    <a class="dropdown-item estado-option {{ $estadoActual === 'ausente' ? 'active' : '' }}"
+                                        href="javascript:;" data-estado="ausente">
                                         <span class="legend-indicator bg-warning-custom me-1"></span> Ausente
-                                        @if($estadoActual === 'ausente')
+                                        @if ($estadoActual === 'ausente')
                                             <i class="bi-check-lg float-end"></i>
                                         @endif
                                     </a>
-                                    <a class="dropdown-item estado-option {{ $estadoActual === 'privado' ? 'active' : '' }}" 
-                                       href="javascript:;" 
-                                       data-estado="privado">
+                                    <a class="dropdown-item estado-option {{ $estadoActual === 'privado' ? 'active' : '' }}"
+                                        href="javascript:;" data-estado="privado">
                                         <span class="legend-indicator bg-secondary me-1"></span> Privado
-                                        @if($estadoActual === 'privado')
+                                        @if ($estadoActual === 'privado')
                                             <i class="bi-check-lg float-end"></i>
                                         @endif
                                     </a>
@@ -803,7 +818,8 @@
 
                             <div class="dropdown-divider"></div>
 
-                            <form method="POST" action="{{ route('logout') }}" onsubmit="this.querySelector('button').disabled=true;">
+                            <form method="POST" action="{{ route('logout') }}"
+                                onsubmit="this.querySelector('button').disabled=true;">
                                 @csrf
                                 <button type="submit" class="dropdown-item"
                                     style="border: none; background: none; width: 100%; text-align: left; padding: 0.5rem 1rem; cursor: pointer;">

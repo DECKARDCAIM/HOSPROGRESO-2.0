@@ -5,16 +5,16 @@
      <div class="navbar-vertical-container">
          <div class="navbar-vertical-footer-offset">
 
-            <a class="navbar-brand" href="/" aria-label="Front">
-                <img class="navbar-brand-logo" src="{{ asset('img/logotipo.svg') }}" alt="Logo"
-                    data-hs-theme-appearance="default">
-                <img class="navbar-brand-logo" src="{{ asset('img/logotipo-white.svg') }}" alt="Logo"
-                    data-hs-theme-appearance="dark">
-                <img class="navbar-brand-logo-mini" src="{{ asset('img/logotipo.svg') }}" alt="Logo"
-                    data-hs-theme-appearance="default">
-                <img class="navbar-brand-logo-mini" src="{{ asset('img/logotipo-white.svg') }}" alt="Logo"
-                    data-hs-theme-appearance="dark">
-            </a>
+             <a class="navbar-brand" href="/" aria-label="Front">
+                 <img class="navbar-brand-logo" src="{{ asset('img/logotipo.svg') }}" alt="Logo"
+                     data-hs-theme-appearance="default">
+                 <img class="navbar-brand-logo" src="{{ asset('img/logotipo-white.svg') }}" alt="Logo"
+                     data-hs-theme-appearance="dark">
+                 <img class="navbar-brand-logo-mini" src="{{ asset('img/logotipo.svg') }}" alt="Logo"
+                     data-hs-theme-appearance="default">
+                 <img class="navbar-brand-logo-mini" src="{{ asset('img/logotipo-white.svg') }}" alt="Logo"
+                     data-hs-theme-appearance="dark">
+             </a>
              <button type="button" class="js-navbar-vertical-aside-toggle-invoker navbar-aside-toggler">
                  <i class="bi-arrow-bar-left navbar-toggler-short-align"
                      data-bs-template='<div class="tooltip d-none d-md-block" role="tooltip"><div class="arrow"></div><div class="tooltip-inner"></div></div>'
@@ -107,8 +107,8 @@
                      <!-- Módulo: Citas Médicas -->
                      <div class="nav-item">
                          <a class="nav-link dropdown-toggle" href="#navbarVerticalMenuCitas" role="button"
-                             data-bs-toggle="collapse" data-bs-target="#navbarVerticalMenuCitas"
-                             aria-expanded="false" aria-controls="navbarVerticalMenuCitas">
+                             data-bs-toggle="collapse" data-bs-target="#navbarVerticalMenuCitas" aria-expanded="false"
+                             aria-controls="navbarVerticalMenuCitas">
                              <i class="bi-calendar-check nav-icon"></i>
                              <span class="nav-link-title">Citas Médicas</span>
                          </a>
@@ -151,9 +151,7 @@
 
                          <div id="navbarVerticalMenuAdministracion" class="nav-collapse collapse"
                              data-bs-parent="#navbarVerticalMenu">
-                             <a class="nav-link" href="/administracion/usuarios">Usuarios</a>
-                             <a class="nav-link" href="/administracion/permisos">Permisos</a>
-                             <a class="nav-link" href="/administracion/configuracion">Configuración</a>
+                             <a class="nav-link" href="{{ route('users.index') }}">Usuarios</a>
                          </div>
                      </div>
 
@@ -187,8 +185,8 @@
 
 
 
-                        <div class="navbar-vertical-footer">
-                            <ul class="navbar-vertical-footer-list">
+                     <div class="navbar-vertical-footer">
+                         <ul class="navbar-vertical-footer-list">
                              <li class="navbar-vertical-footer-list-item">
                                  <div class="dropdown dropup">
                                      <button type="button" class="btn btn-ghost-secondary btn-icon rounded-circle"
@@ -202,7 +200,7 @@
                                              $iconMap = [
                                                  'auto' => 'bi-moon-stars',
                                                  'default' => 'bi-brightness-high',
-                                                 'dark' => 'bi-moon'
+                                                 'dark' => 'bi-moon',
                                              ];
                                              $currentIcon = $iconMap[$userTheme] ?? $iconMap['auto'];
                                          @endphp
@@ -220,7 +218,9 @@
                                          <a class="dropdown-item {{ $userTheme === 'auto' ? 'active' : '' }}"
                                              href="#" data-icon="bi-moon-stars" data-value="auto">
                                              <i class="bi-moon-stars me-2"></i>
-                                             <span class="text-truncate" title="Automático (Sistema Predeterminado)">Automático (Sistema Predeterminado)
+                                             <span class="text-truncate"
+                                                 title="Automático (Sistema Predeterminado)">Automático (Sistema
+                                                 Predeterminado)
                                              </span>
                                          </a>
                                          <a class="dropdown-item {{ $userTheme === 'default' ? 'active' : '' }}"

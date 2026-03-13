@@ -898,13 +898,11 @@
                         ${rel.dpi ? `<div class="text-muted small">DPI: ${rel.dpi}</div>` : ''}
                     </div>
                     <div style="min-width:180px;">
-                        <select class="form-select form-select-sm" name="relatives[${idx}][relationship]" required>
+                        <select class="form-select form-select-sm" name="relatives[${idx}][relationship_type_id]" required>
                             <option value="">Relación *</option>
-                            <option value="madre">Madre</option>
-                            <option value="padre">Padre</option>
-                            <option value="tutor">Tutor</option>
-                            <option value="tutor legal">Tutor Legal</option>
-                            <option value="otro">Otro</option>
+                            @foreach($relationshipTypes as $type)
+                                <option value="{{ $type->id }}">{{ ucfirst($type->name) }}</option>
+                            @endforeach
                         </select>
                     </div>
                     <button type="button" class="btn btn-xs btn-soft-danger flex-shrink-0" onclick="removeSelectedRelative(${idx})">

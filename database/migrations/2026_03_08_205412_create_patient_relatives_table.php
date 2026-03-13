@@ -16,20 +16,7 @@ return new class extends Migration
             $table->foreignId('patient_id')->constrained('patients')->cascadeOnDelete();
 
             // Tipo de relación
-            $table->enum('relationship', [
-                'madre',
-                'padre',
-                'hermano',
-                'hermana',
-                'tío',
-                'tía',
-                'abuelo',
-                'abuela',
-                'primo',
-                'prima',
-                'tutor legal',
-                'otro'
-            ]);
+            $table->foreignId('relationship_type_id')->nullable()->constrained('relationship_types')->nullOnDelete();
 
             // Datos del familiar
             $table->string('first_name')->nullable();
@@ -46,7 +33,7 @@ return new class extends Migration
 
             // Índices
             $table->index('patient_id');
-            $table->index('relationship');
+            $table->index('relationship_type_id');
         });
     }
 

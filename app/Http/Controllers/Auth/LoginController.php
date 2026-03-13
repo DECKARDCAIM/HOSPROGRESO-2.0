@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Auth;
 
 use App\Http\Controllers\Controller;
 use Illuminate\Foundation\Auth\AuthenticatesUsers;
+use Illuminate\Http\Request;
 
 class LoginController extends Controller
 {
@@ -36,5 +37,22 @@ class LoginController extends Controller
     {
         $this->middleware('guest')->except('logout');
         $this->middleware('auth')->only('logout');
+    }
+
+    /**
+     * The user has been authenticated.
+     *
+     * @param  \Illuminate\Http\Request  $request
+     * @param  mixed  $user
+     * @return mixed
+     */
+    protected function authenticated(Request $request, $user)
+    {
+        if (!$user->is_active || !$user->role_id || !$user->work_department_id) {
+            auth()->logout();
+            return redirect()->route('login')->withErrors([
+                'access_denied' => 'Su cuenta no está completada o se encuentra inactiva (Falta rol o departamento). Por favor, contacte con el departamento de informática para soporte técnico.'
+            ]);
+        }
     }
 }

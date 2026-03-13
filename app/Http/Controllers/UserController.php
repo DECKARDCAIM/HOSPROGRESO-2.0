@@ -8,6 +8,16 @@ use Illuminate\Support\Facades\DB;
 
 class UserController extends Controller
 {
+    public function index()
+    {
+        $users = \App\Models\User::with(['role', 'workDepartment', 'unityExecution'])->get();
+        $totalUsers = $users->count();
+        $activeUsers = $users->where('is_active', true)->count();
+        $inactiveUsers = $users->where('is_active', false)->count();
+
+        return view('modules.user.index', compact('users', 'totalUsers', 'activeUsers', 'inactiveUsers'));
+    }
+
     /**
      * Actualizar el estado del usuario autenticado
      */

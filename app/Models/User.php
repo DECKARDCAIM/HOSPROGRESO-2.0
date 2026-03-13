@@ -36,13 +36,31 @@ class User extends Authenticatable
         'nit',
         'marital_status',
         'phone',
-        'department',
+        'unity_execution_id',
+        'work_department_id',
+        'collegiate_number',
+        'specialty',
         'address',
         'birth_date',
         'gender',
         'estado',
         'theme_preference',
     ];
+
+    public function role()
+    {
+        return $this->belongsTo(Role::class);
+    }
+
+    public function unityExecution()
+    {
+        return $this->belongsTo(UnityExecution::class);
+    }
+
+    public function workDepartment()
+    {
+        return $this->belongsTo(WorkDepartment::class);
+    }
 
     /**
      * The attributes that should be hidden for serialization.

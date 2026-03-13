@@ -11,7 +11,7 @@ class PatientRelative extends Model
 
     protected $fillable = [
         'patient_id',
-        'relationship',
+        'relationship_type_id',
         'first_name',
         'second_name',
         'third_name',
@@ -27,5 +27,13 @@ class PatientRelative extends Model
     public function patient()
     {
         return $this->belongsTo(Patient::class);
+    }
+
+    /**
+     * Get the relationship type.
+     */
+    public function relationshipType()
+    {
+        return $this->belongsTo(RelationshipType::class);
     }
 }

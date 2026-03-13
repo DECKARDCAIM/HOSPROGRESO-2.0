@@ -4,7 +4,7 @@ use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
 
-return new class extends Migration
+return new class extends Migration 
 {
     public function up(): void
     {
@@ -16,7 +16,7 @@ return new class extends Migration
             $table->string('first_last_name');
             $table->string('second_last_name')->nullable();
             $table->string('married_last_name')->nullable();
-            
+
             $table->string('email')->unique();
             $table->timestamp('email_verified_at')->nullable();
             $table->string('password');
@@ -26,9 +26,15 @@ return new class extends Migration
             $table->string('banner_photo_path', 2048)->nullable();
             $table->string('cui', 13)->nullable()->unique();
             $table->string('nit')->nullable()->unique();
-            $table->enum('marital_status', ['soltero','casado','divorciado','viudo','union_libre'])->nullable();
+            $table->enum('marital_status', ['soltero', 'casado', 'divorciado', 'viudo', 'union_libre'])->nullable();
             $table->string('phone')->nullable();
-            $table->string('department')->nullable();
+            $table->foreignId('role_id')->nullable()->constrained('roles')->nullOnDelete();
+            $table->foreignId('unity_execution_id')->nullable()->constrained('unity_executions')->nullOnDelete();
+            $table->foreignId('work_department_id')->nullable()->constrained('work_departments')->nullOnDelete();
+            
+            $table->string('collegiate_number')->nullable();
+            $table->string('specialty')->nullable();
+            
             $table->text('address')->nullable();
             $table->date('birth_date')->nullable();
             $table->string('gender')->nullable();

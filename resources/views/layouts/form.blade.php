@@ -7,7 +7,7 @@
     <meta name="csrf-token" content="{{ csrf_token() }}">
     <link rel="icon" type="image/png" href="{{ asset('img/logo.png') }}">
     <link rel="apple-touch-icon" href="{{ asset('img/logo.png') }}">
-    <title>{{ config('app.name') }} - @yield('title')</title>
+    <title>@yield('title')</title>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="{{ asset('vendor/bootstrap-icons/font/bootstrap-icons.css') }}">
     <link rel="stylesheet" href="{{ asset('vendor/tom-select/dist/css/tom-select.bootstrap5.css') }}">
@@ -199,19 +199,22 @@
             <div class="row">
                 @include('includes.form.content')
                 <div class="col-lg-6 d-flex justify-content-center align-items-center min-vh-lg-100">
-                    <div class="w-100 content-space-t-4 content-space-t-lg-2 content-space-b-1" style="max-width: 25rem;">
+                    <div class="w-100 content-space-t-4 content-space-t-lg-2 content-space-b-1"
+                        style="max-width: 25rem;">
+
                         @yield('content')
+
                     </div>
                 </div>
             </div>
         </div>
     </main>
     <script src="{{ asset('vendor/jquery/dist/jquery.min.js') }}"></script>
-    {{-- <script src="{{ asset('vendor/jquery-migrate/dist/jquery-migrate.min.js') }}"></script> --}}
     <script src="{{ asset('vendor/bootstrap/dist/js/bootstrap.bundle.min.js') }}"></script>
     <script src="{{ asset('vendor/hs-toggle-password/dist/js/hs-toggle-password.js') }}"></script>
     <script src="{{ asset('vendor/tom-select/dist/js/tom-select.complete.min.js') }}"></script>
     <script src="{{ asset('js/theme.min.js') }}"></script>
     @yield('scripts')
 </body>
+
 </html>

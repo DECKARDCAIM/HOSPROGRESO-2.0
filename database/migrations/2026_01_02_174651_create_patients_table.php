@@ -4,14 +4,12 @@ use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
 
-return new class extends Migration
+return new class extends Migration 
 {
     public function up(): void
     {
         Schema::create('patients', function (Blueprint $table) {
             $table->id();
-
-            // Expediente clínico se movió a su propia tabla
 
             // Datos personales
             $table->string('first_name')->nullable();
@@ -57,7 +55,7 @@ return new class extends Migration
             $table->index('email');
             $table->index('phone');
 
-            $table->index(['first_last_name','second_last_name']);
+            $table->index(['first_last_name', 'second_last_name']);
 
             $table->fullText([
                 'first_name',

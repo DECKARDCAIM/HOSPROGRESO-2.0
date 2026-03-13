@@ -23,8 +23,11 @@
 
           <div class="text-center mb-5">
             @php
-              $nombreCompleto = $user->first_name . ' ' . $user->first_last_name . ' ' . $user->second_last_name . ' ' . $user->married_last_name;
-              $iniciales = strtoupper(substr($user->first_name, 0, 1) . substr($user->first_last_name, 0, 1) . substr($user->second_last_name, 0, 1) . substr($user->married_last_name, 0, 1));
+              $nombreCompleto = trim($user->first_name . ' ' . trim($user->second_name . ' ' . $user->third_name)) . ' ' . trim($user->first_last_name . ' ' . $user->second_last_name . ' ' . $user->married_last_name);
+              $iniciales = '';
+              if (!empty($user->first_name)) $iniciales .= strtoupper(substr($user->first_name, 0, 1));
+              if (!empty($user->first_last_name)) $iniciales .= strtoupper(substr($user->first_last_name, 0, 1));
+              if (empty($iniciales)) $iniciales = 'U';
             @endphp
             @if($user->profile_photo_path || $user->profile_photo_path)
               <div class="avatar avatar-xxl avatar-circle profile-cover-avatar" style="position: relative;">

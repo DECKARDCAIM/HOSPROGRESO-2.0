@@ -16,6 +16,7 @@ use Illuminate\Http\Request;
 use Carbon\Carbon;
 use Maatwebsite\Excel\Facades\Excel;
 use App\Exports\PatientsExport;
+use App\Models\RelationshipType;
 
 class PatientController extends Controller
 {
@@ -134,7 +135,6 @@ class PatientController extends Controller
         $civilStatuses = CivilStatus::where('is_active', true)->orderBy('name')->get();
         $ethnicities = Ethnicity::where('is_active', true)->orderBy('name')->get();
         $linguisticCommunities = LinguisticCommunity::where('is_active', true)->orderBy('name')->get();
-
         return view('modules.patient.index', compact(
             'patients',
             'countries',
@@ -165,6 +165,8 @@ class PatientController extends Controller
         $ethnicities = Ethnicity::where('is_active', true)->orderBy('name')->get();
         $linguisticCommunities = LinguisticCommunity::where('is_active', true)->orderBy('name')->get();
 
+        $relationshipTypes = RelationshipType::where('is_active', true)->orderBy('name')->get();
+
         return view('modules.patient.create', compact(
             'countries',
             'departments',
@@ -172,7 +174,8 @@ class PatientController extends Controller
             'genders',
             'civilStatuses',
             'ethnicities',
-            'linguisticCommunities'
+            'linguisticCommunities',
+            'relationshipTypes'
         ));
     }
 
@@ -234,7 +237,7 @@ class PatientController extends Controller
             if ($request->has('relatives') && is_array($request->input('relatives'))) {
                 foreach ($request->input('relatives') as $relativeData) {
                     $patient->relatives()->create([
-                        'relationship' => $relativeData['relationship'],
+                        'relationship_type_id' => $relativeData['relationship_type_id'],
                         'first_name' => $relativeData['first_name'],
                         'second_name' => $relativeData['second_name'] ?? null,
                         'third_name' => $relativeData['third_name'] ?? null,
@@ -292,6 +295,8 @@ class PatientController extends Controller
         $ethnicities = Ethnicity::where('is_active', true)->orderBy('name')->get();
         $linguisticCommunities = LinguisticCommunity::where('is_active', true)->orderBy('name')->get();
 
+        $relationshipTypes = RelationshipType::where('is_active', true)->orderBy('name')->get();
+
         return view('modules.patient.edit', compact(
             'patient',
             'countries',
@@ -300,7 +305,8 @@ class PatientController extends Controller
             'genders',
             'civilStatuses',
             'ethnicities',
-            'linguisticCommunities'
+            'linguisticCommunities',
+            'relationshipTypes'
         ));
     }
 
