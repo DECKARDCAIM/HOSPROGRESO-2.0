@@ -111,5 +111,30 @@ class UserController extends Controller
             ], 500);
         }
     }
+
+    /**
+     * Mostrar el perfil público de un usuario y los miembros de su departamento
+     */
+    public function showProfile($id)
+    {
+        $user = \App\Models\User::with(['role', 'workDepartment', 'unityExecution'])->findOrFail($id);
+
+        // Miembros del departamento del usuario
+        $departamentMembers = \App\Models\User::where('id', '!=', $user->id)
+            ->where('is_active', true)
+            ->where(function ($query) use ($user) {
+                if ($user->unity_execution_id) {
+                    $query->where('unity_execution_id', $user->unity_execution_id);
+                } elseif ($user->work_department_id) {
+                    $query->where('work_department_id', $user->work_department_id);
+                } else {
+                    $query->whereRaw('1 = 0');
+                }
+            })
+            ->limit(10)
+            ->get();
+
+        return view('modules.users.profile', compact('user', 'departamentMembers'));
+    }
 }
 

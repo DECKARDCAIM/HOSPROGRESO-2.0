@@ -1,5 +1,5 @@
 @extends('layouts.panel')
-@section('title', ' Mi Perfil')
+@section('title', ' Perfil de ' . $user->first_name)
 
 @section('content')
     <main id="content" role="main" class="main">
@@ -78,37 +78,14 @@
 
                         <ul class="nav nav-tabs align-items-center">
                             <li class="nav-item">
-                                <a class="nav-link active disabled" href="#">Mi Perfil</a>
+                                <a class="nav-link active disabled" href="#">Perfil del Usuario</a>
                             </li>
 
                             <li class="nav-item ms-auto">
                                 <div class="d-flex gap-2">
-                                    <a class="btn btn-white btn-sm" href="{{ route('profile.edit') }}">
-                                        <i class="bi-person-plus-fill me-1"></i> Editar perfil
+                                    <a class="btn btn-white btn-sm" href="{{ route('profile.index') }}">
+                                        <i class="bi-arrow-left me-1"></i> Regresar
                                     </a>
-
-                                    <div class="dropdown nav-scroller-dropdown">
-                                        <button type="button" class="btn btn-white btn-icon btn-sm" id="profileDropdown"
-                                            data-bs-toggle="dropdown" aria-expanded="false">
-                                            <i class="bi-three-dots-vertical"></i>
-                                        </button>
-
-                                        <div class="dropdown-menu dropdown-menu-end mt-1" aria-labelledby="profileDropdown">
-                                            <span class="dropdown-header">Configuración</span>
-
-                                            <a class="dropdown-item" href="#">
-                                                <i class="bi-share-fill dropdown-item-icon"></i> Compartir perfil
-                                            </a>
-
-                                            <div class="dropdown-divider"></div>
-
-                                            <span class="dropdown-header">Feedback</span>
-
-                                            <a class="dropdown-item" href="#">
-                                                <i class="bi-flag dropdown-item-icon"></i> Reportar
-                                            </a>
-                                        </div>
-                                    </div>
                                 </div>
                             </li>
                         </ul>
@@ -287,91 +264,6 @@
                                     <a class="btn btn-white btn-sm" href="./#">Iniciar Actividades</a>
                                 </div>
                             </div>
-                            <div class="card card-centered mb-3 mb-lg-5">
-                                <div class="card-header card-header-content-between">
-                                    <h4 class="card-header-title">Dispositivos</h4>
-
-                                    <div class="dropdown">
-                                        <button type="button"
-                                            class="btn btn-ghost-secondary btn-icon btn-sm rounded-circle"
-                                            id="projectReportDropdown" data-bs-toggle="dropdown" aria-expanded="false">
-                                            <i class="bi-three-dots-vertical"></i>
-                                        </button>
-
-                                        <div class="dropdown-menu dropdown-menu-end mt-1"
-                                            aria-labelledby="projectReportDropdown">
-                                            <span class="dropdown-header">Configuración</span>
-
-                                            <a class="dropdown-item" href="#" data-bs-toggle="modal"
-                                                data-bs-target="#sessionHistoryModal">
-                                                <i class="bi-clock-history dropdown-item-icon"></i> Ver registros
-                                            </a>
-
-                                            <a class="dropdown-item" href="#" data-bs-toggle="modal"
-                                                data-bs-target="#logoutOtherBrowserSessionsModal">
-                                                <i class="bi-box-arrow-right dropdown-item-icon"></i> Cerrar sesiónes
-                                            </a>
-                                        </div>
-                                    </div>
-                                </div>
-                                <div class="card-body">
-                                    <p class="card-text text-start">Puedes cerrar sesión en todos tus otros dispositivos si
-                                        lo deseas. A continuación se muestran tus sesiones Activas.</p>
-
-                                    @if (count($activeSessions) > 0)
-                                        <ul
-                                            class="list-group list-group-flush list-group-no-gutters d-flex align-items-start text-start">
-                                            @foreach ($activeSessions as $session)
-                                                <li class="list-group-item w-100">
-                                                    <div class="d-flex align-items-center">
-                                                        <div class="flex-shrink-0">
-                                                            @if ($session->agent['is_desktop'])
-                                                                <i class="bi-display fs-2 text-muted"></i>
-                                                            @else
-                                                                <i class="bi-phone fs-2 text-muted"></i>
-                                                            @endif
-                                                        </div>
-
-                                                        <div class="flex-grow-1 ms-3">
-                                                            <div class="d-flex justify-content-between align-items-center">
-                                                                <h5 class="mb-0">
-                                                                    {{ $session->agent['platform'] ? $session->agent['platform'] : 'Desconocido' }}
-                                                                    -
-                                                                    {{ $session->agent['browser'] ? $session->agent['browser'] : 'Desconocido' }}
-
-                                                                    @if ($session->is_active)
-                                                                        <span
-                                                                            class="badge bg-soft-success text-success ms-2">Activa</span>
-                                                                    @else
-                                                                        <span
-                                                                            class="badge bg-soft-secondary text-secondary ms-2">Cerrada</span>
-                                                                    @endif
-                                                                </h5>
-                                                            </div>
-                                                            <ul
-                                                                class="list-inline list-separator small text-muted mb-0 mt-1">
-                                                                <li class="list-inline-item">{{ $session->ip_address }}
-                                                                </li>
-                                                                <li class="list-inline-item" data-bs-toggle="tooltip"
-                                                                    title="Fecha de inicio de sesión">
-                                                                    <i class="bi-calendar-event me-1"></i>
-                                                                    {{ $session->login_at }}
-                                                                </li>
-                                                                <li class="list-inline-item">
-                                                                    @if ($session->is_current_device)
-                                                                        <span class="text-success fw-semibold">Este
-                                                                            dispositivo</span>
-                                                                    @else
-                                                                        Última act.: {{ $session->last_active }}
-                                                                    @endif
-                                                                </li>
-                                                            </ul>
-                                                        </div>
-                                                    </div>
-                                                </li>
-                                            @endforeach
-                                        </ul>
-                                    @endif
                                 </div>
                             </div>
                         </div>
@@ -384,190 +276,18 @@
             <!-- End Row -->
         </div>
         <!-- End Content -->
-
-        <!-- Modal Cerrar Sesiones -->
-        <div class="modal fade" id="logoutOtherBrowserSessionsModal" tabindex="-1"
-            aria-labelledby="logoutOtherBrowserSessionsModalLabel" aria-hidden="true">
-            <div class="modal-dialog modal-dialog-centered">
-                <div class="modal-content">
-                    <div class="modal-header">
-                        <h5 class="modal-title" id="logoutOtherBrowserSessionsModalLabel">Cerrar Otras Sesiones del
-                            Navegador</h5>
-                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                    </div>
-                    <form action="{{ route('profile.sessions.destroy') }}" method="POST">
-                        @csrf
-                        @method('DELETE')
-                        <div class="modal-body">
-                            <p>Introduce tu contraseña para confirmar que deseas cerrar sesión en tus otros dispositivos en
-                                todos los navegadores.</p>
-
-                            <div class="mb-3">
-                                <label for="password" class="form-label">Contraseña</label>
-                                <input type="password" class="form-control" id="password" name="password" required
-                                    autocomplete="current-password" placeholder="Tu contraseña actual">
-                                @error('password')
-                                    <span class="text-danger small">{{ $message }}</span>
-                                @enderror
-                            </div>
-                        </div>
-                        <div class="modal-footer">
-                            <button type="button" class="btn btn-white" data-bs-dismiss="modal">Cancelar</button>
-                            <button type="submit" class="btn btn-primary">Cerrar otras sesiones</button>
-                        </div>
-                    </form>
-                </div>
-            </div>
-        </div>
-        <!-- Modal Historial de Sesiones -->
-        <div class="modal fade" id="sessionHistoryModal" tabindex="-1" aria-labelledby="sessionHistoryModalLabel"
-            aria-hidden="true">
-            <div class="modal-dialog modal-dialog-centered modal-dialog-scrollable modal-lg">
-                <div class="modal-content">
-                    <div class="modal-header">
-                        <h5 class="modal-title" id="sessionHistoryModalLabel">Historial de Sesiones</h5>
-                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                    </div>
-                    <div class="modal-body p-0">
-                        <div id="sessionHistoryLoader" class="text-center p-5">
-                            <div class="spinner-border text-primary" role="status">
-                                <span class="visually-hidden">Cargando...</span>
-                            </div>
-                        </div>
-
-                        <ul id="sessionHistoryList" class="list-group list-group-flush list-group-no-gutters d-none">
-                            <!-- Items dinámicos -->
-                        </ul>
-                    </div>
-                    <div class="modal-footer justify-content-between">
-                        <span id="sessionHistoryPaginationInfo" class="small text-muted"></span>
-                        <div class="btn-group">
-                            <button type="button" id="sessionHistoryPrevBtn" class="btn btn-white btn-sm" disabled>
-                                <i class="bi-chevron-left"></i> Anterior
-                            </button>
-                            <button type="button" id="sessionHistoryNextBtn" class="btn btn-white btn-sm" disabled>
-                                Siguiente <i class="bi-chevron-right"></i>
-                            </button>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-        <!-- End Modal Historial de Sesiones -->
     </main>
 @endsection
 
 @push('scripts')
     <script>
         document.addEventListener('DOMContentLoaded', function() {
-            let currentHistoryPage = 1;
-            const historyModal = document.getElementById('sessionHistoryModal');
-            const loader = document.getElementById('sessionHistoryLoader');
-            const list = document.getElementById('sessionHistoryList');
-            const prevBtn = document.getElementById('sessionHistoryPrevBtn');
-            const nextBtn = document.getElementById('sessionHistoryNextBtn');
-            const paginationInfo = document.getElementById('sessionHistoryPaginationInfo');
-
-            function loadHistory(page = 1) {
-                loader.classList.remove('d-none');
-                list.classList.add('d-none');
-                prevBtn.disabled = true;
-                nextBtn.disabled = true;
-
-                fetch(`/profile/sessions/history?page=${page}`, {
-                        headers: {
-                            'X-Requested-With': 'XMLHttpRequest',
-                            'Accept': 'application/json'
-                        }
-                    })
-                    .then(response => response.json())
-                    .then(data => {
-                        renderHistoryList(data.data);
-
-                        paginationInfo.textContent =
-                            `Mostrando ${data.from || 0} a ${data.to || 0} de ${data.total} entradas`;
-                        currentHistoryPage = data.current_page;
-
-                        prevBtn.disabled = !data.prev_page_url;
-                        nextBtn.disabled = !data.next_page_url;
-
-                        loader.classList.add('d-none');
-                        list.classList.remove('d-none');
-                    })
-                    .catch(error => {
-                        console.error('Error fetching history:', error);
-                        loader.innerHTML = '<p class="text-danger">Hubo un error al cargar el historial.</p>';
-                    });
-            }
-
-            function renderHistoryList(sessions) {
-                list.innerHTML = '';
-
-                if (sessions.length === 0) {
-                    list.innerHTML =
-                        '<div class="p-4 text-center"><p class="text-muted">No hay registros de historial.</p></div>';
-                    return;
-                }
-
-                sessions.forEach(session => {
-                    const icon = session.is_desktop ? '<i class="bi-display fs-2 text-muted"></i>' :
-                        '<i class="bi-phone fs-2 text-muted"></i>';
-                    const statusBadge = session.is_active ?
-                        '<span class="badge bg-soft-success text-success ms-2">Activa</span>' :
-                        '<span class="badge bg-soft-secondary text-secondary ms-2">Cerrada</span>';
-
-                    const currentDeviceBadge = session.is_current_device ?
-                        '<span class="text-success fw-semibold">Este dispositivo</span>' :
-                        `Última act.: ${session.last_active}`;
-
-                    const item = `
-                        <li class="list-group-item p-4 border-bottom">
-                            <div class="d-flex align-items-center">
-                                <div class="flex-shrink-0">
-                                    ${icon}
-                                </div>
-                                <div class="flex-grow-1 ms-3">
-                                    <div class="d-flex justify-content-between align-items-center">
-                                        <h5 class="mb-0">
-                                            ${session.platform} - ${session.browser}
-                                            ${statusBadge}
-                                        </h5>
-                                    </div>
-                                    <ul class="list-inline list-separator small text-muted mb-0 mt-1">
-                                        <li class="list-inline-item">${session.ip_address}</li>
-                                        <li class="list-inline-item" data-bs-toggle="tooltip" title="Fecha de inicio de sesión">
-                                            <i class="bi-calendar-event me-1"></i> ${session.login_at}
-                                        </li>
-                                        <li class="list-inline-item">
-                                            ${currentDeviceBadge}
-                                        </li>
-                                    </ul>
-                                </div>
-                            </div>
-                        </li>
-                    `;
-                    list.insertAdjacentHTML('beforeend', item);
-                });
-            }
-
-            // Listeners for pagination
-            prevBtn.addEventListener('click', () => loadHistory(currentHistoryPage - 1));
-            nextBtn.addEventListener('click', () => loadHistory(currentHistoryPage + 1));
-
-            // Load on modal open
-            historyModal.addEventListener('show.bs.modal', function() {
-                loadHistory(1);
+            var tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'));
+            var tooltipList = tooltipTriggerList.map(function (tooltipTriggerEl) {
+                return new bootstrap.Tooltip(tooltipTriggerEl);
             });
         });
     </script>
-    @if ($errors->has('password'))
-        <script>
-            document.addEventListener('DOMContentLoaded', function() {
-                var modal = new bootstrap.Modal(document.getElementById('logoutOtherBrowserSessionsModal'));
-                modal.show();
-            });
-        </script>
-    @endif
     <script src="{{ asset('vendor/hs-nav-scroller/dist/hs-nav-scroller.min.js') }}"></script>
     <script src="{{ asset('vendor/hs-sticky-block/dist/hs-sticky-block.min.js') }}"></script>
     <script src="{{ asset('vendor/hs-file-attach/dist/hs-file-attach.min.js') }}"></script>

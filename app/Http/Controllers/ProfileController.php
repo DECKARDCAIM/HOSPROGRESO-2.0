@@ -17,7 +17,118 @@ class ProfileController extends Controller
     public function index()
     {
         $user = Auth::user();
-        return view('modules.profile.index', compact('user'));
+
+        // Obtener solo sesiones activas de nuestro historial
+        $sessions = \App\Models\SessionHistory::where('user_id', $user->id)
+            ->where('is_active', true)
+            ->orderBy('last_active_at', 'desc')
+            ->get();
+
+        $activeSessions = $sessions->map(function ($session) {
+            $agent = new \Jenssegers\Agent\Agent();
+            $agent->setUserAgent($session->user_agent);
+
+            $currentSessionId = request()->session()->getId();
+
+            return (object) [
+                'agent' => [
+                    'is_desktop' => $agent->isDesktop(),
+                    'platform' => $agent->platform(),
+                    'browser' => $agent->browser(),
+                ],
+                'ip_address' => $session->ip_address,
+                'is_current_device' => $session->session_id === $currentSessionId,
+                'login_at' => $session->login_at->translatedFormat('d M Y, h:i A'),
+                'last_active' => $session->last_active_at->diffForHumans(),
+                'is_active' => true,
+            ];
+        });
+
+        // Filtrar aquellas que físicamente ya expiraron en la sesion real de laravel para no engañar a la vista
+        $activeSessions = $activeSessions->filter(function ($s) {
+            return $s->is_current_device || \Illuminate\Support\Facades\DB::table('sessions')->where('id', \App\Models\SessionHistory::where('ip_address', $s->ip_address)->where('user_id', Auth::id())->value('session_id'))->exists();
+        });
+
+        // Miembros del departamento del usuario
+        $departamentMembers = \App\Models\User::where('id', '!=', $user->id)
+            ->where('is_active', true)
+            ->where(function ($query) use ($user) {
+                if ($user->unity_execution_id) {
+                    $query->where('unity_execution_id', $user->unity_execution_id);
+                } elseif ($user->work_department_id) {
+                    $query->where('work_department_id', $user->work_department_id);
+                } else {
+                    $query->whereRaw('1 = 0');
+                }
+            })
+            ->limit(10)
+            ->get();
+
+        return view('modules.profile.index', compact('user', 'activeSessions', 'departamentMembers'));
+    }
+
+    /**
+     * Obtener el historial completo paginado (AJAX)
+     */
+    public function sessionHistory(Request $request)
+    {
+        $history = \App\Models\SessionHistory::where('user_id', Auth::id())
+            ->orderBy('login_at', 'desc')
+            ->paginate(20);
+
+        $currentSessionId = $request->session()->getId();
+
+        $history->getCollection()->transform(function ($session) use ($currentSessionId) {
+            $agent = new \Jenssegers\Agent\Agent();
+            $agent->setUserAgent($session->user_agent);
+
+            // Verificamos de nuevo si en realidad la sesión "activa" ya caducó físicamente
+            $isPhysicallyActive = $session->is_active && ($session->session_id === $currentSessionId || \Illuminate\Support\Facades\DB::table('sessions')->where('id', $session->session_id)->exists());
+
+            return [
+                'id' => $session->id,
+                'platform' => $agent->platform() ?: 'Desconocido',
+                'browser' => $agent->browser() ?: 'Desconocido',
+                'is_desktop' => $agent->isDesktop(),
+                'ip_address' => $session->ip_address,
+                'login_at' => $session->login_at->translatedFormat('d M Y, h:i A'),
+                'last_active' => $session->last_active_at->diffForHumans(),
+                'is_current_device' => $session->session_id === $currentSessionId,
+                'is_active' => $isPhysicallyActive,
+            ];
+        });
+
+        return response()->json($history);
+    }
+
+    /**
+     * Cerrar otras sesiones del usuario
+     */
+    public function destroyOtherSessions(Request $request)
+    {
+        $request->validate([
+            'password' => 'required|current_password',
+        ]);
+
+        try {
+            $currentSessionId = $request->session()->getId();
+
+            // 1. Eliminar de la base de datos de sesiones de Laravel para cerrar las conexiones
+            \Illuminate\Support\Facades\DB::table('sessions')
+                ->where('user_id', Auth::id())
+                ->where('id', '!=', $currentSessionId)
+                ->delete();
+
+            // 2. Marcar como "inactivas" en nuestro historial personalizado
+            \App\Models\SessionHistory::where('user_id', Auth::id())
+                ->where('session_id', '!=', $currentSessionId)
+                ->update(['is_active' => false]);
+
+            return redirect()->route('profile.index')->with('success', 'Las demás sesiones han sido cerradas exitosamente.');
+        } catch (\Exception $e) {
+            \Illuminate\Support\Facades\Log::error('Error al cerrar otras sesiones: ' . $e->getMessage());
+            return redirect()->route('profile.index')->withErrors(['error' => 'Error al cerrar las sesiones: ' . $e->getMessage()]);
+        }
     }
 
     /**
@@ -30,10 +141,32 @@ class ProfileController extends Controller
     }
 
     /**
-     * Actualizar el perfil del usuario
+     * Actualizar el perfil del usuario (o contraseña, si se está enviando desde el formulario de seguridad)
      */
     public function update(Request $request)
     {
+        $user = Auth::user();
+
+        // 1. Manejo exclusivo de cambio de contraseña
+        if ($request->has('update_password_only')) {
+            $request->validate([
+                'current_password' => 'required|current_password',
+                'password' => 'required|min:8|confirmed',
+            ]);
+
+            try {
+                DB::table('users')->where('id', $user->id)->update([
+                    'password' => \Illuminate\Support\Facades\Hash::make($request->password)
+                ]);
+
+                return redirect()->route('profile.index')->with('success', 'Contraseña actualizada correctamente');
+            } catch (\Exception $e) {
+                \Illuminate\Support\Facades\Log::error('Error al actualizar contraseña: ' . $e->getMessage());
+                return redirect()->back()->withErrors(['error' => 'Error al actualizar contraseña: ' . $e->getMessage()])->withInput();
+            }
+        }
+
+        // 2. Manejo de información demográfica normal
         $request->validate([
             'first_name' => 'required|string|max:255',
             'second_name' => 'nullable|string|max:255',
@@ -42,40 +175,77 @@ class ProfileController extends Controller
             'second_last_name' => 'nullable|string|max:255',
             'married_last_name' => 'nullable|string|max:255',
 
-            'email' => 'required|email|max:255|unique:users,email,' . Auth::id(),
+            // Correo no se actualiza desde aquí, se omite.
             'cui' => 'nullable|string|max:13|unique:users,cui,' . Auth::id(),
             'nit' => 'nullable|string|max:9|unique:users,nit,' . Auth::id(),
 
             'marital_status' => 'nullable|string|in:soltero,casado,divorciado,viudo,union_libre',
-            'phone' => 'nullable|string|max:8',
-            'department' => 'nullable|string|max:255',
-            'address' => 'nullable|string|max:255',
+            'phone' => 'nullable|string|max:15', // phone is string
+            'address' => 'nullable|string|max:500', // max 500 para dirección
             'birth_date' => 'nullable|date',
             'gender' => 'nullable|string|in:masculino,femenino',
+            
+            // Imágenes
+            'profile_photo' => 'nullable|image|mimes:jpeg,png,jpg|max:4096',
+            'banner_photo' => 'nullable|image|mimes:jpeg,png,jpg|max:4096',
         ]);
 
         try {
-            $user = Auth::user();
-            
-            DB::table('users')
-                ->where('id', $user->id)
-                ->update([
-                    'first_name' => $request->first_name,
-                    'second_name' => $request->second_name,
-                    'third_name' => $request->third_name,
-                    'first_last_name' => $request->first_last_name,
-                    'second_last_name' => $request->second_last_name,
-                    'married_last_name' => $request->married_last_name,
-                    'email' => $request->email,
-                    'cui' => $request->cui,
-                    'nit' => $request->nit,
-                    'marital_status' => $request->marital_status,
-                    'phone' => $request->phone,
-                    'department' => $request->department,
-                    'address' => $request->address,
-                    'birth_date' => $request->birth_date,
-                    'gender' => $request->gender,
-                ]);
+            $updateData = [
+                'first_name' => $request->first_name,
+                'second_name' => $request->second_name,
+                'third_name' => $request->third_name,
+                'first_last_name' => $request->first_last_name,
+                'second_last_name' => $request->second_last_name,
+                'married_last_name' => $request->married_last_name,
+                'cui' => $request->cui,
+                'nit' => $request->nit,
+                'marital_status' => $request->marital_status,
+                'phone' => $request->phone,
+                'address' => $request->address,
+                'birth_date' => $request->birth_date,
+                'gender' => $request->gender,
+            ];
+
+            // Subir Avatar
+            if ($request->hasFile('profile_photo')) {
+                if ($user->profile_photo_path) {
+                    $oldPublicFile = public_path('storage/' . $user->profile_photo_path);
+                    if (\Illuminate\Support\Facades\File::exists($oldPublicFile)) {
+                        try {
+                            \Illuminate\Support\Facades\File::delete($oldPublicFile);
+                        } catch (\Exception $e) {} // Ignorar si está bloqueado por otro proceso
+                    }
+                }
+
+                $avatarFile = $request->file('profile_photo');
+                $avatarName = \Illuminate\Support\Str::random(40) . '.' . $avatarFile->getClientOriginalExtension();
+                $avatarPath = 'profile_photos/' . $avatarName;
+                
+                $avatarFile->move(public_path('storage/profile_photos'), $avatarName);
+                $updateData['profile_photo_path'] = $avatarPath;
+            }
+
+            // Subir Banner
+            if ($request->hasFile('banner_photo')) {
+                if ($user->banner_photo_path) {
+                    $oldPublicFile = public_path('storage/' . $user->banner_photo_path);
+                    if (\Illuminate\Support\Facades\File::exists($oldPublicFile)) {
+                        try {
+                            \Illuminate\Support\Facades\File::delete($oldPublicFile);
+                        } catch (\Exception $e) {} // Ignorar si está bloqueado por otro proceso
+                    }
+                }
+
+                $bannerFile = $request->file('banner_photo');
+                $bannerName = \Illuminate\Support\Str::random(40) . '.' . $bannerFile->getClientOriginalExtension();
+                $bannerPath = 'banner_photos/' . $bannerName;
+                
+                $bannerFile->move(public_path('storage/banner_photos'), $bannerName);
+                $updateData['banner_photo_path'] = $bannerPath;
+            }
+
+            DB::table('users')->where('id', $user->id)->update($updateData);
             
             $user->refresh();
 
@@ -90,7 +260,7 @@ class ProfileController extends Controller
             // Si no es AJAX, redirigir
             return redirect()->route('profile.index')->with('success', 'Perfil actualizado correctamente');
         } catch (\Exception $e) {
-            \Log::error('Error al actualizar perfil: ' . $e->getMessage());
+            \Illuminate\Support\Facades\Log::error('Error al actualizar perfil: ' . $e->getMessage());
             
             // Si es una petición AJAX, devolver JSON
             if ($request->ajax() || $request->wantsJson()) {

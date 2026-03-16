@@ -27,6 +27,8 @@ Route::middleware('auth')->group(function () {
 
     // Rutas de perfil
     Route::get('/profile', [ProfileController::class , 'index'])->name('profile.index');
+    Route::get('/profile/sessions/history', [ProfileController::class , 'sessionHistory'])->name('profile.sessions.history');
+    Route::delete('/profile/sessions', [ProfileController::class , 'destroyOtherSessions'])->name('profile.sessions.destroy');
     Route::get('/profile/edit', [ProfileController::class , 'edit'])->name('profile.edit');
     Route::put('/profile', [ProfileController::class , 'update'])->name('profile.update');
     Route::post('/profile/update-avatar', [ProfileController::class , 'updateAvatar'])->name('profile.update-avatar');
@@ -53,4 +55,5 @@ Route::middleware('auth')->group(function () {
 
     Route::get('/users', [UserController::class , 'index'])->name('users.index');
     Route::get('/users/create', [UserController::class , 'create'])->name('users.create');
+    Route::get('/users/{id}/profile', [UserController::class , 'showProfile'])->name('users.profile');
 });

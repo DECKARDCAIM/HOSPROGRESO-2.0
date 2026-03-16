@@ -2,692 +2,394 @@
 @section('title', ' Editar Perfil')
 
 @section('content')
-<main id="content" role="main" class="main">
-    <div class="content container-fluid">
-      <div class="row justify-content-lg-center">
-        <div class="col-lg-10">
-          <div class="profile-cover">
-            <div class="profile-cover-img-wrapper" style="position: relative;">
-              <img id="profileCoverImg" class="profile-cover-img" 
-                   src="{{ $user->banner_url ?? ($user->banner_photo_path ? asset('storage/banner_photos/' . basename($user->banner_photo_path)) : asset('img/1920x400/img2.jpg')) }}"
-                   data-src="{{ $user->banner_url ?? ($user->banner_photo_path ? asset('storage/banner_photos/' . basename($user->banner_photo_path)) : asset('img/1920x400/img2.jpg')) }}"
-                   alt="Image Description"
-                   onerror="this.onerror=null; retryImageLoad(this);"
-                   onload="hideBannerLoading();">
-              <div class="image-loading-placeholder" id="banner-loading" style="position: absolute; top: 0; left: 0; right: 0; bottom: 0; display: flex; align-items: center; justify-content: center; background: #f8f9fa; z-index: 1;">
-                <div class="spinner-border text-primary" role="status">
-                  <span class="visually-hidden">Cargando...</span>
-                </div>
-              </div>
+    <main id="content" role="main" class="main">
+        <!-- Content -->
+        <div class="content container-fluid">
+            <div class="row justify-content-lg-center">
+                <div class="col-lg-10">
+                    <div class="profile-cover">
+                        <div class="profile-cover-img-wrapper">
 
-              <div class="profile-cover-content profile-cover-uploader p-3">
-                <input type="file" class="profile-cover-uploader-input" id="banner-photo-input" name="banner_photo" accept="image/png,image/jpeg,image/jpg" style="display: none;">
-                @if(!$user->banner_url && !$user->banner_photo_path)
-                <label class="profile-cover-uploader-label btn btn-sm btn-white" id="upload-banner-label" for="banner-photo-input">
-                  <i class="bi-camera-fill"></i>
-                  <span class="d-none d-sm-inline-block ms-1">Subir banner</span>
-                </label>
-                @endif
-                @if($user->banner_url || $user->banner_photo_path)
-                <button type="button" class="btn btn-sm btn-danger" id="delete-banner-btn" onclick="deleteBanner()">
-                  <i class="bi-trash"></i>
-                  <span class="d-none d-sm-inline-block ms-1">Eliminar</span>
-                </button>
-                @endif
-              </div>
-            </div>
-          </div>
+                            <img id="profileCoverImg" class="profile-cover-img"
+                                src="{{ $user->banner_photo_path ? asset('storage/' . $user->banner_photo_path) : asset('img/1920x400/img2.jpg') }}"
+                                data-src="{{ $user->banner_photo_path ? asset('storage/' . $user->banner_photo_path) : asset('img/1920x400/img2.jpg') }}"
+                                alt="Image Description" onerror="this.onerror=null; retryImageLoad(this);">
 
-          <div class="text-center mb-5">
-            <div style="position: relative; display: inline-block; margin-bottom: 10px;">
-              @php
-                $nombreCompleto = $user->first_name . ' ' . $user->first_last_name . ' ' . $user->second_last_name . ' ' . $user->married_last_name;
-                $iniciales = strtoupper(substr($user->first_name, 0, 1) . substr($user->first_last_name, 0, 1) . substr($user->second_last_name, 0, 1) . substr($user->married_last_name, 0, 1));
-              @endphp
-              @if($user->profile_photo_path || $user->profile_photo_path)
-                <label class="avatar avatar-xxl avatar-circle avatar-uploader profile-cover-avatar" for="profile-photo-input" style="position: relative;">
-                  <img id="editAvatarImgModal" class="avatar-img" 
-                       src="{{ $user->profile_photo_path ?? asset('storage/profile_photos/' . basename($user->profile_photo_path)) }}"
-                       data-src="{{ $user->profile_photo_path ?? asset('storage/profile_photos/' . basename($user->profile_photo_path)) }}"
-                       alt="Image Description"
-                       onerror="this.onerror=null; retryImageLoad(this);"
-                       onload="hideAvatarLoading();">
-                  <div class="image-loading-placeholder" id="avatar-loading" style="position: absolute; top: 0; left: 0; right: 0; bottom: 0; display: flex; align-items: center; justify-content: center; background: #f8f9fa; border-radius: 50%; z-index: 1;">
-                    <div class="spinner-border spinner-border-sm text-primary" role="status">
-                      <span class="visually-hidden">Cargando...</span>
-                    </div>
-                  </div>
-                  <input type="file" class="avatar-uploader-input" id="profile-photo-input" name="profile_photo" accept="image/png,image/jpeg,image/jpg" style="display: none;">
-                  <span class="avatar-uploader-trigger" id="upload-avatar-trigger" style="position: absolute; bottom: 0; right: 0; z-index: 10; display: none;">
-                    <i class="bi-camera-fill avatar-uploader-icon shadow-sm"></i>
-                  </span>
-                  <button type="button" class="btn btn-sm btn-danger" id="delete-avatar-btn" onclick="deleteAvatar()" style="position: absolute; bottom: 0; right: 0; border-radius: 50%; width: 36px; height: 36px; padding: 0; display: flex; align-items: center; justify-content: center; z-index: 10; box-shadow: 0 2px 4px rgba(0,0,0,0.2);">
-                    <i class="bi-trash"></i>
-                  </button>
-                </label>
-              @else
-                <label class="avatar avatar-xxl avatar-circle avatar-soft-primary avatar-uploader profile-cover-avatar" for="profile-photo-input" style="position: relative; border:none !important;">
-                  <span class="avatar-initials" id="avatar-initials-container">{{ $iniciales }}</span>
-                  <input type="file" class="avatar-uploader-input" id="profile-photo-input" name="profile_photo" accept="image/png,image/jpeg,image/jpg" style="display: none;">
-                  <span class="avatar-uploader-trigger" id="upload-avatar-trigger" style="position: absolute; bottom: 0; right: 0; z-index: 10;">
-                    <i class="bi-camera-fill avatar-uploader-icon shadow-sm"></i>
-                  </span>
-                  <button type="button" class="btn btn-sm btn-danger" id="delete-avatar-btn" onclick="deleteAvatar()" style="position: absolute; bottom: 0; right: 0; border-radius: 50%; width: 36px; height: 36px; padding: 0; display: none; align-items: center; justify-content: center; z-index: 10; box-shadow: 0 2px 4px rgba(0,0,0,0.2);">
-                    <i class="bi-trash"></i>
-                  </button>
-                </label>
-              @endif
-            </div>
-
-            <h1 class="page-header-title">{{ $nombreCompleto }} <i class="bi-patch-check-fill fs-2 text-primary" data-bs-toggle="tooltip" data-bs-placement="top" title="Verificado"></i></h1>
-          </div>
-
-          <div class="row">
-            <div class="col-lg-12">
-              <div class="card">
-                <div class="card-header">
-                  <h4 class="card-header-title">Editar Perfil</h4>
-                </div>
-                <div class="card-body">
-                  <form id="profileForm" method="POST" action="{{ route('profile.update') }}">
-                    @csrf
-                    @method('PUT')
-
-                    <div class="row mb-4">
-                      <div class="col-md-6">
-                        <label class="form-label" for="first_name">Nombre</label>
-                        <input type="text" class="form-control" id="first_name" name="first_name" value="{{ old('first_name', $user->first_name) }}" required>
-                      </div>
-                      <div class="col-md-6">
-                        <label class="form-label" for="second_name">Segundo nombre</label>
-                        <input type="text" class="form-control" id="second_name" name="second_name" value="{{ old('second_name', $user->second_name) }}">
-                      </div>
-                      <div class="col-md-6">
-                        <label class="form-label" for="third_name">Tercer nombre</label>
-                        <input type="text" class="form-control" id="third_name" name="third_name" value="{{ old('third_name', $user->third_name) }}">
-                      </div>
-                      <div class="col-md-6">
-                        <label class="form-label" for="first_last_name">Primer apellido</label>
-                        <input type="text" class="form-control" id="first_last_name" name="first_last_name" value="{{ old('first_last_name', $user->first_last_name) }}">
-                      </div>
-                      <div class="col-md-6">
-                        <label class="form-label" for="second_last_name">Segundo apellido</label>
-                        <input type="text" class="form-control" id="second_last_name" name="second_last_name" value="{{ old('second_last_name', $user->second_last_name) }}">
-                      </div>
-                      <div class="col-md-6">
-                        <label class="form-label" for="married_last_name">Apellido de casada</label>
-                        <input type="text" class="form-control" id="married_last_name" name="married_last_name" value="{{ old('married_last_name', $user->married_last_name) }}">
-                      </div>
+                            <div class="profile-cover-content profile-cover-uploader p-3">
+                                <input type="file" class="js-file-attach profile-cover-uploader-input"
+                                    id="profileCoverUplaoder" name="banner_photo" form="profileForm"
+                                    data-hs-file-attach-options='{
+                    "textTarget": "#profileCoverImg",
+                    "mode": "image",
+                    "targetAttr": "src",
+                    "allowTypes": [".png", ".jpeg", ".jpg"]
+                }'>
+                                <label class="profile-cover-uploader-label btn btn-sm btn-white" for="profileCoverUplaoder">
+                                    <i class="bi-camera-fill"></i>
+                                    <span class="d-none d-sm-inline-block ms-1">Upload header</span>
+                                </label>
+                            </div>
+                        </div>
                     </div>
 
-                    <div class="row mb-4">
-                      <div class="col-md-6">
-                        <label class="form-label" for="email">Correo electrónico</label>
-                        <input type="email" class="form-control" id="email" name="email" value="{{ old('email', $user->email) }}" required>
-                      </div>
-                      <div class="col-md-6">
-                        <label class="form-label" for="phone">Teléfono</label>
-                        <input type="text" class="form-control" id="phone" name="phone" value="{{ old('phone', $user->phone) }}">
-                      </div>
-                    </div>
-
-                    <div class="row mb-4">
-                      <div class="col-md-6">
-                        <label class="form-label" for="department">Departamento</label>
-                        <input type="text" class="form-control" id="department" name="department" value="{{ old('department', $user->department) }}">
-                      </div>
-                    </div>
-
-                      <div class="col-md-6">
-                        <label class="form-label" for="address">Dirección</label>
-                        <input type="text" class="form-control" id="address" name="address" value="{{ old('address', $user->address) }}">
-                      </div>
-                      <div class="col-md-6">
-                        <label class="form-label" for="birth_date">Fecha de nacimiento</label>
-                        <input type="date" class="form-control" id="birth_date" name="birth_date" value="{{ old('birth_date', $user->birth_date) }}">
-                      </div>
-                      <div class="col-md-6">
-                        <label class="form-label" for="gender">Género</label>
-                        <select class="form-control" id="gender" name="gender">
-                          <option value="masculino" {{ old('gender', $user->gender) == 'masculino' ? 'selected' : '' }}>Masculino</option>
-                          <option value="femenino" {{ old('gender', $user->gender) == 'femenino' ? 'selected' : '' }}>Femenino</option>
-                        </select>
-                      </div>
-                    </div>
-
-                    <div class="d-flex justify-content-end gap-2">
-                      <a href="{{ route('profile.index') }}" class="btn btn-white">Cancelar</a>
-                      <button type="submit" class="btn btn-primary">Guardar cambios</button>
-                    </div>
-                  </form>
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
-    </div>
-  </main>
-
-<script>
-document.addEventListener('DOMContentLoaded', function () {
-    // SUBIR AVATAR INMEDIATAMENTE AL SELECCIONAR
-    const profilePhotoInput = document.getElementById('profile-photo-input');
-    if (profilePhotoInput) {
-        profilePhotoInput.addEventListener('change', function(e) {
-            const file = e.target.files[0];
-            if (!file) return;
-
-            const allowedTypes = ['image/jpeg', 'image/png', 'image/jpg'];
-            if (!allowedTypes.includes(file.type)) {
-                alert('Solo se permiten archivos JPG, PNG.');
-                e.target.value = '';
-                return;
-            }
-
-            // Mostrar preview inmediatamente
-            const reader = new FileReader();
-            reader.onload = function(e) {
-                const avatarImg = document.getElementById('editAvatarImgModal');
-                const initialsContainer = document.getElementById('avatar-initials-container');
-                
-                if (avatarImg) {
-                    avatarImg.src = e.target.result;
-                } else if (initialsContainer) {
-                    // Reemplazar el label completo cuando no hay foto
-                    const label = initialsContainer.closest('.avatar-uploader');
-                    if (label) {
-                        // Remover clase avatar-soft-primary
-                        label.classList.remove('avatar-soft-primary');
-                        
-                        // Crear la imagen
-                        const newImg = document.createElement('img');
-                        newImg.id = 'editAvatarImgModal';
-                        newImg.className = 'avatar-img';
-                        newImg.src = e.target.result;
-                        newImg.alt = 'Image Description';
-                        newImg.onerror = function() { this.onerror=null; retryImageLoad(this); };
-                        newImg.onload = function() { hideAvatarLoading(); };
-                        
-                        // Reemplazar el span de iniciales con la imagen
-                        initialsContainer.replaceWith(newImg);
-                        
-                        // Agregar placeholder de loading
-                        const loadingDiv = document.createElement('div');
-                        loadingDiv.className = 'image-loading-placeholder';
-                        loadingDiv.id = 'avatar-loading';
-                        loadingDiv.style.cssText = 'position: absolute; top: 0; left: 0; right: 0; bottom: 0; display: flex; align-items: center; justify-content: center; background: #f8f9fa; border-radius: 50%; z-index: 1;';
-                        loadingDiv.innerHTML = '<div class="spinner-border spinner-border-sm text-primary" role="status"><span class="visually-hidden">Cargando...</span></div>';
-                        label.appendChild(loadingDiv);
-                    }
-                }
-            };
-            reader.readAsDataURL(file);
-
-            // Subir inmediatamente
-            const formData = new FormData();
-            formData.append('profile_photo_path', file);
-            formData.append('_token', document.querySelector('meta[name="csrf-token"]').getAttribute('content'));
-
-            fetch('{{ route("profile.update-avatar") }}', {
-                method: 'POST',
-                body: formData,
-                headers: {
-                    'X-Requested-With': 'XMLHttpRequest',
-                    'Accept': 'application/json'
-                }
-            })
-            .then(response => response.json())
-            .then(data => {
-                if (data.success) {
-                    // Actualizar con URL del servidor
-                    const avatarImg = document.getElementById('editAvatarImgModal');
-                    if (avatarImg) avatarImg.src = data.avatar_url;
-                    
-                    // Actualizar en navbar
-                    const navbarImg = document.getElementById('navbar-avatar-img');
-                    const dropdownImg = document.getElementById('dropdown-avatar-img');
-                    if (navbarImg) navbarImg.src = data.avatar_url;
-                    if (dropdownImg) dropdownImg.src = data.avatar_url;
-                    
-                    // Ocultar trigger de subir y mostrar botón de eliminar
-                    const uploadTrigger = document.getElementById('upload-avatar-trigger');
-                    if (uploadTrigger) {
-                        uploadTrigger.style.display = 'none';
-                    }
-                    
-                    // Mostrar botón de eliminar (siempre existe, solo cambiamos visibilidad)
-                    const deleteBtn = document.getElementById('delete-avatar-btn');
-                    if (deleteBtn) {
-                        deleteBtn.style.display = 'flex';
-                    }
-                } else {
-                    alert(data.message || 'Error al subir la foto.');
-                }
-            })
-            .catch(error => {
-                console.error('Error:', error);
-                alert('Error de conexión. Intenta nuevamente.');
-            });
-        });
-    }
-
-    // SUBIR BANNER INMEDIATAMENTE AL SELECCIONAR
-    const bannerPhotoInput = document.getElementById('banner-photo-input');
-    if (bannerPhotoInput) {
-        bannerPhotoInput.addEventListener('change', function(e) {
-            const file = e.target.files[0];
-            if (!file) return;
-
-            const allowedTypes = ['image/jpeg', 'image/png', 'image/jpg'];
-            if (!allowedTypes.includes(file.type)) {
-                alert('Solo se permiten archivos JPG, PNG.');
-                e.target.value = '';
-                return;
-            }
-
-            // Mostrar preview inmediatamente
-            const reader = new FileReader();
-            reader.onload = function(e) {
-                document.getElementById('profileCoverImg').src = e.target.result;
-            };
-            reader.readAsDataURL(file);
-
-            // Subir inmediatamente
-            const formData = new FormData();
-            formData.append('banner_photo_path', file);
-            formData.append('_token', document.querySelector('meta[name="csrf-token"]').getAttribute('content'));
-
-            fetch('{{ route("profile.update-banner") }}', {
-                method: 'POST',
-                body: formData,
-                headers: {
-                    'X-Requested-With': 'XMLHttpRequest',
-                    'Accept': 'application/json'
-                }
-            })
-            .then(response => response.json())
-            .then(data => {
-                if (data.success) {
-                    // Actualizar con URL del servidor
-                    document.getElementById('profileCoverImg').src = data.banner_url;
-                    
-                    // Ocultar botón de subir y mostrar botón de eliminar
-                    const uploadLabel = document.getElementById('upload-banner-label');
-                    if (uploadLabel) {
-                        uploadLabel.style.display = 'none';
-                    }
-                    
-                    // Mostrar botón de eliminar si no existe
-                    if (!document.getElementById('delete-banner-btn')) {
-                        const deleteBtn = document.createElement('button');
-                        deleteBtn.type = 'button';
-                        deleteBtn.className = 'btn btn-sm btn-danger';
-                        deleteBtn.id = 'delete-banner-btn';
-                        deleteBtn.onclick = deleteBanner;
-                        deleteBtn.innerHTML = '<i class="bi-trash"></i><span class="d-none d-sm-inline-block ms-1">Eliminar</span>';
-                        document.querySelector('.profile-cover-uploader').appendChild(deleteBtn);
-                    }
-                } else {
-                    alert(data.message || 'Error al subir el banner.');
-                }
-            })
-            .catch(error => {
-                console.error('Error:', error);
-                alert('Error de conexión. Intenta nuevamente.');
-            });
-        });
-    }
-
-    // ELIMINAR AVATAR
-    window.deleteAvatar = function() {
-        if (!confirm('¿Estás seguro de que deseas eliminar tu foto de perfil?')) {
-            return;
-        }
-
-        fetch('{{ route("profile.delete-avatar") }}', {
-            method: 'DELETE',
-            headers: {
-                'X-Requested-With': 'XMLHttpRequest',
-                'Accept': 'application/json',
-                'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content')
-            }
-        })
-        .then(response => response.json())
-        .then(data => {
-            if (data.success) {
-                // Reemplazar imagen con iniciales
-                const avatarImg = document.getElementById('editAvatarImgModal');
-                const label = avatarImg ? avatarImg.closest('.avatar-uploader') : null;
-                if (avatarImg && label) {
-                    @php
-                        $nombreCompleto = $user->first_name . ' ' . $user->first_last_name . ' ' . $user->second_last_name . ' ' . $user->married_last_name;
-                        $iniciales = strtoupper(substr($user->first_name, 0, 1) . substr($user->first_last_name, 0, 1) . substr($user->second_last_name, 0, 1) . substr($user->married_last_name, 0, 1));
-                    @endphp
-                    
-                    // Agregar clase avatar-soft-primary al label
-                    label.classList.add('avatar-soft-primary');
-                    
-                    // Crear span de iniciales
-                    const initialsSpan = document.createElement('span');
-                    initialsSpan.className = 'avatar-initials';
-                    initialsSpan.id = 'avatar-initials-container';
-                    initialsSpan.textContent = '{{ $iniciales }}';
-                    
-                    // Remover imagen y loading placeholder
-                    avatarImg.remove();
-                    const loadingPlaceholder = document.getElementById('avatar-loading');
-                    if (loadingPlaceholder) loadingPlaceholder.remove();
-                    
-                    // Agregar iniciales
-                    label.insertBefore(initialsSpan, label.firstChild);
-                }
-                
-                // Ocultar botón de eliminar y mostrar trigger de subir
-                const deleteBtn = document.getElementById('delete-avatar-btn');
-                if (deleteBtn) {
-                    deleteBtn.style.display = 'none';
-                }
-                
-                // Mostrar trigger de subir (cámara) - siempre existe, solo cambiamos visibilidad
-                const uploadTrigger = document.getElementById('upload-avatar-trigger');
-                if (uploadTrigger) {
-                    uploadTrigger.style.display = '';
-                }
-                
-                // Actualizar navbar
-                const navbarImg = document.getElementById('navbar-avatar-img');
-                const dropdownImg = document.getElementById('dropdown-avatar-img');
-                if (navbarImg) navbarImg.remove();
-                if (dropdownImg) dropdownImg.remove();
-                
-                alert('Foto de perfil eliminada correctamente.');
-                setTimeout(() => window.location.reload(), 500);
-            } else {
-                alert(data.message || 'Error al eliminar la foto.');
-            }
-        })
-        .catch(error => {
-            console.error('Error:', error);
-            alert('Error de conexión. Intenta nuevamente.');
-        });
-    };
-
-    // ELIMINAR BANNER
-    window.deleteBanner = function() {
-        if (!confirm('¿Estás seguro de que deseas eliminar el banner?')) {
-            return;
-        }
-
-        fetch('{{ route("profile.delete-banner") }}', {
-            method: 'DELETE',
-            headers: {
-                'X-Requested-With': 'XMLHttpRequest',
-                'Accept': 'application/json',
-                'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content')
-            }
-        })
-        .then(response => response.json())
-        .then(data => {
-            if (data.success) {
-                // Restaurar banner por defecto
-                document.getElementById('profileCoverImg').src = '{{ asset("img/1920x400/img2.jpg") }}';
-                
-                // Eliminar botón de eliminar y mostrar botón de subir
-                const deleteBtn = document.getElementById('delete-banner-btn');
-                if (deleteBtn) deleteBtn.remove();
-                
-                // Mostrar botón de subir
-                const uploadLabel = document.getElementById('upload-banner-label');
-                if (!uploadLabel) {
-                    const uploaderDiv = document.querySelector('.profile-cover-uploader');
-                    if (uploaderDiv) {
-                        const newLabel = document.createElement('label');
-                        newLabel.className = 'profile-cover-uploader-label btn btn-sm btn-white';
-                        newLabel.id = 'upload-banner-label';
-                        newLabel.setAttribute('for', 'banner-photo-input');
-                        newLabel.innerHTML = '<i class="bi-camera-fill"></i><span class="d-none d-sm-inline-block ms-1">Subir banner</span>';
-                        uploaderDiv.appendChild(newLabel);
-                    }
-                } else {
-                    uploadLabel.style.display = '';
-                }
-                
-                alert('Banner eliminado correctamente.');
-                setTimeout(() => window.location.reload(), 500);
-            } else {
-                alert(data.message || 'Error al eliminar el banner.');
-            }
-        })
-        .catch(error => {
-            console.error('Error:', error);
-            alert('Error de conexión. Intenta nuevamente.');
-        });
-    };
-
-    // Manejar envío del formulario de perfil
-    const profileForm = document.getElementById('profileForm');
-    if (profileForm) {
-        profileForm.addEventListener('submit', function(e) {
-            e.preventDefault();
-            
-            const formData = new FormData(this);
-            formData.append('_method', 'PUT');
-            const submitButton = this.querySelector('button[type="submit"]');
-            const originalText = submitButton.innerHTML;
-            
-            // Deshabilitar botón y mostrar carga
-            submitButton.disabled = true;
-            submitButton.innerHTML = '<span class="spinner-border spinner-border-sm me-1"></span>Guardando...';
-            
-            fetch(this.action, {
-                method: 'POST',
-                body: formData,
-                headers: {
-                    'X-Requested-With': 'XMLHttpRequest',
-                    'Accept': 'application/json',
-                    'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content')
-                }
-            })
-            .then(response => response.json())
-            .then(data => {
-                if (data.success) {
-                    // Redirigir al index
-                    window.location.href = '{{ route("profile.index") }}';
-                } else {
-                    alert('Error: ' + (data.message || 'Error desconocido'));
-                    submitButton.disabled = false;
-                    submitButton.innerHTML = originalText;
-                }
-            })
-            .catch(error => {
-                console.error('Error:', error);
-                alert('Error al actualizar el perfil. Por favor, intenta nuevamente.');
-                submitButton.disabled = false;
-                submitButton.innerHTML = originalText;
-            });
-        });
-    }
-
-    // Función para cargar imágenes con múltiples intentos
-    function loadImageWithRetry(imgElement, maxRetries = 3, retryDelay = 1000) {
-        let retryCount = 0;
-        const originalSrc = imgElement.getAttribute('data-src');
-        
-        if (!originalSrc) {
-            hideLoadingPlaceholder(imgElement);
-            return;
-        }
-
-        function tryLoad() {
-            // Generar URL basada en la URL actual
-            let imageUrl = originalSrc;
-            
-            // Normalizar URL basada en la URL actual
-            const currentHost = window.location.hostname;
-            const currentOrigin = window.location.origin;
-            
-            // Si la URL original contiene localhost o 127.0.0.1, o no coincide con el host actual
-            if (originalSrc.includes('localhost') || originalSrc.includes('127.0.0.1') || 
-                !originalSrc.includes(currentHost)) {
-                
-                // Extraer el nombre del archivo
-                const pathMatch = originalSrc.match(/\/storage\/([^\/]+\/[^\/]+)$/);
-                if (pathMatch) {
-                    // Intentar diferentes variaciones según el hostname
-                    if (currentHost === '192.168.1.219') {
-                        // Primero intentar sin subdirectorio
-                        imageUrl = currentOrigin + '/storage/' + pathMatch[1];
-                    } else if (currentHost === 'hospro-workstation.test') {
-                        imageUrl = currentOrigin + '/storage/' + pathMatch[1];
-                    } else {
-                        imageUrl = currentOrigin + '/storage/' + pathMatch[1];
-                    }
-                }
-            }
-            
-            // Si la URL no es absoluta, hacerla absoluta
-            if (!imageUrl.startsWith('http://') && !imageUrl.startsWith('https://')) {
-                imageUrl = currentOrigin + '/' + imageUrl.replace(/^\//, '');
-            }
-
-            const testImg = new Image();
-            
-            testImg.onload = function() {
-                imgElement.src = imageUrl;
-                hideLoadingPlaceholder(imgElement);
-            };
-            
-            testImg.onerror = function() {
-                retryCount++;
-                
-                if (retryCount < maxRetries) {
-                    // Intentar con diferentes variaciones de URL
-                    setTimeout(() => {
-                        // Intentar con diferentes variaciones de URL
-                        const pathMatch = originalSrc.match(/\/storage\/([^\/]+\/[^\/]+)$/);
-                        if (pathMatch) {
-                            const fallbackUrls = [];
-                            const hostname = window.location.hostname;
-                            
-                            if (hostname === '192.168.1.219') {
-                                // Para IP, intentar ambas variaciones
-                                fallbackUrls.push(
-                                    window.location.origin + '/storage/' + pathMatch[1],
-                                    window.location.origin + '/HOSPRO-WorkStation/public/storage/' + pathMatch[1]
+                    <!-- Profile Header -->
+                    <div class="text-center mb-5">
+                        @php
+                            $nombreCompleto =
+                                trim($user->first_name . ' ' . trim($user->second_name . ' ' . $user->third_name)) .
+                                ' ' .
+                                trim(
+                                    $user->first_last_name .
+                                        ' ' .
+                                        $user->second_last_name .
+                                        ' ' .
+                                        $user->married_last_name,
                                 );
-                            } else if (hostname === 'hospro-workstation.test') {
-                                fallbackUrls.push(
-                                    window.location.origin + '/storage/' + pathMatch[1]
-                                );
-                            } else {
-                                // Para otros dominios, intentar con el path actual
-                                fallbackUrls.push(window.location.origin + '/storage/' + pathMatch[1]);
+                            $iniciales = '';
+                            if (!empty($user->first_name)) {
+                                $iniciales .= strtoupper(substr($user->first_name, 0, 1));
                             }
-                            
-                            const fallbackIndex = retryCount - 1;
-                            if (fallbackIndex < fallbackUrls.length) {
-                                testImg.src = fallbackUrls[fallbackIndex];
-                            } else {
-                                // Si se agotaron las URLs de fallback, reintentar con delay
-                                setTimeout(() => tryLoad(), retryDelay * retryCount);
+                            if (!empty($user->first_last_name)) {
+                                $iniciales .= strtoupper(substr($user->first_last_name, 0, 1));
                             }
-                        } else {
-                            setTimeout(() => tryLoad(), retryDelay * retryCount);
-                        }
-                    }, retryDelay * retryCount);
-                } else {
-                    // Máximo de intentos alcanzado, mostrar placeholder o iniciales
-                    hideLoadingPlaceholder(imgElement);
-                    showImageError(imgElement);
-                }
-            };
-            
-            testImg.src = imageUrl;
-        }
-        
-        tryLoad();
-    }
+                            if (empty($iniciales)) {
+                                $iniciales = 'U';
+                            }
+                        @endphp
 
-    function hideLoadingPlaceholder(imgElement) {
-        const loadingId = imgElement.id === 'profileCoverImg' || imgElement.id === 'editAvatarImgModal' ? 
-            (imgElement.id === 'profileCoverImg' ? 'banner-loading' : 'avatar-loading') : 
-            (imgElement.classList.contains('profile-cover-img') ? 'banner-loading' : 'avatar-loading');
-        const loadingPlaceholder = document.getElementById(loadingId);
-        if (loadingPlaceholder) {
-            loadingPlaceholder.style.display = 'none';
-        }
-    }
+                        <label class="avatar avatar-xxl avatar-circle avatar-uploader profile-cover-avatar"
+                            for="editAvatarUploaderModal" style="cursor: pointer; position: relative; border: none;">
 
-    function showImageError(imgElement) {
-        // Si es el avatar, mostrar iniciales en su lugar
-        if (imgElement.classList.contains('avatar-img')) {
-            const avatarContainer = imgElement.closest('.avatar');
-            if (avatarContainer) {
-                imgElement.style.display = 'none';
-            }
-        }
-    }
+                            @if ($user->profile_photo_path)
+                                <img class="avatar-img" id="editAvatarImgModal"
+                                    src="{{ asset('storage/' . $user->profile_photo_path) }}" alt="Foto de perfil">
+                            @else
+                                <span class="avatar-soft-primary" id="editAvatarInitials"
+                                    style="display: flex; align-items: center; justify-content: center; width: 100%; height: 100%;">
+                                    <span class="avatar-initials">{{ $iniciales }}</span>
+                                </span>
+                                <img class="avatar-img d-none" id="editAvatarImgModal" src=""
+                                    alt="Previsualización de foto"
+                                    onload="document.getElementById('editAvatarInitials').style.display='none'; this.classList.remove('d-none');">
+                            @endif
 
-    // Función para ocultar el loading del banner cuando la imagen carga
-    window.hideBannerLoading = function() {
-        const bannerLoading = document.getElementById('banner-loading');
-        if (bannerLoading) {
-            bannerLoading.style.display = 'none';
-        }
-    };
+                            <input type="file" class="js-file-attach avatar-uploader-input" id="editAvatarUploaderModal"
+                                name="profile_photo" form="profileForm"
+                                data-hs-file-attach-options='{
+                "textTarget": "#editAvatarImgModal",
+                "mode": "image",
+                "targetAttr": "src",
+                "allowTypes": [".png", ".jpeg", ".jpg"]
+            }'>
 
-    // Función para ocultar el loading del avatar cuando la imagen carga
-    window.hideAvatarLoading = function() {
-        const avatarLoading = document.getElementById('avatar-loading');
-        if (avatarLoading) {
-            avatarLoading.style.display = 'none';
-        }
-    };
+                            <span class="avatar-uploader-trigger">
+                                <i class="bi-pencil-fill avatar-uploader-icon shadow-sm"></i>
+                            </span>
+                        </label>
+                        <h1 class="page-header-title">{{ $nombreCompleto }} <i class="bi-patch-check-fill fs-2 text-primary"
+                                data-bs-toggle="tooltip" data-bs-placement="top" title="Administrador"></i></h1>
+                    </div>
+                    <!-- End Profile Header -->
 
-    // Función global para reintentar carga de imágenes
-    window.retryImageLoad = function(imgElement) {
-        if (imgElement.dataset.retryCount) {
-            imgElement.dataset.retryCount = parseInt(imgElement.dataset.retryCount) + 1;
-        } else {
-            imgElement.dataset.retryCount = '1';
-        }
+                    <div class="js-nav-scroller hs-nav-scroller-horizontal mb-5">
+                        <span class="hs-nav-scroller-arrow-prev" style="display: none;">
+                            <a class="hs-nav-scroller-arrow-link" href="javascript:;">
+                                <i class="bi-chevron-left"></i>
+                            </a>
+                        </span>
 
-        if (parseInt(imgElement.dataset.retryCount) <= 3) {
-            setTimeout(() => {
-                loadImageWithRetry(imgElement);
-            }, 1000 * parseInt(imgElement.dataset.retryCount));
-        } else {
-            showImageError(imgElement);
-        }
-    };
+                        <span class="hs-nav-scroller-arrow-next" style="display: none;">
+                            <a class="hs-nav-scroller-arrow-link" href="javascript:;">
+                                <i class="bi-chevron-right"></i>
+                            </a>
+                        </span>
 
-    // Cargar banner - verificar si ya cargó o necesita retry
-    const bannerImg = document.getElementById('profileCoverImg');
-    if (bannerImg) {
-        // Si la imagen ya tiene src y está cargada, ocultar loading
-        if (bannerImg.complete && bannerImg.naturalHeight !== 0) {
-            hideBannerLoading();
-        } else {
-            // Si no está cargada, intentar cargar con retry
-            bannerImg.addEventListener('load', hideBannerLoading);
-            loadImageWithRetry(bannerImg);
-        }
-    }
 
-    // Cargar avatar - verificar si ya cargó o necesita retry
-    const avatarImg = document.getElementById('editAvatarImgModal');
-    if (avatarImg) {
-        // Si la imagen ya tiene src y está cargada, ocultar loading
-        if (avatarImg.complete && avatarImg.naturalHeight !== 0) {
-            hideAvatarLoading();
-        } else {
-            // Si no está cargada, intentar cargar con retry
-            avatarImg.addEventListener('load', hideAvatarLoading);
-            loadImageWithRetry(avatarImg);
-        }
-    }
-});
-</script>
+                        <ul class="nav nav-tabs align-items-center">
+                            <li class="nav-item">
+                                <a class="nav-link active disabled" href="#">Editar perfil</a>
+                            </li>
+
+                            <li class="nav-item ms-auto">
+                                <div class="d-flex gap-2">
+                                    <a class="btn btn-white btn-sm" href="{{ route('profile.index') }}">
+                                        <i class="bi-arrow-left me-1"></i> Regresar
+                                    </a>
+                                </div>
+                            </li>
+                        </ul>
+                    </div>
+                    <div class="row">
+                        @if ($errors->any())
+                            <div class="alert alert-danger text-white" role="alert">
+                                <strong>¡Ups! Ha ocurrido un problema:</strong>
+                                <ul class="mb-0 mt-2">
+                                    @foreach ($errors->all() as $error)
+                                        <li>{{ $error }}</li>
+                                    @endforeach
+                                </ul>
+                            </div>
+                        @endif
+                        <div class="col-lg-12">
+                            <div class="card mb-3 mb-lg-5">
+                                <div class="card-header card-header-content-between">
+                                    <h4 class="card-header-title">Información personal</h4>
+                                </div>
+                                <div class="card-body">
+                                    <form id="profileForm" method="POST" action="{{ route('profile.update') }}"
+                                        enctype="multipart/form-data">
+                                        @csrf
+                                        @method('PUT')
+
+                                        <div class="row mb-4">
+                                            <div class="col-md-6">
+                                                <label class="form-label" for="first_name">Primer nombre</label>
+                                                <input type="text" class="form-control" id="first_name" name="first_name"
+                                                    value="{{ old('first_name', $user->first_name) }}" required>
+                                            </div>
+                                            <div class="col-md-6">
+                                                <label class="form-label" for="second_name">Segundo
+                                                    nombre</label>
+                                                <input type="text" class="form-control" id="second_name"
+                                                    name="second_name"
+                                                    value="{{ old('second_name', $user->second_name) }}">
+                                            </div>
+                                            <div class="col-md-6">
+                                                <label class="form-label" for="third_name">Tercer
+                                                    nombre</label>
+                                                <input type="text" class="form-control" id="third_name"
+                                                    name="third_name" value="{{ old('third_name', $user->third_name) }}">
+                                            </div>
+                                            <div class="col-md-6">
+                                                <label class="form-label" for="first_last_name">Primer
+                                                    apellido</label>
+                                                <input type="text" class="form-control" id="first_last_name"
+                                                    name="first_last_name"
+                                                    value="{{ old('first_last_name', $user->first_last_name) }}">
+                                            </div>
+                                            <div class="col-md-6">
+                                                <label class="form-label" for="second_last_name">Segundo
+                                                    apellido</label>
+                                                <input type="text" class="form-control" id="second_last_name"
+                                                    name="second_last_name"
+                                                    value="{{ old('second_last_name', $user->second_last_name) }}">
+                                            </div>
+                                            <div class="col-md-6">
+                                                <label class="form-label" for="married_last_name">Apellido
+                                                    de
+                                                    casada</label>
+                                                <input type="text" class="form-control" id="married_last_name"
+                                                    name="married_last_name"
+                                                    value="{{ old('married_last_name', $user->married_last_name) }}">
+                                            </div>
+                                        </div>
+
+                                        <hr class="my-5">
+                                        <h5 class="mb-4">Información de contacto y demográfica</h5>
+
+                                        <div class="row mb-4">
+                                            <div class="col-md-6">
+                                                <label class="form-label" for="email">Correo
+                                                    electrónico</label>
+                                                <input type="email" class="form-control" id="email" name="email"
+                                                    value="{{ old('email', $user->email) }}" readonly disabled>
+                                                <small class="form-text text-muted">No puedes modificar el correo
+                                                    electrónico de esta cuenta.</small>
+                                            </div>
+                                            <div class="col-md-6">
+                                                <label class="form-label" for="phone">Teléfono</label>
+                                                <input type="text" class="form-control" id="phone" name="phone"
+                                                    value="{{ old('phone', $user->phone) }}">
+                                            </div>
+                                        </div>
+
+                                        <div class="row mb-4">
+                                            <div class="col-md-6">
+                                                <label class="form-label" for="cui">DPI / CUI</label>
+                                                <input type="text" class="form-control" id="cui" name="cui"
+                                                    maxlength="13" value="{{ old('cui', $user->cui) }}">
+                                            </div>
+                                            <div class="col-md-6">
+                                                <label class="form-label" for="nit">NIT</label>
+                                                <input type="text" class="form-control" id="nit" name="nit"
+                                                    value="{{ old('nit', $user->nit) }}">
+                                            </div>
+                                        </div>
+
+                                        <div class="row mb-4">
+                                            <div class="col-md-4">
+                                                <label class="form-label" for="marital_status">Estado Civil</label>
+                                                <select class="form-control" id="marital_status" name="marital_status">
+                                                    <option value=""
+                                                        {{ old('marital_status', $user->marital_status) == '' ? 'selected' : '' }}>
+                                                        Seleccione</option>
+                                                    <option value="soltero"
+                                                        {{ old('marital_status', $user->marital_status) == 'soltero' ? 'selected' : '' }}>
+                                                        Soltero/a</option>
+                                                    <option value="casado"
+                                                        {{ old('marital_status', $user->marital_status) == 'casado' ? 'selected' : '' }}>
+                                                        Casado/a</option>
+                                                    <option value="divorciado"
+                                                        {{ old('marital_status', $user->marital_status) == 'divorciado' ? 'selected' : '' }}>
+                                                        Divorciado/a</option>
+                                                    <option value="viudo"
+                                                        {{ old('marital_status', $user->marital_status) == 'viudo' ? 'selected' : '' }}>
+                                                        Viudo/a</option>
+                                                    <option value="union_libre"
+                                                        {{ old('marital_status', $user->marital_status) == 'union_libre' ? 'selected' : '' }}>
+                                                        Unión Libre</option>
+                                                </select>
+                                            </div>
+
+                                            <div class="col-md-4">
+                                                <label class="form-label" for="gender">Género</label>
+                                                <select class="form-control" id="gender" name="gender">
+                                                    <option value=""
+                                                        {{ old('gender', $user->gender) == '' ? 'selected' : '' }}>
+                                                        Seleccione</option>
+                                                    <option value="masculino"
+                                                        {{ old('gender', $user->gender) == 'masculino' ? 'selected' : '' }}>
+                                                        Masculino</option>
+                                                    <option value="femenino"
+                                                        {{ old('gender', $user->gender) == 'femenino' ? 'selected' : '' }}>
+                                                        Femenino</option>
+                                                </select>
+                                            </div>
+
+                                            <div class="col-md-4">
+                                                <label class="form-label" for="birth_date">Fecha de
+                                                    nacimiento</label>
+                                                <input type="date" class="form-control" id="birth_date"
+                                                    name="birth_date" value="{{ old('birth_date', $user->birth_date) }}">
+                                            </div>
+                                        </div>
+
+                                        <div class="row mb-4">
+                                            <div class="col-md-12">
+                                                <label class="form-label" for="address">Dirección de residencia</label>
+                                                <input type="text" class="form-control" id="address" name="address"
+                                                    value="{{ old('address', $user->address) }}">
+                                            </div>
+                                        </div>
+
+                                        <div class="d-flex justify-content-end gap-2 p-4 pt-1">
+                                            <a href="{{ route('profile.index') }}" class="btn btn-white">Cancelar</a>
+                                            <button type="submit" class="btn btn-primary">Guardar
+                                                cambios de perfil</button>
+                                        </div>
+                                    </form>
+                                </div>
+                            </div>
+
+                            <!-- Seccion de Seguridad y Contraseña -->
+                            <div class="card mb-3 mb-lg-5">
+                                <div class="card-header card-header-content-between">
+                                    <h4 class="card-header-title">Seguridad y acceso</h4>
+                                </div>
+                                <div class="card-body">
+                                    <p class="card-text">Para actualizar tu contraseña, verifica tu contraseña actual y
+                                        luego escribe la nueva.</p>
+
+                                    <form id="passwordForm" method="POST" action="{{ route('profile.update') }}">
+                                        @csrf
+                                        @method('PUT')
+                                        <input type="hidden" name="update_password_only" value="1">
+
+                                        <div class="row mb-3">
+                                            <label for="current_password"
+                                                class="col-sm-3 col-form-label form-label">Contraseña actual</label>
+                                            <div class="col-sm-9">
+                                                <input type="password" class="form-control" name="current_password"
+                                                    id="current_password" placeholder="Ingresa tu contraseña actual"
+                                                    aria-label="Contraseña actual">
+                                                @error('current_password')
+                                                    <span class="invalid-feedback d-block" role="alert">
+                                                        <strong>{{ $message }}</strong>
+                                                    </span>
+                                                @enderror
+                                            </div>
+                                        </div>
+
+                                        <div class="row mb-3">
+                                            <label for="new_password" class="col-sm-3 col-form-label form-label">Nueva
+                                                contraseña</label>
+                                            <div class="col-sm-9">
+                                                <input type="password" class="form-control" name="password"
+                                                    id="new_password" placeholder="Ingresa tu nueva contraseña"
+                                                    aria-label="Nueva contraseña">
+                                                @error('password')
+                                                    <span class="invalid-feedback d-block" role="alert">
+                                                        <strong>{{ $message }}</strong>
+                                                    </span>
+                                                @enderror
+                                            </div>
+                                        </div>
+
+                                        <div class="row mb-4">
+                                            <label for="password_confirmation"
+                                                class="col-sm-3 col-form-label form-label">Verificar contraseña</label>
+                                            <div class="col-sm-9">
+                                                <input type="password" class="form-control" name="password_confirmation"
+                                                    id="password_confirmation"
+                                                    placeholder="Vuelve a escribir la nueva contraseña"
+                                                    aria-label="Confirmar contraseña">
+                                            </div>
+                                        </div>
+
+                                        <div class="d-flex justify-content-end gap-2 p-2">
+                                            <button type="submit" class="btn btn-primary">Actualizar contraseña</button>
+                                        </div>
+                                    </form>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+    </main>
 @endsection
 
+@push('scripts')
+    <script src="{{ asset('assets/vendor/hs-nav-scroller/dist/hs-nav-scroller.min.js') }}"></script>
+    <script src="{{ asset('assets/vendor/hs-sticky-block/dist/hs-sticky-block.min.js') }}"></script>
+    <script src="{{ asset('assets/vendor/hs-file-attach/dist/hs-file-attach.min.js') }}"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+
+            // 1. PREVISUALIZACIÓN DEL BANNER
+            const bannerInput = document.getElementById('profileCoverUplaoder');
+            const bannerImg = document.getElementById('profileCoverImg');
+
+            if (bannerInput && bannerImg) {
+                bannerInput.addEventListener('change', function(e) {
+                    const file = e.target.files[0];
+                    if (file) {
+                        const reader = new FileReader();
+                        reader.onload = function(event) {
+                            bannerImg.src = event.target.result;
+                        };
+                        reader.readAsDataURL(file);
+                    }
+                });
+            }
+
+            // 2. PREVISUALIZACIÓN DEL AVATAR
+            const avatarInput = document.getElementById('editAvatarUploaderModal');
+            const avatarImg = document.getElementById('editAvatarImgModal');
+
+            if (avatarInput && avatarImg) {
+                avatarInput.addEventListener('change', function(e) {
+                    const file = e.target.files[0];
+                    if (file) {
+                        const reader = new FileReader();
+                        reader.onload = function(event) {
+                            avatarImg.src = event.target.result;
+                        };
+                        reader.readAsDataURL(file);
+                    }
+                });
+            }
+
+        });
+    </script>
+@endpush

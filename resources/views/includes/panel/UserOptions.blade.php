@@ -697,13 +697,20 @@
                                     $primerNombre = $user->first_name ?? '';
                                     $primerApellido = $user->first_last_name ?? '';
                                     $iniciales = '';
-                                    if (!empty($primerNombre)) $iniciales .= strtoupper(substr($primerNombre, 0, 1));
-                                    if (!empty($primerApellido)) $iniciales .= strtoupper(substr($primerApellido, 0, 1));
-                                    if (empty($iniciales)) $iniciales = 'U';
+                                    if (!empty($primerNombre)) {
+                                        $iniciales .= strtoupper(substr($primerNombre, 0, 1));
+                                    }
+                                    if (!empty($primerApellido)) {
+                                        $iniciales .= strtoupper(substr($primerApellido, 0, 1));
+                                    }
+                                    if (empty($iniciales)) {
+                                        $iniciales = 'U';
+                                    }
                                 @endphp
-                                @if ($user && ($user->avatar_url || $user->avatar))
+
+                                @if ($user && $user->profile_photo_path)
                                     <img class="avatar-img" id="navbar-avatar-img"
-                                        src="{{ $user->avatar_url ?? asset('storage/avatars/' . basename($user->avatar)) }}"
+                                        src="{{ asset('storage/' . $user->profile_photo_path) }}"
                                         alt="Image Description" onerror="this.onerror=null; retryNavbarImage(this);">
                                 @else
                                     <div class="avatar-img avatar-soft-primary" id="navbar-avatar-initials">
@@ -724,16 +731,24 @@
                                         $user = Auth::user();
                                         $primerNombre = $user->first_name ?? '';
                                         $primerApellido = $user->first_last_name ?? '';
-                                        $nombreMostrar = trim($primerNombre . ' ' . $primerApellido) ?: ($user->email ?? 'Usuario');
+                                        $nombreMostrar =
+                                            trim($primerNombre . ' ' . $primerApellido) ?: $user->email ?? 'Usuario';
                                         $iniciales = '';
-                                        if (!empty($primerNombre)) $iniciales .= strtoupper(substr($primerNombre, 0, 1));
-                                        if (!empty($primerApellido)) $iniciales .= strtoupper(substr($primerApellido, 0, 1));
-                                        if (empty($iniciales)) $iniciales = 'U';
+                                        if (!empty($primerNombre)) {
+                                            $iniciales .= strtoupper(substr($primerNombre, 0, 1));
+                                        }
+                                        if (!empty($primerApellido)) {
+                                            $iniciales .= strtoupper(substr($primerApellido, 0, 1));
+                                        }
+                                        if (empty($iniciales)) {
+                                            $iniciales = 'U';
+                                        }
                                     @endphp
                                     <div class="avatar avatar-sm avatar-circle">
-                                        @if ($user && ($user->avatar_url || $user->avatar))
-                                            <img class="avatar-img" id="dropdown-avatar-img"
-                                                src="{{ $user->avatar_url ?? asset('storage/avatars/' . basename($user->avatar)) }}"
+
+                                        @if ($user && $user->profile_photo_path)
+                                            <img class="avatar-img" id="dropdown-avatar-img" style="max-width: none;"
+                                                src="{{ asset('storage/' . $user->profile_photo_path) }}"
                                                 alt="Image Description"
                                                 onerror="this.onerror=null; retryNavbarImage(this);">
                                         @else
@@ -741,6 +756,7 @@
                                                 <span class="avatar-initials">{{ $iniciales }}</span>
                                             </div>
                                         @endif
+
                                     </div>
                                     <div class="flex-grow-1 ms-3">
                                         <h5 class="mb-0">{{ $nombreMostrar }}</h5>
