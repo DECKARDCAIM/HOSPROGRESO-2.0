@@ -136,5 +136,15 @@ class UserController extends Controller
 
         return view('modules.users.profile', compact('user', 'departamentMembers'));
     }
-}
 
+    public function create()
+    {
+        return view('modules.user.create');
+    }
+
+    public function edit($id)
+    {
+        $user = \App\Models\User::findOrFail($id);
+        return view('modules.user.edit', compact('user'));
+    }
+}
