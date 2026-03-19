@@ -31,10 +31,15 @@ return new class extends Migration
             $table->foreignId('role_id')->nullable()->constrained('roles')->nullOnDelete();
             $table->foreignId('unity_execution_id')->nullable()->constrained('unity_executions')->nullOnDelete();
             $table->foreignId('work_department_id')->nullable()->constrained('work_departments')->nullOnDelete();
-            
+
+            $table->foreignId('country_id')->nullable()->constrained('countries')->nullOnDelete();
+            $table->foreignId('department_id')->nullable()->constrained('departments')->nullOnDelete();
+            $table->foreignId('municipality_id')->nullable()->constrained('municipalities')->nullOnDelete();
+            $table->foreignId('schedule_id')->nullable()->constrained('schedules')->nullOnDelete();
+
             $table->string('collegiate_number')->nullable();
-            $table->string('specialty')->nullable();
-            
+            $table->foreignId('specialty_id')->nullable()->constrained('specialties')->nullOnDelete();
+
             $table->text('address')->nullable();
             $table->date('birth_date')->nullable();
             $table->string('gender')->nullable();

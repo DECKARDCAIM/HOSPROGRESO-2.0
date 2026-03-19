@@ -5,12 +5,19 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Log;
+use App\Models\Role;
+use App\Models\Schedule;
+use App\Models\Country;
+use App\Models\Department;
+use App\Models\Municipality;
+use App\Models\Specialty;
 
 class UserController extends Controller
 {
     public function index()
     {
-        $users = \App\Models\User::with(['role', 'workDepartment', 'unityExecution'])->get();
+        $users = \App\Models\User::with(['role', 'workDepartment', 'unityExecution', 'specialty', 'schedule'])->get();
         $totalUsers = $users->count();
         $activeUsers = $users->where('is_active', true)->count();
         $inactiveUsers = $users->where('is_active', false)->count();
@@ -139,7 +146,65 @@ class UserController extends Controller
 
     public function create()
     {
-        return view('modules.user.create');
+        $roles         = Role::where('is_active', true)->get();
+        $schedules     = Schedule::where('is_active', true)->get();
+        $countries     = Country::orderBy('name')->get();
+        $departments   = Department::orderBy('name')->get();
+        $municipalities = Municipality::orderBy('name')->get();
+        $specialties   = Specialty::where('is_active', true)->orderBy('name')->get();
+
+        return view('modules.user.create', compact(
+            'roles', 'schedules', 'countries', 'departments', 'municipalities', 'specialties'
+        ));
+    }
+
+    public function store(Request $request)
+    {
+        $request->validate([
+            'first_name' => 'required|string|max:255',
+            'first_last_name' => 'required|string|max:255',
+            'email' => 'required|string|email|max:255|unique:users',
+            'password' => 'required|string|min:8',
+            'role_id' => 'nullable|exists:roles,id',
+        ]);
+
+        try {
+            DB::beginTransaction();
+
+            $user = \App\Models\User::create([
+                'first_name' => $request->first_name,
+                'second_name' => $request->second_name,
+                'third_name' => $request->third_name,
+                'first_last_name' => $request->first_last_name,
+                'second_last_name' => $request->second_last_name,
+                'married_last_name' => $request->married_last_name,
+                'email' => $request->email,
+                'password' => $request->password, // Password hashing is handled by User model cast
+                'cui' => $request->cui,
+                'nit' => $request->nit,
+                'marital_status' => $request->marital_status,
+                'phone' => $request->phone,
+                'birth_date' => $request->birth_date,
+                'gender' => $request->gender,
+                'role_id' => $request->role_id,
+                'specialty_id' => $request->specialty_id,
+                'schedule_id' => $request->schedule_id,
+                'country_id' => $request->country_id,
+                'department_id' => $request->department_id,
+                'municipality_id' => $request->municipality_id,
+                'address' => $request->address,
+                'is_active' => true,
+                'estado' => 'disponible'
+            ]);
+
+            DB::commit();
+
+            return redirect()->route('users.index')->with('success', 'Usuario creado exitosamente.');
+        } catch (\Exception $e) {
+            DB::rollBack();
+            Log::error('Error al crear usuario: ' . $e->getMessage());
+            return back()->withInput()->with('error', 'Ocurrió un error al crear el usuario: ' . $e->getMessage());
+        }
     }
 
     public function edit($id)

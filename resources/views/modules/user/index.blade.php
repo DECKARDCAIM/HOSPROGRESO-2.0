@@ -329,7 +329,7 @@
                                             class="d-block fs-5">{{ $user->workDepartment->name ?? 'Sin departamento' }}</span>
                                     </td>
                                     <td>
-                                        {{ $user->specialty ?? 'No especificada' }}
+                                        {{ $user->specialty->name ?? 'No especificada' }}
                                     </td>
                                     <td>
                                         @if ($user->is_active)

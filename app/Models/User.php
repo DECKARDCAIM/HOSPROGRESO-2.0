@@ -39,12 +39,16 @@ class User extends Authenticatable
         'unity_execution_id',
         'work_department_id',
         'collegiate_number',
-        'specialty',
+        'specialty_id',
         'address',
         'birth_date',
         'gender',
         'estado',
         'theme_preference',
+        'country_id',
+        'department_id',
+        'municipality_id',
+        'schedule_id',
     ];
 
     public function role()
@@ -60,6 +64,31 @@ class User extends Authenticatable
     public function workDepartment()
     {
         return $this->belongsTo(WorkDepartment::class);
+    }
+
+    public function country()
+    {
+        return $this->belongsTo(Country::class);
+    }
+
+    public function department()
+    {
+        return $this->belongsTo(Department::class);
+    }
+
+    public function municipality()
+    {
+        return $this->belongsTo(Municipality::class);
+    }
+
+    public function schedule()
+    {
+        return $this->belongsTo(Schedule::class);
+    }
+
+    public function specialty()
+    {
+        return $this->belongsTo(Specialty::class);
     }
 
     /**
