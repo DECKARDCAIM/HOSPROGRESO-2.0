@@ -71,13 +71,19 @@
             <div class="card">
                 <div class="card-header card-header-content-md-between">
                     <div class="mb-2 mb-md-0">
-                        <form>
+                        <form action="{{ route('users.index') }}" method="GET">
+                            @if(request('per_page')) <input type="hidden" name="per_page" value="{{ request('per_page') }}"> @endif
                             <div class="input-group input-group-merge input-group-flush">
-                                <div class="input-group-prepend input-group-text">
+                                <button type="submit" class="input-group-prepend input-group-text bg-transparent border-0">
                                     <i class="bi-search"></i>
-                                </div>
-                                <input id="datatableSearch" type="search" class="form-control" placeholder="Buscar"
-                                    aria-label="Buscar usuarios">
+                                </button>
+                                <input name="search" type="text" class="form-control" placeholder="Buscar"
+                                    aria-label="Buscar usuarios" value="{{ request('search') }}">
+                                @if(request('search'))
+                                    <a class="input-group-append input-group-text text-muted" href="{{ route('users.index', request()->except('search')) }}">
+                                        <i class="bi-x-lg"></i>
+                                    </a>
+                                @endif
                             </div>
                         </form>
                     </div>
@@ -256,7 +262,7 @@
                    },
                    "search": "#datatableSearch",
                    "entries": "#datatableEntries",
-                   "pageLength": 15,
+                   "pageLength": {{ request('per_page', 25) }},
                    "isResponsive": false,
                    "isShowPaging": false,
                    "pagination": "datatablePagination"
@@ -362,28 +368,28 @@
                     <div class="row justify-content-center justify-content-sm-between align-items-sm-center">
                         <div class="col-sm mb-2 mb-sm-0">
                             <div class="d-flex justify-content-center justify-content-sm-start align-items-center">
-                                <span class="me-2">Showing:</span>
+                                <span class="me-2">Mostrando:</span>
                                 <div class="tom-select-custom">
                                     <select id="datatableEntries"
                                         class="js-select form-select form-select-borderless w-auto" autocomplete="off"
                                         data-hs-tom-select-options='{
-                            "searchInDropdown": false,
-                            "hideSearch": true
-                          }'>
-                                        <option value="10">10</option>
-                                        <option value="15" selected>15</option>
-                                        <option value="20">20</option>
+                                            "searchInDropdown": false,
+                                            "hideSearch": true
+                                        }'
+                                        onchange="window.location.href = '{{ route('users.index', request()->except(['per_page', 'page'])) }}' + (window.location.search.includes('?') ? '&' : '?') + 'per_page=' + this.value">
+                                        <option value="10" {{ request('per_page') == 10 ? 'selected' : '' }}>10</option>
+                                        <option value="25" {{ request('per_page', 25) == 25 ? 'selected' : '' }}>25</option>
+                                        <option value="50" {{ request('per_page') == 50 ? 'selected' : '' }}>50</option>
+                                        <option value="100" {{ request('per_page') == 100 ? 'selected' : '' }}>100</option>
                                     </select>
                                 </div>
-
-                                <span class="text-secondary me-2">of</span>
-
-                                <span id="datatableWithPaginationInfoTotalQty"></span>
+                                <span class="text-secondary me-2">de</span>
+                                <span id="datatableWithPaginationInfoTotalQty">{{ $users->total() }}</span>
                             </div>
                         </div>
                         <div class="col-sm-auto">
                             <div class="d-flex justify-content-center justify-content-sm-end">
-                                <nav id="datatablePagination" aria-label="Activity pagination"></nav>
+                                {{ $users->links() }}
                             </div>
                         </div>
                     </div>

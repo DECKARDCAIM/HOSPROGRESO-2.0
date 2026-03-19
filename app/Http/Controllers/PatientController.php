@@ -90,7 +90,8 @@ class PatientController extends Controller
             $query->whereDate('birth_date', '<=', $request->birth_date_to);
         }
 
-        $patients = $query->latest()->paginate(15);
+        $perPage = $request->get('per_page', 25);
+        $patients = $query->latest()->paginate($perPage)->appends($request->query());
 
         // Estadísticas
         $totalPatients = Patient::count();

@@ -175,10 +175,36 @@
 
                          <div id="navbarVerticalMenuMantenimiento" class="nav-collapse collapse"
                              data-bs-parent="#navbarVerticalMenu">
-                             <a class="nav-link" href="/mantenimiento/solicitudes">Solicitudes</a>
-                             <a class="nav-link" href="/mantenimiento/material">Material</a>
-                             <a class="nav-link" href="/mantenimiento/dictamenes">Dictámenes</a>
-                             <a class="nav-link" href="/mantenimiento/proyectos">Proyectos</a>
+
+                             {{-- Sub-módulo: Gestionar Ubicaciones --}}
+                             <small class="nav-subtitle">Gestionar Ubicaciones</small>
+                             <a class="nav-link" href="{{ route('countries.index') }}">
+                                 <i class="bi-globe2 nav-icon"></i> Países
+                             </a>
+                             <a class="nav-link" href="{{ route('departments.index') }}">
+                                 <i class="bi-map nav-icon"></i> Departamentos
+                             </a>
+                             <a class="nav-link" href="{{ route('municipalities.index') }}">
+                                 <i class="bi-geo-alt nav-icon"></i> Municipios
+                             </a>
+
+                             {{-- Sub-módulo: Gestionar Paciente --}}
+                             <small class="nav-subtitle mt-2">Gestionar Paciente</small>
+                             <a class="nav-link" href="#">
+                                 <i class="bi-exclamation-triangle nav-icon"></i> Alergias
+                             </a>
+                             <a class="nav-link" href="#">
+                                 <i class="bi-heart nav-icon"></i> Estado Civil
+                             </a>
+                             <a class="nav-link" href="#">
+                                 <i class="bi-gender-ambiguous nav-icon"></i> Género
+                             </a>
+                             <a class="nav-link" href="#">
+                                 <i class="bi-people nav-icon"></i> Etnia
+                             </a>
+                             <a class="nav-link" href="#">
+                                 <i class="bi-translate nav-icon"></i> Comunidad Lingüística
+                             </a>
                          </div>
                      </div>
 

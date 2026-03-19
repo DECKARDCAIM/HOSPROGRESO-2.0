@@ -12,6 +12,7 @@ class Municipality extends Model
     protected $fillable = [
         'department_id',
         'name',
+        'description',
         'is_active',
     ];
 

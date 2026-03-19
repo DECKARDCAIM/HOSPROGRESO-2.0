@@ -7,6 +7,9 @@ use App\Http\Controllers\HomeController;
 use App\Http\Controllers\UserController;
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\PatientController;
+use App\Http\Controllers\CountryController;
+use App\Http\Controllers\DepartmentController;
+use App\Http\Controllers\MunicipalityController;
 
 Route::get('/', function () {
     if (Auth::check()) {
@@ -25,6 +28,7 @@ Route::middleware('auth')->group(function () {
     Route::post('/user/update-estado', [UserController::class , 'updateEstado'])->name('user.update-estado');
     Route::post('/user/update-theme', [UserController::class , 'updateThemePreference'])->name('user.update-theme');
 
+
     // Rutas de perfil
     Route::get('/profile', [ProfileController::class , 'index'])->name('profile.index');
     Route::get('/profile/sessions/history', [ProfileController::class , 'sessionHistory'])->name('profile.sessions.history');
@@ -41,6 +45,22 @@ Route::middleware('auth')->group(function () {
     // Rutas AJAX para ubicaciones
     Route::get('/patients/get-departments-by-country', [PatientController::class , 'getDepartmentsByCountry'])->name('patients.get-departments-by-country');
     Route::get('/patients/get-municipalities-by-department', [PatientController::class , 'getMunicipalitiesByDepartment'])->name('patients.get-municipalities-by-department');
+
+    Route::Resource('countries', CountryController::class);
+    Route::post('/countries/{country}/restore', [CountryController::class, 'restore'])->name('countries.restore');
+
+    Route::Resource('departments', DepartmentController::class);
+    Route::post('/departments/{department}/restore', [DepartmentController::class, 'restore'])->name('departments.restore');
+
+    Route::Resource('municipalities', MunicipalityController::class);
+    Route::post('/municipalities/{municipality}/restore', [MunicipalityController::class, 'restore'])->name('municipalities.restore');
+
+
+
+
+
+
+
     // Rutas AJAX para familiares
     Route::get('/patients/relatives/search', [PatientController::class , 'searchRelatives'])->name('patients.relatives.search');
     Route::post('/patients/relatives/store-ajax', [PatientController::class , 'storeRelativeAjax'])->name('patients.relatives.store-ajax');

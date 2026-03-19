@@ -12,6 +12,7 @@ class CountrySeeder extends Seeder
     {
         Country::create([
             'name' => 'Guatemala',
+            'description' => 'País de Centroamérica, con una rica cultura y tradiciones.',
             'is_active' => true,
         ]);
     }

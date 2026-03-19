@@ -92,36 +92,27 @@
                 <div class="card-header card-header-content-md-between">
                     <div class="mb-2 mb-md-0">
                         <form id="searchForm" method="GET" action="{{ route('patients.index') }}">
+                            @if(request('per_page')) <input type="hidden" name="per_page" value="{{ request('per_page') }}"> @endif
+                            @if (request('gender_id')) <input type="hidden" name="gender_id" value="{{ request('gender_id') }}"> @endif
+                            @if (request('civil_status_id')) <input type="hidden" name="civil_status_id" value="{{ request('civil_status_id') }}"> @endif
+                            @if (request('ethnicity_id')) <input type="hidden" name="ethnicity_id" value="{{ request('ethnicity_id') }}"> @endif
+                            @if (request('linguistic_community_id')) <input type="hidden" name="linguistic_community_id" value="{{ request('linguistic_community_id') }}"> @endif
+                            @if (request('department_id')) <input type="hidden" name="department_id" value="{{ request('department_id') }}"> @endif
+                            @if (request('municipality_id')) <input type="hidden" name="municipality_id" value="{{ request('municipality_id') }}"> @endif
+                            
                             <div class="input-group input-group-merge input-group-flush">
-                                <div class="input-group-prepend input-group-text">
-                                </div>
+                                <button type="submit" class="input-group-prepend input-group-text bg-transparent border-0">
+                                    <i class="bi-search"></i>
+                                </button>
                                 <input id="datatableSearch" type="text" name="search" class="form-control"
                                     placeholder="Buscar pacientes" aria-label="Buscar pacientes"
                                     value="{{ request('search') }}">
-                                <button type="submit" class="btn btn-ghost-secondary"
-                                    style="border: none; background: transparent;">
-                                    <i class="bi-search"></i>
-                                </button>
+                                @if(request('search'))
+                                    <a class="input-group-append input-group-text text-muted" href="{{ route('patients.index', request()->except('search')) }}">
+                                        <i class="bi-x-lg"></i>
+                                    </a>
+                                @endif
                             </div>
-                            @if (request('gender_id'))
-                                <input type="hidden" name="gender_id" value="{{ request('gender_id') }}">
-                            @endif
-                            @if (request('civil_status_id'))
-                                <input type="hidden" name="civil_status_id" value="{{ request('civil_status_id') }}">
-                            @endif
-                            @if (request('ethnicity_id'))
-                                <input type="hidden" name="ethnicity_id" value="{{ request('ethnicity_id') }}">
-                            @endif
-                            @if (request('linguistic_community_id'))
-                                <input type="hidden" name="linguistic_community_id"
-                                    value="{{ request('linguistic_community_id') }}">
-                            @endif
-                            @if (request('department_id'))
-                                <input type="hidden" name="department_id" value="{{ request('department_id') }}">
-                            @endif
-                            @if (request('municipality_id'))
-                                <input type="hidden" name="municipality_id" value="{{ request('municipality_id') }}">
-                            @endif
                         </form>
                     </div>
 
@@ -499,8 +490,22 @@
                         <div class="col-sm mb-2 mb-sm-0">
                             <div class="d-flex justify-content-center justify-content-sm-start align-items-center">
                                 <span class="me-2">Mostrando:</span>
-                                <span class="text-secondary me-2">{{ $patients->firstItem() ?? 0 }} -
-                                    {{ $patients->lastItem() ?? 0 }} de {{ $patients->total() }}</span>
+                                <div class="tom-select-custom">
+                                    <select id="datatableEntries"
+                                        class="js-select form-select form-select-borderless w-auto" autocomplete="off"
+                                        data-hs-tom-select-options='{
+                                            "searchInDropdown": false,
+                                            "hideSearch": true
+                                        }'
+                                        onchange="window.location.href = '{{ route('patients.index', request()->except(['per_page', 'page'])) }}' + (window.location.search.includes('?') ? '&' : '?') + 'per_page=' + this.value">
+                                        <option value="10" {{ request('per_page') == 10 ? 'selected' : '' }}>10</option>
+                                        <option value="25" {{ request('per_page', 25) == 25 ? 'selected' : '' }}>25</option>
+                                        <option value="50" {{ request('per_page') == 50 ? 'selected' : '' }}>50</option>
+                                        <option value="100" {{ request('per_page') == 100 ? 'selected' : '' }}>100</option>
+                                    </select>
+                                </div>
+                                <span class="text-secondary me-2">de</span>
+                                <span id="datatableWithPaginationInfoTotalQty">{{ $patients->total() }}</span>
                             </div>
                         </div>
 

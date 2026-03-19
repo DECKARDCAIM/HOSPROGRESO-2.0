@@ -15,12 +15,33 @@ use App\Models\Specialty;
 
 class UserController extends Controller
 {
-    public function index()
+    public function index(Request $request)
     {
-        $users = \App\Models\User::with(['role', 'workDepartment', 'unityExecution', 'specialty', 'schedule'])->get();
-        $totalUsers = $users->count();
-        $activeUsers = $users->where('is_active', true)->count();
-        $inactiveUsers = $users->where('is_active', false)->count();
+        $perPage = $request->get('per_page', 25);
+        $search = $request->get('search');
+
+        $query = \App\Models\User::with(['role', 'workDepartment', 'unityExecution', 'specialty', 'schedule']);
+
+        if ($search) {
+            $query->where(function($q) use ($search) {
+                $q->where('first_name', 'like', "%{$search}%")
+                  ->orWhere('first_last_name', 'like', "%{$search}%")
+                  ->orWhere('email', 'like', "%{$search}%")
+                  ->orWhereHas('role', function($q) use ($search) {
+                      $q->where('name', 'like', "%{$search}%");
+                  })
+                  ->orWhereHas('workDepartment', function($q) use ($search) {
+                      $q->where('name', 'like', "%{$search}%");
+                  });
+            });
+        }
+
+        $users = $query->paginate($perPage)->appends($request->query());
+        
+        // Para los contadores seguimos queriendo el total sin paginar
+        $totalUsers = \App\Models\User::count();
+        $activeUsers = \App\Models\User::where('is_active', true)->count();
+        $inactiveUsers = \App\Models\User::where('is_active', false)->count();
 
         return view('modules.user.index', compact('users', 'totalUsers', 'activeUsers', 'inactiveUsers'));
     }
