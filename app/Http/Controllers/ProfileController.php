@@ -36,6 +36,7 @@ class ProfileController extends Controller
                     'platform' => $agent->platform(),
                     'browser' => $agent->browser(),
                 ],
+                'session_id' => $session->session_id,
                 'ip_address' => $session->ip_address,
                 'is_current_device' => $session->session_id === $currentSessionId,
                 'login_at' => $session->login_at->translatedFormat('d M Y, h:i A'),
@@ -46,7 +47,7 @@ class ProfileController extends Controller
 
         // Filtrar aquellas que físicamente ya expiraron en la sesion real de laravel para no engañar a la vista
         $activeSessions = $activeSessions->filter(function ($s) {
-            return $s->is_current_device || \Illuminate\Support\Facades\DB::table('sessions')->where('id', \App\Models\SessionHistory::where('ip_address', $s->ip_address)->where('user_id', Auth::id())->value('session_id'))->exists();
+            return $s->is_current_device || \Illuminate\Support\Facades\DB::table('sessions')->where('id', $s->session_id)->exists();
         });
 
         // Miembros del departamento del usuario

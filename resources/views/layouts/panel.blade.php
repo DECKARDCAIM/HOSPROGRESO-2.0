@@ -12,7 +12,6 @@
     <link rel="stylesheet" href="{{ asset('vendor/bootstrap-icons/font/bootstrap-icons.css') }}">
     <link rel="preload" href="{{ asset('css/theme.min.css') }}" data-hs-appearance="default" as="style">
     <link rel="preload" href="{{ asset('css/theme-dark.min.css') }}" data-hs-appearance="dark" as="style">
-    <link rel="stylesheet" href="{{ asset('css/custom.css') }}">
     @yield('styles')
 
     <style data-hs-appearance-onload-styles>
@@ -43,7 +42,7 @@
         </div>
     </div>
     <script>
-        (function() {
+        (function () {
             var preloader = document.getElementById('loading-spinner');
 
             function showLoader() {
@@ -55,12 +54,12 @@
                 }
             }
 
-            window.addEventListener('load', function() {
+            window.addEventListener('load', function () {
                 if (preloader) {
                     preloader.style.transition = 'opacity 0.3s ease-out';
                     preloader.style.opacity = '0';
                     preloader.style.pointerEvents = 'none';
-                    setTimeout(function() {
+                    setTimeout(function () {
                         if (preloader.style.opacity === '0') {
                             preloader.style.display = 'none';
                         }
@@ -68,7 +67,27 @@
                 }
             });
 
-            document.addEventListener('click', function(e) {
+            window.addEventListener('pageshow', function (event) {
+                if (event.persisted && preloader) {
+                    preloader.style.transition = 'none';
+                    preloader.style.opacity = '1';
+                    preloader.style.display = 'flex';
+                    preloader.style.pointerEvents = 'auto';
+
+                    setTimeout(function () {
+                        preloader.style.transition = 'opacity 0.3s ease-out';
+                        preloader.style.opacity = '0';
+                        preloader.style.pointerEvents = 'none';
+                        setTimeout(function () {
+                            if (preloader.style.opacity === '0') {
+                                preloader.style.display = 'none';
+                            }
+                        }, 300);
+                    }, 50);
+                }
+            });
+
+            document.addEventListener('click', function (e) {
                 var link = e.target.closest('a');
                 if (link &&
                     link.getAttribute('href') &&
@@ -80,7 +99,7 @@
                 }
             });
 
-            document.addEventListener('submit', function(e) {
+            document.addEventListener('submit', function (e) {
                 if (!e.target.closest('.js-step-form')) {
                     showLoader();
                 }
@@ -277,12 +296,12 @@
     <script src="{{ asset('js/theme.min.js') }}"></script>
 
     <script>
-        (function() {
-            @if (!Auth::check() || !Auth::user()->theme_preference)
-                localStorage.removeItem('hs_theme')
+        (function () {
+            @if (!Auth:: check() || !Auth:: user() -> theme_preference)
+            localStorage.removeItem('hs_theme')
             @endif
 
-            window.onload = function() {
+            window.onload = function () {
                 new HSSideNav('.js-navbar-vertical-aside').init()
                 new HSFormSearch('.js-form-search')
                 HSBsDropdown.init()
@@ -300,7 +319,7 @@
                 const $variants = document.querySelectorAll(`[aria-labelledby="selectThemeDropdown"] [data-icon]`)
                 if (!$variants.length) return false
 
-                const setActiveStyle = function() {
+                const setActiveStyle = function () {
                     const originalTheme = HSThemeAppearance.getOriginalAppearance() || 'default'
 
                     $variants.forEach($item => {
@@ -343,7 +362,7 @@
     </script>
 
     <script>
-        $(function() {
+        $(function () {
             const ESTADOS = {
                 disponible: {
                     color: 'success',
@@ -354,7 +373,7 @@
                     label: 'Ocupado'
                 },
                 ausente: {
-                    color: 'warning-custom',
+                    color: 'warning',
                     label: 'Ausente'
                 },
                 privado: {
@@ -395,10 +414,10 @@
             }
 
             function cambiarEstado(estado) {
-                $.post('{{ route('user.update-estado') }}', {
-                        estado,
-                        _token: '{{ csrf_token() }}'
-                    })
+                $.post('{{ route('user.estado') }}', {
+                    estado,
+                    _token: '{{ csrf_token() }}'
+                })
                     .done(r => {
                         if (r.success) {
                             updateEstadoUI(r.estado || estado);
@@ -411,7 +430,7 @@
                     });
             }
 
-            $('.estado-option').on('click', function(e) {
+            $('.estado-option').on('click', function (e) {
                 e.preventDefault();
                 cambiarEstado($(this).data('estado'));
             });
@@ -428,6 +447,182 @@
             $('#navbar-avatar-initials, #dropdown-avatar-initials').hide();
         });
     </script>
+
+    @auth
+    <!-- Modal de tiempo de espera de sesión -->
+    <div class="modal fade" id="sessionTimeoutModal" tabindex="-1" role="dialog" aria-labelledby="sessionTimeoutModalLabel" aria-hidden="true" data-bs-backdrop="static" style="z-index: 9999;">
+        <div class="modal-dialog modal-dialog-centered" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="sessionTimeoutModalLabel">Sesión a punto de expirar</h5>
+                </div>
+                <div class="modal-body text-center">
+                    <div class="mb-3">
+                        <i class="bi-exclamation-triangle-fill text-warning fs-1"></i>
+                    </div>
+                    <p>Su sesión está a punto de expirar debido a la inactividad. ¿Desea continuar conectado?</p>
+                    <div class="fs-4 fw-bold text-danger" id="session-timeout-countdown">05:00</div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-primary w-100" id="stay-logged-in-btn">Mantener sesión iniciada</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            (function() {
+                const SESSION_LIFETIME = {{ (int) config('session.lifetime') }} * 60; // En segundos
+                const WARNING_THRESHOLD = 300; // 5 minutos fijos
+                
+                let warningTimer = null;
+                let countdownInterval = null;
+                let lastPing = Date.now();
+                const PING_INTERVAL = 5 * 60 * 1000; // Ping cada 5 minutos de actividad
+                
+                const modalElement = document.getElementById('sessionTimeoutModal');
+                const countdownDisplay = document.getElementById('session-timeout-countdown');
+                const stayLoggedInBtn = document.getElementById('stay-logged-in-btn');
+                
+                if (!modalElement) return;
+
+                let timeoutModal = null;
+                try {
+                    timeoutModal = new bootstrap.Modal(modalElement);
+                } catch (e) {
+                    console.error('Error inicializando modal de sesión:', e);
+                }
+
+                function resetTimer() {
+                    // Si el modal está visible, NO reiniciar los temporizadores automáticamente con el mouse
+                    if (modalElement.classList.contains('show')) return;
+
+                    clearTimeout(warningTimer);
+                    clearInterval(countdownInterval);
+                    
+                    // Configurar temporizador para la advertencia
+                    let waitTime = (SESSION_LIFETIME - WARNING_THRESHOLD);
+                    if (waitTime < 0) waitTime = 1;
+
+                    warningTimer = setTimeout(showWarning, waitTime * 1000);
+                }
+
+                function showWarning() {
+                    if (timeoutModal) {
+                        timeoutModal.show();
+                    } else {
+                        try {
+                            timeoutModal = new bootstrap.Modal(modalElement);
+                            timeoutModal.show();
+                        } catch (e) {}
+                    }
+                    
+                    let countdownSeconds = WARNING_THRESHOLD;
+                    updateCountdownDisplay(countdownSeconds);
+                    
+                    countdownInterval = setInterval(() => {
+                        countdownSeconds--;
+                        updateCountdownDisplay(countdownSeconds);
+                        
+                        if (countdownSeconds <= 0) {
+                            clearInterval(countdownInterval);
+                            logout();
+                        }
+                    }, 1000);
+                }
+
+                function updateCountdownDisplay(seconds) {
+                    const mins = Math.floor(seconds / 60);
+                    const secs = Math.floor(seconds % 60);
+                    if (countdownDisplay) {
+                        countdownDisplay.textContent = `${mins}:${secs.toString().padStart(2, '0')}`;
+                    }
+                }
+
+                function stayLoggedIn() {
+                    fetch('{{ route('session.ping') }}', {
+                        method: 'POST',
+                        headers: {
+                            'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content'),
+                            'Content-Type': 'application/json',
+                            'Accept': 'application/json',
+                            'X-Requested-With': 'XMLHttpRequest'
+                        }
+                    }).then(response => {
+                        if (response.ok) {
+                            lastPing = Date.now();
+                            if (timeoutModal) timeoutModal.hide();
+                            clearTimeout(warningTimer);
+                            clearInterval(countdownInterval);
+                            resetTimer();
+                        } else {
+                            logout();
+                        }
+                    }).catch(() => logout());
+                }
+
+                function silentPing() {
+                    fetch('{{ route('session.ping') }}', {
+                        method: 'POST',
+                        headers: {
+                            'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content'),
+                            'Accept': 'application/json',
+                            'X-Requested-With': 'XMLHttpRequest'
+                        }
+                    }).then(response => {
+                        if (response.ok) {
+                            lastPing = Date.now();
+                        }
+                    });
+                }
+
+                function logout() {
+                    fetch('{{ route('logout') }}', {
+                        method: 'POST',
+                        headers: {
+                            'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content'),
+                            'Accept': 'application/json',
+                            'X-Requested-With': 'XMLHttpRequest'
+                        }
+                    }).finally(() => {
+                        window.location.href = '/login';
+                    });
+                }
+
+                // Eventos que reinician el temporizador
+                const resetEvents = ['mousedown', 'mousemove', 'keypress', 'scroll', 'touchstart', 'click'];
+                
+                let lastReset = 0;
+                const debouncedReset = () => {
+                    const now = Date.now();
+                    // Solo reiniciar si el modal no está visible
+                    if (!modalElement.classList.contains('show')) {
+                        if (now - lastReset > 10000) { // Cada 10 segundos de actividad
+                            lastReset = now;
+                            resetTimer();
+                            
+                            // Si ha pasado suficiente tiempo, enviar ping silencioso para mantener sesión en el servidor
+                            if (now - lastPing > PING_INTERVAL) {
+                                silentPing();
+                            }
+                        }
+                    }
+                };
+
+                resetEvents.forEach(event => {
+                    document.addEventListener(event, debouncedReset, { passive: true });
+                });
+
+                if (stayLoggedInBtn) {
+                    stayLoggedInBtn.addEventListener('click', stayLoggedIn);
+                }
+
+                resetTimer();
+            })();
+        });
+    </script>
+    @endauth
 
     @stack('scripts')
 </body>

@@ -42,7 +42,7 @@
         </div>
     </div>
     <script>
-        (function() {
+        (function () {
             var preloader = document.getElementById('loading-spinner');
 
             function showLoader() {
@@ -54,12 +54,12 @@
                 }
             }
 
-            window.addEventListener('load', function() {
+            window.addEventListener('load', function () {
                 if (preloader) {
                     preloader.style.transition = 'opacity 0.3s ease-out';
                     preloader.style.opacity = '0';
                     preloader.style.pointerEvents = 'none';
-                    setTimeout(function() {
+                    setTimeout(function () {
                         if (preloader.style.opacity === '0') {
                             preloader.style.display = 'none';
                         }
@@ -67,7 +67,27 @@
                 }
             });
 
-            document.addEventListener('click', function(e) {
+            window.addEventListener('pageshow', function (event) {
+                if (event.persisted && preloader) {
+                    preloader.style.transition = 'none';
+                    preloader.style.opacity = '1';
+                    preloader.style.display = 'flex';
+                    preloader.style.pointerEvents = 'auto';
+
+                    setTimeout(function () {
+                        preloader.style.transition = 'opacity 0.3s ease-out';
+                        preloader.style.opacity = '0';
+                        preloader.style.pointerEvents = 'none';
+                        setTimeout(function () {
+                            if (preloader.style.opacity === '0') {
+                                preloader.style.display = 'none';
+                            }
+                        }, 300);
+                    }, 50);
+                }
+            });
+
+            document.addEventListener('click', function (e) {
                 var link = e.target.closest('a');
                 if (link &&
                     link.getAttribute('href') &&
@@ -79,7 +99,7 @@
                 }
             });
 
-            document.addEventListener('submit', function(e) {
+            document.addEventListener('submit', function (e) {
                 if (!e.target.closest('.js-step-form')) {
                     showLoader();
                 }

@@ -219,8 +219,8 @@
 
                                 <div class="card-body-height">
                                     <div class="tab-content" id="notificationTabContent">
-                                        <div class="tab-pane fade show active" id="notificationNavOne"
-                                            role="tabpanel" aria-labelledby="notificationNavOne-tab">
+                                        <div class="tab-pane fade show active" id="notificationNavOne" role="tabpanel"
+                                            aria-labelledby="notificationNavOne-tab">
                                             <ul class="list-group list-group-flush navbar-card-list-group">
                                                 <li class="list-group-item form-check-select">
                                                     <div class="row">
@@ -228,8 +228,7 @@
                                                             <div class="d-flex align-items-center">
                                                                 <div class="form-check">
                                                                     <input class="form-check-input" type="checkbox"
-                                                                        value="" id="notificationCheck1"
-                                                                        checked>
+                                                                        value="" id="notificationCheck1" checked>
                                                                     <label class="form-check-label"
                                                                         for="notificationCheck1"></label>
                                                                     <span class="form-check-stretched-bg"></span>
@@ -258,8 +257,7 @@
                                                             <div class="d-flex align-items-center">
                                                                 <div class="form-check">
                                                                     <input class="form-check-input" type="checkbox"
-                                                                        value="" id="notificationCheck2"
-                                                                        checked>
+                                                                        value="" id="notificationCheck2" checked>
                                                                     <label class="form-check-label"
                                                                         for="notificationCheck2"></label>
                                                                     <span class="form-check-stretched-bg"></span>
@@ -290,8 +288,7 @@
                                                             <div class="d-flex align-items-center">
                                                                 <div class="form-check">
                                                                     <input class="form-check-input" type="checkbox"
-                                                                        value="" id="notificationCheck3"
-                                                                        checked>
+                                                                        value="" id="notificationCheck3" checked>
                                                                     <label class="form-check-label"
                                                                         for="notificationCheck3"></label>
                                                                     <span class="form-check-stretched-bg"></span>
@@ -452,8 +449,7 @@
                                                                         for="notificationCheck8"></label>
                                                                     <span class="form-check-stretched-bg"></span>
                                                                 </div>
-                                                                <div
-                                                                    class="avatar avatar-sm avatar-dark avatar-circle">
+                                                                <div class="avatar avatar-sm avatar-dark avatar-circle">
                                                                     <span class="avatar-initials">HS</span>
                                                                 </div>
                                                             </div>
@@ -686,36 +682,37 @@
                             data-bs-dropdown-animation>
                             <div class="avatar avatar-sm avatar-circle">
                                 @php
-                                    $user = Auth::user();
-                                    $estadoActual = $user->estado ?? 'disponible';
-                                    $estadoAvatarColors = [
-                                        'disponible' => 'success',
-                                        'ocupado' => 'danger',
-                                        'ausente' => 'warning-custom',
-                                        'privado' => 'secondary',
-                                    ];
-                                    $primerNombre = $user->first_name ?? '';
-                                    $primerApellido = $user->first_last_name ?? '';
-                                    $iniciales = '';
-                                    if (!empty($primerNombre)) {
-                                        $iniciales .= strtoupper(substr($primerNombre, 0, 1));
-                                    }
-                                    if (!empty($primerApellido)) {
-                                        $iniciales .= strtoupper(substr($primerApellido, 0, 1));
-                                    }
-                                    if (empty($iniciales)) {
-                                        $iniciales = 'U';
-                                    }
+                                $user = Auth::user();
+                                $estadoActual = $user->estado ?? 'disponible';
+                                $estadoAvatarColors = [
+                                'disponible' => 'success',
+                                'ocupado' => 'danger',
+                                'ausente' => 'warning',
+                                'privado' => 'secondary',
+                                'desconectado' => 'secondary',
+                                ];
+                                $primerNombre = $user->first_name ?? '';
+                                $primerApellido = $user->first_last_name ?? '';
+                                $iniciales = '';
+                                if (!empty($primerNombre)) {
+                                $iniciales .= strtoupper(substr($primerNombre, 0, 1));
+                                }
+                                if (!empty($primerApellido)) {
+                                $iniciales .= strtoupper(substr($primerApellido, 0, 1));
+                                }
+                                if (empty($iniciales)) {
+                                $iniciales = 'U';
+                                }
                                 @endphp
 
                                 @if ($user && $user->profile_photo_path)
-                                    <img class="avatar-img" id="navbar-avatar-img"
-                                        src="{{ asset('storage/' . $user->profile_photo_path) }}"
-                                        alt="Image Description" onerror="this.onerror=null; retryNavbarImage(this);">
+                                <img class="avatar-img" id="navbar-avatar-img"
+                                    src="{{ asset('storage/' . $user->profile_photo_path) }}" alt="Image Description"
+                                    onerror="this.onerror=null; retryNavbarImage(this);">
                                 @else
-                                    <div class="avatar-img avatar-soft-primary" id="navbar-avatar-initials">
-                                        <span class="avatar-initials">{{ $iniciales }}</span>
-                                    </div>
+                                <div class="avatar-img avatar-soft-primary" id="navbar-avatar-initials">
+                                    <span class="avatar-initials">{{ $iniciales }}</span>
+                                </div>
                                 @endif
                                 <span
                                     class="avatar-status avatar-sm-status avatar-status-{{ $estadoAvatarColors[$estadoActual] }}"
@@ -728,33 +725,33 @@
                             <div class="dropdown-item-text">
                                 <div class="d-flex align-items-center">
                                     @php
-                                        $user = Auth::user();
-                                        $primerNombre = $user->first_name ?? '';
-                                        $primerApellido = $user->first_last_name ?? '';
-                                        $nombreMostrar =
-                                            trim($primerNombre . ' ' . $primerApellido) ?: $user->email ?? 'Usuario';
-                                        $iniciales = '';
-                                        if (!empty($primerNombre)) {
-                                            $iniciales .= strtoupper(substr($primerNombre, 0, 1));
-                                        }
-                                        if (!empty($primerApellido)) {
-                                            $iniciales .= strtoupper(substr($primerApellido, 0, 1));
-                                        }
-                                        if (empty($iniciales)) {
-                                            $iniciales = 'U';
-                                        }
+                                    $user = Auth::user();
+                                    $primerNombre = $user->first_name ?? '';
+                                    $primerApellido = $user->first_last_name ?? '';
+                                    $nombreMostrar =
+                                    trim($primerNombre . ' ' . $primerApellido) ?: $user->email ?? 'Usuario';
+                                    $iniciales = '';
+                                    if (!empty($primerNombre)) {
+                                    $iniciales .= strtoupper(substr($primerNombre, 0, 1));
+                                    }
+                                    if (!empty($primerApellido)) {
+                                    $iniciales .= strtoupper(substr($primerApellido, 0, 1));
+                                    }
+                                    if (empty($iniciales)) {
+                                    $iniciales = 'U';
+                                    }
                                     @endphp
                                     <div class="avatar avatar-sm avatar-circle">
 
                                         @if ($user && $user->profile_photo_path)
-                                            <img class="avatar-img" id="dropdown-avatar-img" style="max-width: none;"
-                                                src="{{ asset('storage/' . $user->profile_photo_path) }}"
-                                                alt="Image Description"
-                                                onerror="this.onerror=null; retryNavbarImage(this);">
+                                        <img class="avatar-img" id="dropdown-avatar-img" style="max-width: none;"
+                                            src="{{ asset('storage/' . $user->profile_photo_path) }}"
+                                            alt="Image Description"
+                                            onerror="this.onerror=null; retryNavbarImage(this);">
                                         @else
-                                            <div class="avatar-img avatar-soft-primary" id="dropdown-avatar-initials">
-                                                <span class="avatar-initials">{{ $iniciales }}</span>
-                                            </div>
+                                        <div class="avatar-img avatar-soft-primary" id="dropdown-avatar-initials">
+                                            <span class="avatar-initials">{{ $iniciales }}</span>
+                                        </div>
                                         @endif
 
                                     </div>
@@ -769,23 +766,25 @@
 
                             <div class="dropdown">
                                 <a class="navbar-dropdown-submenu-item dropdown-item dropdown-toggle"
-                                    href="javascript:;" id="navSubmenuPagesAccountDropdown1"
-                                    data-bs-toggle="dropdown" aria-expanded="false">
+                                    href="javascript:;" id="navSubmenuPagesAccountDropdown1" data-bs-toggle="dropdown"
+                                    aria-expanded="false">
                                     Estado
                                     @php
-                                        $estadoActual = Auth::user()->estado ?? 'disponible';
-                                        $estadoLabels = [
-                                            'disponible' => 'Disponible',
-                                            'ocupado' => 'Ocupado',
-                                            'ausente' => 'Ausente',
-                                            'privado' => 'Privado',
-                                        ];
-                                        $estadoColors = [
-                                            'disponible' => 'success',
-                                            'ocupado' => 'danger',
-                                            'ausente' => 'warning-custom',
-                                            'privado' => 'secondary',
-                                        ];
+                                    $estadoActual = Auth::user()->estado ?? 'disponible';
+                                    $estadoLabels = [
+                                    'disponible' => 'Disponible',
+                                    'ocupado' => 'Ocupado',
+                                    'ausente' => 'Ausente',
+                                    'privado' => 'Privado',
+                                    'desconectado' => 'Desconectado',
+                                    ];
+                                    $estadoColors = [
+                                    'disponible' => 'success',
+                                    'ocupado' => 'danger',
+                                    'ausente' => 'warning',
+                                    'privado' => 'secondary',
+                                    'desconectado' => 'secondary',
+                                    ];
                                     @endphp
                                     <span class="legend-indicator bg-{{ $estadoColors[$estadoActual] }} ms-2"></span>
                                     <span class="ms-1">{{ $estadoLabels[$estadoActual] }}</span>
@@ -797,28 +796,28 @@
                                         href="javascript:;" data-estado="disponible">
                                         <span class="legend-indicator bg-success me-1"></span> Disponible
                                         @if ($estadoActual === 'disponible')
-                                            <i class="bi-check-lg float-end"></i>
+                                        <i class="bi-check-lg float-end"></i>
                                         @endif
                                     </a>
                                     <a class="dropdown-item estado-option {{ $estadoActual === 'ocupado' ? 'active' : '' }}"
                                         href="javascript:;" data-estado="ocupado">
                                         <span class="legend-indicator bg-danger me-1"></span> Ocupado
                                         @if ($estadoActual === 'ocupado')
-                                            <i class="bi-check-lg float-end"></i>
+                                        <i class="bi-check-lg float-end"></i>
                                         @endif
                                     </a>
                                     <a class="dropdown-item estado-option {{ $estadoActual === 'ausente' ? 'active' : '' }}"
                                         href="javascript:;" data-estado="ausente">
-                                        <span class="legend-indicator bg-warning-custom me-1"></span> Ausente
+                                        <span class="legend-indicator bg-warning me-1"></span> Ausente
                                         @if ($estadoActual === 'ausente')
-                                            <i class="bi-check-lg float-end"></i>
+                                        <i class="bi-check-lg float-end"></i>
                                         @endif
                                     </a>
                                     <a class="dropdown-item estado-option {{ $estadoActual === 'privado' ? 'active' : '' }}"
                                         href="javascript:;" data-estado="privado">
                                         <span class="legend-indicator bg-secondary me-1"></span> Privado
                                         @if ($estadoActual === 'privado')
-                                            <i class="bi-check-lg float-end"></i>
+                                        <i class="bi-check-lg float-end"></i>
                                         @endif
                                     </a>
                                     <div class="dropdown-divider"></div>

@@ -27,6 +27,7 @@ class TrackSessionHistory
                     'ip_address' => $request->ip(),
                     'user_agent' => $request->userAgent(),
                     'last_active_at' => now(),
+                    'is_active' => true,
                 ]);
             } else {
                 // Registra por primera vez con su login_at original
@@ -37,6 +38,7 @@ class TrackSessionHistory
                     'user_agent' => $request->userAgent(),
                     'login_at' => now(),
                     'last_active_at' => now(),
+                    'is_active' => true,
                 ]);
             }
         }

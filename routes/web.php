@@ -22,10 +22,11 @@ Route::get('login', [LoginController::class , 'showLoginForm'])->name('login');
 Route::post('login', [LoginController::class , 'login']);
 Route::post('logout', [LoginController::class , 'logout'])->name('logout');
 
-Route::get('/home', [HomeController::class , 'index'])->name('home');
+Route::get('/home', [HomeController::class , 'index'])->name('home')->middleware('PreventBackHistory');
 
-Route::middleware('auth')->group(function () {
-    Route::post('/user/update-estado', [UserController::class , 'updateEstado'])->name('user.update-estado');
+Route::middleware(['auth', 'PreventBackHistory'])->group(function () {
+    Route::post('/session/ping', [UserController::class, 'ping'])->name('session.ping');
+    Route::post('/user/update-estado', [UserController::class , 'updateEstado'])->name('user.estado');
     Route::post('/user/update-theme', [UserController::class , 'updateThemePreference'])->name('user.update-theme');
 
 
@@ -47,13 +48,13 @@ Route::middleware('auth')->group(function () {
     Route::get('/patients/get-municipalities-by-department', [PatientController::class , 'getMunicipalitiesByDepartment'])->name('patients.get-municipalities-by-department');
 
     Route::Resource('countries', CountryController::class);
-    Route::post('/countries/{country}/restore', [CountryController::class, 'restore'])->name('countries.restore');
+    Route::post('/countries/{country}/restore', [CountryController::class , 'restore'])->name('countries.restore');
 
     Route::Resource('departments', DepartmentController::class);
-    Route::post('/departments/{department}/restore', [DepartmentController::class, 'restore'])->name('departments.restore');
+    Route::post('/departments/{department}/restore', [DepartmentController::class , 'restore'])->name('departments.restore');
 
     Route::Resource('municipalities', MunicipalityController::class);
-    Route::post('/municipalities/{municipality}/restore', [MunicipalityController::class, 'restore'])->name('municipalities.restore');
+    Route::post('/municipalities/{municipality}/restore', [MunicipalityController::class , 'restore'])->name('municipalities.restore');
 
 
 

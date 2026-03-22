@@ -44,7 +44,7 @@ return new class extends Migration
             $table->date('birth_date')->nullable();
             $table->string('gender')->nullable();
 
-            $table->enum('estado', ['disponible', 'ocupado', 'ausente', 'privado'])->default('disponible');
+            $table->enum('estado', ['disponible', 'ocupado', 'ausente', 'privado', 'desconectado'])->default('disponible');
             $table->string('theme_preference')->nullable()->default('auto');
             $table->rememberToken();
             $table->timestamps();

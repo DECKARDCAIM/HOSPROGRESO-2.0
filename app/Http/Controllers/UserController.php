@@ -53,7 +53,7 @@ class UserController extends Controller
     {
         try {
             $request->validate([
-                'estado' => 'required|in:disponible,ocupado,ausente,privado'
+                'estado' => 'required|in:disponible,ocupado,ausente,privado,desconectado'
             ]);
 
             $user = Auth::user();
@@ -232,5 +232,13 @@ class UserController extends Controller
     {
         $user = \App\Models\User::findOrFail($id);
         return view('modules.user.edit', compact('user'));
+    }
+
+    /**
+     * Mantener la sesión activa (Ping)
+     */
+    public function ping()
+    {
+        return response()->json(['success' => true]);
     }
 }

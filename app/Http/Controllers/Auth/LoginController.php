@@ -54,5 +54,37 @@ class LoginController extends Controller
                 'access_denied' => 'Su cuenta no está completada o se encuentra inactiva (Falta rol o departamento). Por favor, contacte con el departamento de informática para soporte técnico.'
             ]);
         }
+
+        $user->update(['estado' => 'disponible']);
+    }
+
+    /**
+     * Log the user out of the application.
+     *
+     * @param  \Illuminate\Http\Request  $request
+     * @return \Illuminate\Http\RedirectResponse|\Illuminate\Http\JsonResponse
+     */
+    public function logout(Request $request)
+    {
+        $user = auth()->user();
+        if ($user) {
+            \Illuminate\Support\Facades\DB::table('users')
+                ->where('id', $user->id)
+                ->update(['estado' => 'desconectado']);
+        }
+
+        $this->guard()->logout();
+
+        $request->session()->invalidate();
+
+        $request->session()->regenerateToken();
+
+        if ($response = $this->loggedOut($request)) {
+            return $response;
+        }
+
+        return $request->wantsJson()
+            ? new \Illuminate\Http\JsonResponse([], 204)
+            : redirect('/');
     }
 }
