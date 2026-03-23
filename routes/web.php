@@ -10,6 +10,7 @@ use App\Http\Controllers\PatientController;
 use App\Http\Controllers\CountryController;
 use App\Http\Controllers\DepartmentController;
 use App\Http\Controllers\MunicipalityController;
+use App\Http\Controllers\MetricsController;
 
 Route::get('/', function () {
     if (Auth::check()) {
@@ -105,4 +106,13 @@ Route::middleware(['auth', 'PreventBackHistory'])->group(function () {
     Route::post('/users', [UserController::class , 'store'])->name('users.store');
     Route::get('/users/{id}/edit', [UserController::class , 'edit'])->name('users.edit');
     Route::get('/users/{id}/profile', [UserController::class , 'showProfile'])->name('users.profile');
+
+    // ==========================================
+    // MÓDULO: MÉTRICAS
+    // ==========================================
+    Route::prefix('metrics')->group(function () {
+        Route::get('/system', [MetricsController::class, 'system'])->name('metrics.system.index');
+        Route::get('/system/expand/{chart}', [MetricsController::class, 'expandSystem'])->name('metrics.system.expand');
+    });
+
 });

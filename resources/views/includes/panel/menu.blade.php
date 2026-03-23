@@ -65,9 +65,9 @@
 
                         <div id="navbarVerticalMenuMetricas" class="nav-collapse collapse"
                             data-bs-parent="#navbarVerticalMenu">
-                            <a class="nav-link" href="/metricas">Dashboard</a>
-                            <a class="nav-link" href="/metricas/reportes">Reportes</a>
-                            <a class="nav-link" href="/metricas/estadisticas">Estadísticas</a>
+                            <a class="nav-link" href="{{ route('metrics.system.index') }}">Sistema</a>
+                            <a class="nav-link" href="javascript:void(0);">Salud</a>
+                            <a class="nav-link" href="javascript:void(0);">Reportes</a>
                         </div>
                     </div>
 
