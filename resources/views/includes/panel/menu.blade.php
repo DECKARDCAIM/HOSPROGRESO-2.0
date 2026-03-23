@@ -203,7 +203,7 @@
                                 <i class="bi-people nav-icon"></i> Etnia
                             </a>
                             <a class="nav-link" href="#">
-                                <i class="bi-translate nav-icon"></i> Comunidad Lingüística
+                                <i class="bi-translate nav-icon"></i> Idiomas
                             </a>
                         </div>
                     </div>

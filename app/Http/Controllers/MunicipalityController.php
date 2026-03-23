@@ -6,6 +6,11 @@ use App\Models\Municipality;
 use App\Models\Department;
 use App\Models\Country;
 use Illuminate\Http\Request;
+use App\Http\Requests\StoreMunicipalityRequest;
+use App\Http\Requests\UpdateMunicipalityRequest;
+use App\Exports\MunicipalityExport;
+use Maatwebsite\Excel\Facades\Excel;
+use Barryvdh\DomPDF\Facade\Pdf;
 
 class MunicipalityController extends Controller
 {
@@ -26,7 +31,6 @@ class MunicipalityController extends Controller
             $search = $request->search;
             $query->where(function($q) use ($search) {
                 $q->where('name', 'LIKE', "%{$search}%")
-                  ->orWhere('description', 'LIKE', "%{$search}%")
                   ->orWhereHas('department', function($q2) use ($search) {
                       $q2->where('name', 'LIKE', "%{$search}%")
                          ->orWhereHas('country', function($q3) use ($search) {
@@ -48,29 +52,32 @@ class MunicipalityController extends Controller
             $query->where('department_id', $request->department_id);
         }
 
-        // Filtro por estado
-        if ($request->filled('status')) {
-            $is_active = $request->status === 'active';
-            $query->where('is_active', $is_active);
+        // Filtro por estado (activo por defecto)
+        $status = $request->input('status', 'active');
+        if ($status === 'active') {
+            $query->where('is_active', true);
+        } elseif ($status === 'inactive') {
+            $query->where('is_active', false);
         }
 
         $perPage                = $request->input('per_page', 25);
-        $municipalities         = $query->orderBy('name')->paginate($perPage)->appends($request->query());
+        $allFilteredIds         = (clone $query)->pluck('id')->toArray();
+        $municipalities         = $query->orderBy('id')->paginate($perPage)->appends($request->query());
         
         $totalMunicipalities    = Municipality::count();
         $activeMunicipalities   = Municipality::where('is_active', true)->count();
         $inactiveMunicipalities = Municipality::where('is_active', false)->count();
         
-        $countries              = Country::orderBy('name')->get();
+        $countries              = Country::orderBy('id')->get();
         
         $departmentsQuery = Department::query();
         if ($request->filled('country_id')) {
             $departmentsQuery->where('country_id', $request->country_id);
         }
-        $departments = $departmentsQuery->orderBy('name')->get();
+        $departments = $departmentsQuery->orderBy('id')->get();
 
         return view('modules.ubication.municipalities.index', compact(
-            'municipalities', 'countries', 'departments',
+            'municipalities', 'allFilteredIds', 'countries', 'departments',
             'totalMunicipalities', 'activeMunicipalities', 'inactiveMunicipalities'
         ));
     }
@@ -93,35 +100,17 @@ class MunicipalityController extends Controller
     /**
      * Store a newly created resource in storage.
      */
-    public function store(Request $request)
+    public function store(StoreMunicipalityRequest $request)
     {
-        $rules = [
-            'name'          => 'required|string|min:5',
-            'department_id' => 'required|exists:departments,id',
-            'description'   => 'nullable|string|max:320',
-        ];
-
-        $messages = [
-            'name.required'          => 'El campo nombre es obligatorio.',
-            'name.string'            => 'El campo nombre debe ser una cadena de texto.',
-            'name.min'               => 'El campo nombre debe tener al menos 5 caracteres.',
-            'department_id.required' => 'El campo departamento es obligatorio.',
-            'department_id.exists'   => 'El departamento seleccionado no es válido.',
-            'description.string'     => 'El campo descripción debe ser una cadena de texto.',
-            'description.max'        => 'El campo descripción no puede tener más de 320 caracteres.',
-        ];
-
-        $this->validate($request, $rules, $messages);
 
         $municipality                = new Municipality();
         $municipality->department_id = $request->department_id;
         $municipality->name          = $request->name;
-        $municipality->description   = $request->description;
         $municipality->save();
 
         $notification = [
             'message'    => 'El municipio ' . $municipality->name . ' se ha creado correctamente.',
-            'alert-type' => 'Creación Éxitosa',
+            'alert-type' => 'success',
         ];
 
         return redirect()->route('municipalities.index')->with(compact('notification'));
@@ -149,34 +138,16 @@ class MunicipalityController extends Controller
     /**
      * Update the specified resource in storage.
      */
-    public function update(Request $request, Municipality $municipality)
+    public function update(UpdateMunicipalityRequest $request, Municipality $municipality)
     {
-        $rules = [
-            'name'          => 'required|string|min:5',
-            'department_id' => 'required|exists:departments,id',
-            'description'   => 'nullable|string|max:320',
-        ];
-
-        $messages = [
-            'name.required'          => 'El campo nombre es obligatorio.',
-            'name.string'            => 'El campo nombre debe ser una cadena de texto.',
-            'name.min'               => 'El campo nombre debe tener al menos 5 caracteres.',
-            'department_id.required' => 'El campo departamento es obligatorio.',
-            'department_id.exists'   => 'El departamento seleccionado no es válido.',
-            'description.string'     => 'El campo descripción debe ser una cadena de texto.',
-            'description.max'        => 'El campo descripción no puede tener más de 320 caracteres.',
-        ];
-
-        $this->validate($request, $rules, $messages);
 
         $municipality->name          = $request->input('name');
         $municipality->department_id = $request->input('department_id');
-        $municipality->description   = $request->input('description');
         $municipality->save();
 
         $notification = [
             'message'    => 'El municipio ' . $municipality->name . ' se ha actualizado correctamente.',
-            'alert-type' => 'Actualización Éxitosa',
+            'alert-type' => 'info',
         ];
 
         return redirect()->route('municipalities.index')->with(compact('notification'));
@@ -188,7 +159,7 @@ class MunicipalityController extends Controller
         $municipality->save();
         $notification = [
             'message'    => 'El municipio ' . $municipality->name . ' ha sido desactivado correctamente.',
-            'alert-type' => 'Actualización Éxitosa'
+            'alert-type' => 'warning'
         ];
         return redirect()->route('municipalities.index')->with(compact('notification'));
     }
@@ -202,8 +173,61 @@ class MunicipalityController extends Controller
         $municipality->save();
         $notification = [
             'message'    => 'El municipio ' . $municipality->name . ' ha sido reactivado correctamente.',
-            'alert-type' => 'Actualización Éxitosa'
+            'alert-type' => 'success'
         ];
         return redirect()->route('municipalities.index')->with(compact('notification'));
+    }
+
+    // ==========================================
+    // ACCIONES MASIVAS
+    // ==========================================
+    public function destroyMultiple(Request $request)
+    {
+        $ids = json_decode($request->input('ids', '[]'), true);
+        if (empty($ids)) return back()->with('error', 'No se seleccionaron municipios.');
+
+        Municipality::whereIn('id', $ids)->update(['is_active' => false]);
+        return back()->with('success', count($ids) . ' municipios han sido desactivados.');
+    }
+
+    public function restoreMultiple(Request $request)
+    {
+        $ids = json_decode($request->input('ids', '[]'), true);
+        if (empty($ids)) return back()->with('error', 'No se seleccionaron municipios.');
+
+        Municipality::whereIn('id', $ids)->update(['is_active' => true]);
+        return back()->with('success', count($ids) . ' municipios han sido reactivados.');
+    }
+
+    // ==========================================
+    // EXPORTACIONES
+    // ==========================================
+    public function exportExcel(Request $request)
+    {
+        $ids = json_decode($request->input('ids', '[]'), true);
+        return Excel::download(new MunicipalityExport($ids), 'municipios.xlsx');
+    }
+
+    public function exportCSV(Request $request)
+    {
+        $ids = json_decode($request->input('ids', '[]'), true);
+        return Excel::download(new MunicipalityExport($ids), 'municipios.csv', \Maatwebsite\Excel\Excel::CSV);
+    }
+
+    public function exportPDF(Request $request)
+    {
+        $ids = json_decode($request->input('ids', '[]'), true);
+        $municipalities = count($ids) > 0 ? Municipality::whereIn('id', $ids)->orderBy('id')->get() : Municipality::orderBy('id')->get();
+        
+        $pdf = Pdf::loadView('modules.ubication.municipalities.print', compact('municipalities'));
+        return $pdf->download('municipios.pdf');
+    }
+
+    public function print(Request $request)
+    {
+        $ids = json_decode($request->input('ids', '[]'), true);
+        $municipalities = count($ids) > 0 ? Municipality::whereIn('id', $ids)->orderBy('id')->get() : Municipality::orderBy('id')->get();
+        
+        return view('modules.ubication.municipalities.print', compact('municipalities'));
     }
 }

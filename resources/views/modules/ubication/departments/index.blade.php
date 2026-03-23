@@ -95,6 +95,25 @@
 
                 <div class="d-grid d-sm-flex justify-content-md-end align-items-sm-center gap-2">
 
+                            <div class="dropdown" id="actionsDropdownWrapper" style="display: none;">
+                                <button type="button" class="btn btn-white btn-sm dropdown-toggle" id="actionsDropdown"
+                                    data-bs-toggle="dropdown" aria-expanded="false">
+                                    <i class="bi-gear me-2"></i> Acciones
+                                </button>
+                                <div class="dropdown-menu dropdown-menu-sm-end" aria-labelledby="actionsDropdown">
+                                    <span class="dropdown-header">Acciones masivas</span>
+                                    @if (request('status') === 'inactive')
+                                        <a id="bulk-restore" class="dropdown-item" href="javascript:;">
+                                            <i class="bi-arrow-clockwise me-2"></i> Reactivar
+                                        </a>
+                                    @else
+                                        <a id="bulk-delete" class="dropdown-item text-danger" href="javascript:;">
+                                            <i class="bi-trash me-2"></i> Eliminar
+                                        </a>
+                                    @endif
+                                </div>
+                            </div>
+
                     <div class="dropdown">
                         <button type="button" class="btn btn-white btn-sm dropdown-toggle w-100"
                             id="departmentsExportDropdown" data-bs-toggle="dropdown" aria-expanded="false">
@@ -102,10 +121,6 @@
                         </button>
                         <div class="dropdown-menu dropdown-menu-sm-end" aria-labelledby="departmentsExportDropdown">
                             <span class="dropdown-header">Options</span>
-                            <a id="export-copy" class="dropdown-item" href="javascript:;">
-                                <img class="avatar avatar-xss avatar-4x3 me-2"
-                                    src="{{ asset('svg/illustrations/copy-icon.svg') }}" alt="Copy"> Copy
-                            </a>
                             <a id="export-print" class="dropdown-item" href="javascript:;">
                                 <img class="avatar avatar-xss avatar-4x3 me-2"
                                     src="{{ asset('svg/illustrations/print-icon.svg') }}" alt="Print"> Print
@@ -127,10 +142,16 @@
                         </div>
                     </div>
 
+                    @php
+                        $activeFilters = count(array_filter(request()->only(['search', 'country_id', 'status'])));
+                    @endphp
                     <div class="dropdown">
                         <button type="button" class="btn btn-white btn-sm w-100" id="departmentsFilterDropdown"
                             data-bs-toggle="dropdown" data-bs-auto-close="outside" aria-expanded="false">
                             <i class="bi-filter me-1"></i> Filtrar
+                            @if($activeFilters > 0)
+                                <span class="badge bg-soft-info text-info rounded-circle ms-1">{{ $activeFilters }}</span>
+                            @endif
                         </button>
                         <div class="dropdown-menu dropdown-menu-sm-end dropdown-card card-dropdown-filter-centered"
                             aria-labelledby="departmentsFilterDropdown" style="min-width: 22rem;">
@@ -154,6 +175,7 @@
                                                 <div class="tom-select-custom">
                                                     <select name="country_id"
                                                         class="js-select form-select form-select-sm"
+                                                        onchange="this.form.submit()"
                                                         data-hs-tom-select-options='{
                                                                 "placeholder": "Cualquier país",
                                                                 "searchInDropdown": false,
@@ -174,14 +196,13 @@
                                                 <small class="text-cap text-body">Estado</small>
                                                 <div class="tom-select-custom">
                                                     <select name="status" class="js-select form-select form-select-sm"
+                                                        onchange="this.form.submit()"
                                                         data-hs-tom-select-options='{
-                                                                "placeholder": "Cualquier estado",
                                                                 "searchInDropdown": false,
                                                                 "hideSearch": true,
                                                                 "dropdownWidth": "10rem"
                                                             }'>
-                                                        <option value="">Cualquier estado</option>
-                                                        <option value="active" {{ request('status')=='active'
+                                                        <option value="active" {{ request('status', 'active')=='active'
                                                             ? 'selected' : '' }}>Activo</option>
                                                         <option value="inactive" {{ request('status')=='inactive'
                                                             ? 'selected' : '' }}>Inactivo</option>
@@ -198,6 +219,21 @@
                             </div>
                         </div>
                     </div>
+                    
+                    <!-- Contador seleccionados -->
+                    <span id="selectedCountWrapper" class="text-body small align-items-center gap-2 ms-2" style="display: flex; display: none !important; border-left: 1px solid #e7eaf3; padding-left: .5rem;">
+                        <span><span class="fw-semibold" id="selectedCount">0</span> selec.</span>
+                        
+                        <!-- Checkbox "Seleccionar Todo" -->
+                        <div class="form-check form-check-sm mb-0" title="Seleccionar todos los registros ({{ count($allFilteredIds) }})">
+                            <input class="form-check-input" type="checkbox" id="selectAllFiltered" data-ids="{{ json_encode($allFilteredIds) }}">
+                            <label class="form-check-label text-muted" style="font-size: 0.7rem; margin-top: 1px;" for="selectAllFiltered">Todos</label>
+                        </div>
+                        
+                        <button type="button" id="clearSelection" class="btn btn-link btn-sm p-0 ms-1 text-muted" style="line-height: 1; font-size: 0.75rem; opacity: 0.7; transition: opacity 0.2s;" onmouseover="this.style.opacity='1'" onmouseout="this.style.opacity='0.7'" title="Limpiar selección">
+                            <i class="bi-x-lg"></i>
+                        </button>
+                    </span>
 
                 </div>
             </div>
@@ -206,12 +242,12 @@
                 <table id="datatable"
                     class="table table-lg table-borderless table-thead-bordered table-nowrap table-align-middle card-table"
                     data-hs-datatables-options='{
-                           "columnDefs": [{"targets": [0, 5], "orderable": false}],
+                           "columnDefs": [{"targets": [0, 4], "orderable": false}],
                            "order": [],
                            "info": {"totalQty": "#datatableWithPaginationInfoTotalQty"},
                            "search": "#datatableSearch",
                            "entries": "#datatableEntries",
-                           "pageLength": {{ request(' per_page', 25) }}, "isResponsive" : false, "isShowPaging" :
+                           "pageLength": {{ request('per_page', 25) }}, "isResponsive" : false, "isShowPaging" :
                     false, "pagination" : "datatablePagination" }'>
                     <thead class="thead-light">
                         <tr>
@@ -223,7 +259,6 @@
                             </th>
                             <th class="table-column-ps-0">Departamento</th>
                             <th>País</th>
-                            <th>Descripción</th>
                             <th>Estado</th>
                             <th>Acciones</th>
                         </tr>
@@ -244,9 +279,6 @@
                             </td>
                             <td>{{ $department->country->name ?? '—' }}</td>
                             <td>
-                                <span class="d-block fs-5">{{ $department->description ?? '—' }}</span>
-                            </td>
-                            <td>
                                 @if ($department->is_active)
                                 <span class="legend-indicator bg-success"></span>Activo
                                 @else
@@ -261,8 +293,7 @@
                                     </a>
 
                                     @if ($department->is_active)
-                                    <form action="{{ route('departments.destroy', $department->id) }}" method="POST"
-                                        onsubmit="return confirm('¿Desactivar el departamento {{ addslashes($department->name) }}?')">
+                                    <form action="{{ route('departments.destroy', $department->id) }}" method="POST" class="requires-confirmation" data-message="¿Desactivar el departamento {{ addslashes($department->name) }}? Esto también desactivará todos sus municipios asociados.">
                                         @csrf
                                         @method('DELETE')
                                         <button type="submit" class="btn btn-white btn-sm" title="Desactivar">
@@ -270,8 +301,7 @@
                                         </button>
                                     </form>
                                     @else
-                                    <form action="{{ route('departments.restore', $department->id) }}" method="POST"
-                                        onsubmit="return confirm('¿Reactivar el departamento {{ addslashes($department->name) }}?')">
+                                    <form action="{{ route('departments.restore', $department->id) }}" method="POST" class="requires-confirmation" data-message="¿Reactivar el departamento {{ addslashes($department->name) }}? Esto también reactivará todos sus municipios asociados.">
                                         @csrf
                                         <button type="submit" class="btn btn-white btn-sm" title="Reactivar">
                                             <i class="bi-arrow-counterclockwise"></i>
@@ -283,7 +313,7 @@
                         </tr>
                         @empty
                         <tr>
-                            <td colspan="6" class="text-center">No hay departamentos registrados.</td>
+                            <td colspan="5" class="text-center">No hay departamentos registrados.</td>
                         </tr>
                         @endforelse
                     </tbody>
@@ -299,7 +329,7 @@
                                 <select id="datatableEntries"
                                     class="js-select form-select form-select-borderless w-auto" autocomplete="off"
                                     data-hs-tom-select-options='{"searchInDropdown": false, "hideSearch": true}'
-                                    onchange="window.location.href = '{{ route('departments.index', request()->except(['per_page', 'page'])) }}' + (window.location.search.includes('?') ? '&' : '?') + 'per_page=' + this.value">
+                                    onchange="window.location.href = '{{ route('departments.index', request()->except(['per_page', 'page'])) }}' + ( '{{ route('departments.index', request()->except(['per_page', 'page'])) }}'.includes('?') ? '&' : '?' ) + 'per_page=' + this.value">
                                     <option value="10" {{ request('per_page')==10 ? 'selected' : '' }}>10</option>
                                     <option value="25" {{ request('per_page', 25)==25 ? 'selected' : '' }}>25</option>
                                     <option value="50" {{ request('per_page')==50 ? 'selected' : '' }}>50</option>
@@ -336,4 +366,152 @@
 <script src="{{ asset('vendor/datatables.net-buttons/js/buttons.html5.min.js') }}"></script>
 <script src="{{ asset('vendor/datatables.net-buttons/js/buttons.print.min.js') }}"></script>
 <script src="{{ asset('vendor/datatables.net-buttons/js/buttons.colVis.min.js') }}"></script>
+
+<script>
+    document.addEventListener('DOMContentLoaded', function () {
+        const storageKey = 'selectedDepartments';
+        let selectedIds = JSON.parse(sessionStorage.getItem(storageKey) || '[]');
+        
+        const checkAll = document.getElementById('datatableCheckAll');
+        const checkboxes = document.querySelectorAll('input[id^="departmentsDataCheck"]');
+        const selectedCountSpan = document.getElementById('selectedCount');
+        const countWrapper = document.getElementById('selectedCountWrapper');
+        const actionsWrapper = document.getElementById('actionsDropdownWrapper');
+        const btnClear = document.getElementById('clearSelection');
+        
+        function updateUI() {
+            selectedCountSpan.textContent = selectedIds.length;
+            if (selectedIds.length > 0) {
+                countWrapper.style.setProperty('display', 'flex', 'important');
+                actionsWrapper.style.display = 'block';
+            } else {
+                countWrapper.style.setProperty('display', 'none', 'important');
+                actionsWrapper.style.display = 'none';
+            }
+            
+            if (checkboxes.length > 0) {
+                const allChecked = Array.from(checkboxes).every(cb => cb.checked);
+                if (checkAll) checkAll.checked = allChecked;
+            }
+            sessionStorage.setItem(storageKey, JSON.stringify(selectedIds));
+        }
+
+        checkboxes.forEach(cb => {
+            if (selectedIds.includes(cb.value)) cb.checked = true;
+            cb.addEventListener('change', function() {
+                if (this.checked) {
+                    if (!selectedIds.includes(this.value)) selectedIds.push(this.value);
+                } else {
+                    selectedIds = selectedIds.filter(id => id !== this.value);
+                }
+                updateUI();
+            });
+        });
+        
+        if (checkAll) {
+            checkAll.addEventListener('change', function() {
+                const isChecked = this.checked;
+                checkboxes.forEach(cb => {
+                    cb.checked = isChecked;
+                    if (isChecked && !selectedIds.includes(cb.value)) {
+                        selectedIds.push(cb.value);
+                    } else if (!isChecked) {
+                        selectedIds = selectedIds.filter(id => id !== cb.value);
+                    }
+                });
+                updateUI();
+            });
+        }
+        
+        if (btnClear) {
+            btnClear.addEventListener('click', function() {
+                selectedIds = [];
+                checkboxes.forEach(cb => cb.checked = false);
+                if(checkAll) checkAll.checked = false;
+                updateUI();
+            });
+        }
+        
+        const btnSelectAllFiltered = document.getElementById('selectAllFiltered');
+        if (btnSelectAllFiltered) {
+            btnSelectAllFiltered.addEventListener('change', function() {
+                if (this.checked) {
+                    const allIds = JSON.parse(this.dataset.ids || '[]');
+                    selectedIds = allIds.map(id => String(id));
+                    checkboxes.forEach(cb => cb.checked = true);
+                    if(checkAll) checkAll.checked = true;
+                } else {
+                    selectedIds = [];
+                    checkboxes.forEach(cb => cb.checked = false);
+                    if(checkAll) checkAll.checked = false;
+                }
+                updateUI();
+            });
+        }
+        
+        updateUI();
+
+        function sendBulkRequest(url, formatStr = null) {
+            if (selectedIds.length === 0) return;
+            const form = document.createElement('form');
+            form.method = 'POST';
+            form.action = url;
+            
+            const csrfToken = document.createElement('input');
+            csrfToken.type = 'hidden';
+            csrfToken.name = '_token';
+            csrfToken.value = '{{ csrf_token() }}';
+            form.appendChild(csrfToken);
+
+            const idsInput = document.createElement('input');
+            idsInput.type = 'hidden';
+            idsInput.name = 'ids';
+            idsInput.value = JSON.stringify(selectedIds);
+            form.appendChild(idsInput);
+            
+            if (formatStr) {
+                const typeInput = document.createElement('input');
+                typeInput.type = 'hidden';
+                typeInput.name = 'format';
+                typeInput.value = formatStr;
+                form.appendChild(typeInput);
+            }
+
+            document.body.appendChild(form);
+            form.submit();
+        }
+
+        const bulkDeleteBtn = document.getElementById('bulk-delete');
+        if (bulkDeleteBtn) {
+            bulkDeleteBtn.addEventListener('click', function() {
+                if (confirm('¿Estás seguro de que deseas eliminar los departamentos seleccionados? Se desactivarán en cascada sus municipios asociados.')) {
+                    sendBulkRequest('{{ route("departments.destroy-multiple") }}');
+                    sessionStorage.removeItem(storageKey);
+                }
+            });
+        }
+
+        const bulkRestoreBtn = document.getElementById('bulk-restore');
+        if (bulkRestoreBtn) {
+            bulkRestoreBtn.addEventListener('click', function() {
+                if (confirm('¿Estás seguro de que deseas reactivar los departamentos seleccionados? Se reactivarán en cascada.')) {
+                    sendBulkRequest('{{ route("departments.restore-multiple") }}');
+                    sessionStorage.removeItem(storageKey);
+                }
+            });
+        }
+
+        const exportExcelBtn = document.getElementById('export-excel');
+        if (exportExcelBtn) exportExcelBtn.addEventListener('click', () => sendBulkRequest('{{ route("departments.export.excel") }}', 'excel'));
+        
+        const exportCsvBtn = document.getElementById('export-csv');
+        if (exportCsvBtn) exportCsvBtn.addEventListener('click', () => sendBulkRequest('{{ route("departments.export.csv") }}', 'csv'));
+        
+        const exportPdfBtn = document.getElementById('export-pdf');
+        if (exportPdfBtn) exportPdfBtn.addEventListener('click', () => sendBulkRequest('{{ route("departments.export.pdf") }}', 'pdf'));
+        
+        const exportPrintBtn = document.getElementById('export-print');
+        if (exportPrintBtn) exportPrintBtn.addEventListener('click', () => sendBulkRequest('{{ route("departments.print") }}', 'print'));
+    });
+</script>
 @endpush

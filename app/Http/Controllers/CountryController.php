@@ -4,6 +4,11 @@ namespace App\Http\Controllers;
 
 use App\Models\Country;
 use Illuminate\Http\Request;
+use App\Http\Requests\StoreCountryRequest;
+use App\Http\Requests\UpdateCountryRequest;
+use App\Exports\CountryExport;
+use Maatwebsite\Excel\Facades\Excel;
+use Barryvdh\DomPDF\Facade\Pdf;
 
 class CountryController extends Controller
 {
@@ -22,26 +27,28 @@ class CountryController extends Controller
         if ($request->filled('search')) {
             $search = $request->search;
             $query->where(function($q) use ($search) {
-                $q->where('name', 'LIKE', "%{$search}%")
-                  ->orWhere('description', 'LIKE', "%{$search}%");
+                $q->where('name', 'LIKE', "%{$search}%");
             });
         }
 
-        // Filtro por estado
-        if ($request->filled('status')) {
-            $is_active = $request->status === 'active';
-            $query->where('is_active', $is_active);
+        // Filtro por estado (activo por defecto)
+        $status = $request->input('status', 'active');
+        if ($status === 'active') {
+            $query->where('is_active', true);
+        } elseif ($status === 'inactive') {
+            $query->where('is_active', false);
         }
 
         $perPage            = $request->input('per_page', 25);
-        $countries          = $query->orderBy('name')->paginate($perPage)->appends($request->query());
+        $allFilteredIds     = (clone $query)->pluck('id')->toArray();
+        $countries          = $query->orderBy('id')->paginate($perPage)->appends($request->query());
         
         $totalCountries     = Country::count();
         $activeCountries    = Country::where('is_active', true)->count();
         $inactiveCountries  = Country::where('is_active', false)->count();
 
         return view('modules.ubication.countries.index', compact(
-            'countries', 'totalCountries', 'activeCountries', 'inactiveCountries'
+            'countries', 'allFilteredIds', 'totalCountries', 'activeCountries', 'inactiveCountries'
         ));
     }
 
@@ -56,29 +63,15 @@ class CountryController extends Controller
     /**
      * Store a newly created resource in storage.
      */
-    public function store(Request $request)
+    public function store(StoreCountryRequest $request)
     {
-        $rules = [
-            'name' => 'required|string|min:5',
-            'description' => 'nullable|string|max:320',
-        ];
-        $messages = [
-            'name.required' => 'El campo nombre es obligatorio.',
-            'name.string' => 'El campo nombre debe ser una cadena de texto.',
-            'name.min' => 'El campo nombre debe tener al menos 5 caracteres.',
-            'description.string' => 'El campo descripción debe ser una cadena de texto.',
-            'description.max' => 'El campo descripción no puede tener más de 320 caracteres.',
-        ];
-
-        $this->validate($request, $rules, $messages);
 
         $countries = new Country();
         $countries->name = $request->input('name');
-        $countries->description = $request->input('description');
         $countries->save();
         $notification = [
             'message' => 'El pais ' . $countries->name . ' se ha creado correctamente.',
-            'alert-type' => 'Creación Éxitosa'
+            'alert-type' => 'success'
         ];
         return redirect()->route('countries.index')->with(compact('notification'));
     }
@@ -102,28 +95,14 @@ class CountryController extends Controller
     /**
      * Update the specified resource in storage.
      */
-    public function update(Request $request, Country $country)
+    public function update(UpdateCountryRequest $request, Country $country)
     {
-        $rules = [
-            'name' => 'required|string|min:5',
-            'description' => 'nullable|string|max:320',
-        ];
-        $messages = [
-            'name.required' => 'El campo nombre es obligatorio.',
-            'name.string' => 'El campo nombre debe ser una cadena de texto.',
-            'name.min' => 'El campo nombre debe tener al menos 5 caracteres.',
-            'description.string' => 'El campo descripción debe ser una cadena de texto.',
-            'description.max' => 'El campo descripción no puede tener más de 320 caracteres.',
-        ];
-
-        $this->validate($request, $rules, $messages);
 
         $country->name = $request->input('name');
-        $country->description = $request->input('description');
         $country->save();
         $notification = [
             'message' => 'El pais ' . $country->name . ' se ha actualizado correctamente.',
-            'alert-type' => 'Actualización Éxitosa'
+            'alert-type' => 'info'
         ];
         return redirect()->route('countries.index')->with(compact('notification'));
     }
@@ -135,9 +114,15 @@ class CountryController extends Controller
     {
         $country->is_active = false;
         $country->save();
+
+        // Desactivación en cascada
+        $departmentIds = $country->departments()->pluck('id');
+        $country->departments()->update(['is_active' => false]);
+        \App\Models\Municipality::whereIn('department_id', $departmentIds)->update(['is_active' => false]);
+
         $notification = [
             'message'    => 'El país ' . $country->name . ' ha sido desactivado correctamente.',
-            'alert-type' => 'Actualización Éxitosa'
+            'alert-type' => 'warning'
         ];
         return redirect()->route('countries.index')->with(compact('notification'));
     }
@@ -149,10 +134,83 @@ class CountryController extends Controller
     {
         $country->is_active = true;
         $country->save();
+
+        // Reactivación en cascada
+        $departmentIds = $country->departments()->pluck('id');
+        $country->departments()->update(['is_active' => true]);
+        \App\Models\Municipality::whereIn('department_id', $departmentIds)->update(['is_active' => true]);
+
         $notification = [
             'message'    => 'El país ' . $country->name . ' ha sido reactivado correctamente.',
-            'alert-type' => 'Actualización Éxitosa'
+            'alert-type' => 'success'
         ];
         return redirect()->route('countries.index')->with(compact('notification'));
+    }
+
+    // ==========================================
+    // ACCIONES MASIVAS
+    // ==========================================
+    public function destroyMultiple(Request $request)
+    {
+        $ids = json_decode($request->input('ids', '[]'), true);
+        if (empty($ids)) return back()->with('error', 'No se seleccionaron países.');
+
+        Country::whereIn('id', $ids)->update(['is_active' => false]);
+        
+        $departments = \App\Models\Department::whereIn('country_id', $ids)->get();
+        if ($departments->count() > 0) {
+            \App\Models\Department::whereIn('id', $departments->pluck('id'))->update(['is_active' => false]);
+            \App\Models\Municipality::whereIn('department_id', $departments->pluck('id'))->update(['is_active' => false]);
+        }
+
+        return back()->with('success', count($ids) . ' países y sus dependencias han sido desactivados.');
+    }
+
+    public function restoreMultiple(Request $request)
+    {
+        $ids = json_decode($request->input('ids', '[]'), true);
+        if (empty($ids)) return back()->with('error', 'No se seleccionaron países.');
+
+        Country::whereIn('id', $ids)->update(['is_active' => true]);
+        
+        $departments = \App\Models\Department::whereIn('country_id', $ids)->get();
+        if ($departments->count() > 0) {
+            \App\Models\Department::whereIn('id', $departments->pluck('id'))->update(['is_active' => true]);
+            \App\Models\Municipality::whereIn('department_id', $departments->pluck('id'))->update(['is_active' => true]);
+        }
+
+        return back()->with('success', count($ids) . ' países y sus dependencias han sido reactivados.');
+    }
+
+    // ==========================================
+    // EXPORTACIONES
+    // ==========================================
+    public function exportExcel(Request $request)
+    {
+        $ids = json_decode($request->input('ids', '[]'), true);
+        return Excel::download(new CountryExport($ids), 'paises.xlsx');
+    }
+
+    public function exportCSV(Request $request)
+    {
+        $ids = json_decode($request->input('ids', '[]'), true);
+        return Excel::download(new CountryExport($ids), 'paises.csv', \Maatwebsite\Excel\Excel::CSV);
+    }
+
+    public function exportPDF(Request $request)
+    {
+        $ids = json_decode($request->input('ids', '[]'), true);
+        $countries = count($ids) > 0 ? Country::whereIn('id', $ids)->orderBy('id')->get() : Country::orderBy('id')->get();
+        
+        $pdf = Pdf::loadView('modules.ubication.countries.print', compact('countries'));
+        return $pdf->download('paises.pdf');
+    }
+
+    public function print(Request $request)
+    {
+        $ids = json_decode($request->input('ids', '[]'), true);
+        $countries = count($ids) > 0 ? Country::whereIn('id', $ids)->orderBy('id')->get() : Country::orderBy('id')->get();
+        
+        return view('modules.ubication.countries.print', compact('countries'));
     }
 }

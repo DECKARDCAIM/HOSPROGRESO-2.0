@@ -43,26 +43,51 @@ Route::middleware(['auth', 'PreventBackHistory'])->group(function () {
 
 
 
-    // Rutas AJAX para ubicaciones
+    // ==========================================
+    // MÓDULO: UBICACIONES (Países, Deptos, Municipios)
+    // ==========================================
     Route::get('/patients/get-departments-by-country', [PatientController::class , 'getDepartmentsByCountry'])->name('patients.get-departments-by-country');
     Route::get('/patients/get-municipalities-by-department', [PatientController::class , 'getMunicipalitiesByDepartment'])->name('patients.get-municipalities-by-department');
 
-    Route::Resource('countries', CountryController::class);
-    Route::post('/countries/{country}/restore', [CountryController::class , 'restore'])->name('countries.restore');
+    // Países
+    Route::controller(CountryController::class)->prefix('countries')->name('countries.')->group(function () {
+        Route::post('export/excel', 'exportExcel')->name('export.excel');
+        Route::post('export/csv', 'exportCSV')->name('export.csv');
+        Route::post('export/pdf', 'exportPDF')->name('export.pdf');
+        Route::post('export/print', 'print')->name('print');
+        Route::post('destroy-multiple', 'destroyMultiple')->name('destroy-multiple');
+        Route::post('restore-multiple', 'restoreMultiple')->name('restore-multiple');
+        Route::post('{country}/restore', 'restore')->name('restore');
+    });
+    Route::resource('countries', CountryController::class);
 
-    Route::Resource('departments', DepartmentController::class);
-    Route::post('/departments/{department}/restore', [DepartmentController::class , 'restore'])->name('departments.restore');
+    // Departamentos
+    Route::controller(DepartmentController::class)->prefix('departments')->name('departments.')->group(function () {
+        Route::post('export/excel', 'exportExcel')->name('export.excel');
+        Route::post('export/csv', 'exportCSV')->name('export.csv');
+        Route::post('export/pdf', 'exportPDF')->name('export.pdf');
+        Route::post('export/print', 'print')->name('print');
+        Route::post('destroy-multiple', 'destroyMultiple')->name('destroy-multiple');
+        Route::post('restore-multiple', 'restoreMultiple')->name('restore-multiple');
+        Route::post('{department}/restore', 'restore')->name('restore');
+    });
+    Route::resource('departments', DepartmentController::class);
 
-    Route::Resource('municipalities', MunicipalityController::class);
-    Route::post('/municipalities/{municipality}/restore', [MunicipalityController::class , 'restore'])->name('municipalities.restore');
+    // Municipios
+    Route::controller(MunicipalityController::class)->prefix('municipalities')->name('municipalities.')->group(function () {
+        Route::post('export/excel', 'exportExcel')->name('export.excel');
+        Route::post('export/csv', 'exportCSV')->name('export.csv');
+        Route::post('export/pdf', 'exportPDF')->name('export.pdf');
+        Route::post('export/print', 'print')->name('print');
+        Route::post('destroy-multiple', 'destroyMultiple')->name('destroy-multiple');
+        Route::post('restore-multiple', 'restoreMultiple')->name('restore-multiple');
+        Route::post('{municipality}/restore', 'restore')->name('restore');
+    });
+    Route::resource('municipalities', MunicipalityController::class);
 
-
-
-
-
-
-
-    // Rutas AJAX para familiares
+    // ==========================================
+    // MÓDULO: PACIENTES Y FAMILIARES
+    // ==========================================
     Route::get('/patients/relatives/search', [PatientController::class , 'searchRelatives'])->name('patients.relatives.search');
     Route::post('/patients/relatives/store-ajax', [PatientController::class , 'storeRelativeAjax'])->name('patients.relatives.store-ajax');
     // Rutas Resource de Pacientes
