@@ -658,7 +658,7 @@
                     </div>
                 </li>
 
-                <li class="nav-item d-none d-sm-inline-block">
+                <li class="nav-item">
                     <button class="btn btn-ghost-secondary btn-icon rounded-circle" type="button"
                         data-bs-toggle="offcanvas" data-bs-target="#offcanvasChatISAAC"
                         aria-controls="offcanvasChatISAAC">
