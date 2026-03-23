@@ -41,7 +41,8 @@ Route::middleware(['auth', 'PreventBackHistory'])->group(function () {
     Route::delete('/profile/delete-avatar', [ProfileController::class , 'deleteAvatar'])->name('profile.delete-avatar');
     Route::delete('/profile/delete-banner', [ProfileController::class , 'deleteBanner'])->name('profile.delete-banner');
 
-
+    // IA ISAAC Chat
+    Route::post('/isaac/chat', [App\Http\Controllers\IsaacChatController::class, 'chat'])->name('isaac.chat');
 
     // ==========================================
     // MÓDULO: UBICACIONES (Países, Deptos, Municipios)

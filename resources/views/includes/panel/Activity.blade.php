@@ -1011,3 +1011,185 @@
   </div>
 </div>
 <!-- End Create a new user Modal -->
+
+<!-- ISAAC CHAT OFFCANVAS -->
+<div class="offcanvas offcanvas-end" tabindex="-1" id="offcanvasChatISAAC" aria-labelledby="offcanvasChatISAACLabel">
+  <!-- Header -->
+  <div class="offcanvas-header justify-content-between border-bottom">
+    <h4 id="offcanvasChatISAACLabel" class="mb-0 d-flex align-items-center">
+      <div class="avatar avatar-xs avatar-circle me-2">
+        <span class="avatar-initials bg-primary text-white"><i class="bi-robot"></i></span>
+      </div>
+      ISAAC <i class="bi-patch-check-fill text-primary ms-1" data-bs-toggle="tooltip" data-bs-placement="top" title="Inteligencia Artificial"></i>
+    </h4>
+    <button type="button" class="btn-close" data-bs-dismiss="offcanvas" aria-label="Close"></button>
+  </div>
+
+  <div class="offcanvas-body d-flex flex-column p-0">
+    <div class="flex-grow-1 overflow-auto p-3" id="chatWindow">
+      <!-- Greeting -->
+      <div class="d-flex mb-3">
+        <div class="flex-shrink-0">
+          <div class="avatar avatar-sm avatar-circle">
+            <span class="avatar-initials bg-primary text-white"><i class="bi-robot"></i></span>
+          </div>
+        </div>
+        <div class="flex-grow-1 ms-3">
+          <div class="border rounded p-2 text-body">
+            @php 
+               $nombreUsuario = auth()->user() ? auth()->user()->first_name : 'Usuario';
+            @endphp
+            <p class="mb-0" style="font-size: 0.875rem;">Hola <strong>{{ $nombreUsuario }}</strong>, soy <strong>ISAAC</strong>, la Inteligencia Artificial del sistema médico HOSPROGRESO. Es un gusto hablar contigo hoy. ¿En qué puedo ayudarte?</p>
+          </div>
+        </div>
+      </div>
+    </div> <!-- end chatWindow -->
+
+    <div class="p-3 border-top">
+      <div class="border rounded-pill p-1 d-flex align-items-end">
+        <textarea id="chatInput" class="form-control border-0 bg-transparent shadow-none px-3 py-2" rows="1"
+          placeholder="Escribe a ISAAC..."
+          style="resize: none; overflow-y: hidden; min-height: 40px;"
+          oninput="this.style.height = ''; this.style.height = this.scrollHeight + 'px'"></textarea>
+
+        <button type="button" id="sendChatBtn" class="btn btn-primary btn-icon rounded-circle flex-shrink-0 mb-1 me-1">
+          <i class="bi-send-fill" id="sendChatIcon"></i>
+          <span class="spinner-border spinner-border-sm d-none" id="sendChatSpinner" role="status" aria-hidden="true"></span>
+        </button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const chatInput = document.getElementById('chatInput');
+    const sendChatBtn = document.getElementById('sendChatBtn');
+    const chatWindow = document.getElementById('chatWindow');
+    const sendChatIcon = document.getElementById('sendChatIcon');
+    const sendChatSpinner = document.getElementById('sendChatSpinner');
+
+    @php 
+        $user = auth()->user();
+        $fullName = $user ? trim("{$user->first_name} {$user->second_name} {$user->third_name} {$user->first_last_name} {$user->second_last_name} {$user->married_last_name}") : 'Usuario';
+        $isAdmin = ($user && $user->role_id == 1); // Asumiendo que 1 es Administrador, ajusta si es necesario
+        $avatarUrl = ($user && $user->profile_photo_path) ? asset('storage/' . $user->profile_photo_path) : null;
+        $initials = $user ? strtoupper(substr($user->first_name, 0, 1)) : 'U';
+    @endphp
+
+    const userName = "{{ $fullName }}";
+    const isAdmin = {{ $isAdmin ? 'true' : 'false' }};
+    const avatarUrl = "{{ $avatarUrl }}";
+    const initials = "{{ $initials }}";
+
+    const userAvatarHtml = avatarUrl 
+        ? `<img class="avatar avatar-sm avatar-circle" src="${avatarUrl}" alt="${userName}" style="object-fit: cover;">`
+        : `<div class="avatar avatar-sm avatar-circle avatar-soft-primary"><span class="avatar-initials">${initials}</span></div>`;
+
+    function appendUserMessage(text) {
+        const badgeHtml = isAdmin ? '<i class="bi-patch-check-fill text-primary" style="font-size: 0.65rem;"></i>' : '';
+        const msgHtml = `
+            <div class="d-flex mb-3 flex-row-reverse">
+                <div class="flex-shrink-0">
+                    ${userAvatarHtml}
+                </div>
+                <div class="flex-grow-1 me-2 text-end">
+                    <div class="bg-primary text-white rounded p-2 d-inline-block" style="text-align: left;">
+                        <p class="mb-0" style="font-size: 0.85rem;">${text.replace(/\n/g, '<br>')}</p>
+                    </div>
+                    <div class="mt-1" style="font-size: 0.7rem; opacity: 0.8;">
+                        ${userName} ${badgeHtml}
+                    </div>
+                </div>
+            </div>
+        `;
+        chatWindow.insertAdjacentHTML('beforeend', msgHtml);
+        scrollToBottom();
+    }
+
+    function appendIsaacMessage(text) {
+        const msgHtml = `
+            <div class="d-flex mb-3">
+                <div class="flex-shrink-0">
+                    <div class="avatar avatar-sm avatar-circle">
+                        <span class="avatar-initials bg-primary text-white"><i class="bi-robot"></i></span>
+                    </div>
+                </div>
+                <div class="flex-grow-1 ms-2">
+                    <div class="border rounded p-2 text-body d-inline-block">
+                        <p class="mb-0" style="font-size: 0.85rem;">${text.replace(/\n/g, '<br>')}</p>
+                    </div>
+                    <div class="mt-1" style="font-size: 0.7rem; opacity: 0.8;">
+                        ISAAC <i class="bi-patch-check-fill text-primary" style="font-size: 0.65rem;"></i>
+                    </div>
+                </div>
+            </div>
+        `;
+        chatWindow.insertAdjacentHTML('beforeend', msgHtml);
+        scrollToBottom();
+    }
+
+    function scrollToBottom() {
+        chatWindow.scrollTop = chatWindow.scrollHeight;
+    }
+
+    function toggleLoading(isLoading) {
+        if(isLoading) {
+            sendChatIcon.classList.add('d-none');
+            sendChatSpinner.classList.remove('d-none');
+            sendChatBtn.disabled = true;
+            chatInput.disabled = true;
+        } else {
+            sendChatSpinner.classList.add('d-none');
+            sendChatIcon.classList.remove('d-none');
+            sendChatBtn.disabled = false;
+            chatInput.disabled = false;
+            chatInput.focus();
+        }
+    }
+
+    function sendMessage() {
+        const message = chatInput.value.trim();
+        if (!message) return;
+
+        appendUserMessage(message);
+        chatInput.value = '';
+        chatInput.style.height = '40px'; 
+
+        toggleLoading(true);
+
+        fetch('{{ route('isaac.chat') }}', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content'),
+                'Accept': 'application/json'
+            },
+            body: JSON.stringify({ message: message })
+        })
+        .then(response => response.json())
+        .then(data => {
+            toggleLoading(false);
+            if(data.success) {
+                appendIsaacMessage(data.reply);
+            } else {
+                appendIsaacMessage('<span class="text-danger"><i class="bi-exclamation-triangle"></i> ' + (data.reply || 'No pude contactar a mi servidor neuronal.') + '</span>');
+            }
+        })
+        .catch(err => {
+            toggleLoading(false);
+            appendIsaacMessage('<span class="text-danger"><i class="bi-x-octagon"></i> Existe un error de conexión con mi cerebro artificial.</span>');
+            console.error(err);
+        });
+    }
+
+    sendChatBtn.addEventListener('click', sendMessage);
+
+    chatInput.addEventListener('keydown', function(e) {
+        if (e.key === 'Enter' && !e.shiftKey) {
+            e.preventDefault();
+            sendMessage();
+        }
+    });
+});
+</script>
