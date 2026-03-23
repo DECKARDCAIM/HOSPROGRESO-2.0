@@ -24,6 +24,7 @@ class UpdateMunicipalityRequest extends FormRequest
     {
         return [
             'name' => 'required|string|min:5',
+            'country_id' => 'required|exists:countries,id',
             'department_id' => 'required|exists:departments,id',
         ];
     }
@@ -33,6 +34,8 @@ class UpdateMunicipalityRequest extends FormRequest
         return [
             'name.required' => 'El campo nombre es obligatorio.',
             'name.string' => 'El campo nombre debe ser una cadena de texto.',
+            'country_id.required' => 'El campo país es obligatorio.',
+            'country_id.exists' => 'El país seleccionado no es válido.',
             'department_id.required' => 'El campo departamento es obligatorio.',
             'department_id.exists' => 'El departamento seleccionado no es válido.',
             'name.min' => 'El campo nombre debe tener al menos 5 caracteres.',

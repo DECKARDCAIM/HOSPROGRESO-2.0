@@ -1045,8 +1045,26 @@
       </div>
     </div> <!-- end chatWindow -->
 
+    <div id="isaacStatus" class="px-3 py-1 small text-muted d-none" style="font-size: 0.75rem;">
+      <i class="bi-robot me-1"></i> ISAAC está pensando...
+    </div>
+
     <div class="p-3 border-top">
-      <div class="border rounded-pill p-1 d-flex align-items-end">
+      <div class="border rounded-pill p-1 d-flex align-items-end position-relative">
+        <div class="dropdown">
+          <button type="button" class="btn btn-ghost-secondary btn-icon btn-sm rounded-circle mb-1 ms-1" id="attachBtn">
+            <i class="bi-paperclip fs-4"></i>
+          </button>
+          <div class="dropdown-menu shadow-lg border p-2" id="attachMenu" style="position: absolute; bottom: 100%; left: 0; display: none; margin-bottom: 10px; min-width: 160px;">
+            <a class="dropdown-item d-flex align-items-center py-2 rounded" href="javascript:;">
+              <i class="bi-image-fill me-2 text-primary"></i> Foto
+            </a>
+            <a class="dropdown-item d-flex align-items-center py-2 rounded" href="javascript:;">
+              <i class="bi-file-earmark-text-fill me-2 text-success"></i> Documento
+            </a>
+          </div>
+        </div>
+
         <textarea id="chatInput" class="form-control border-0 bg-transparent shadow-none px-3 py-2" rows="1"
           placeholder="Escribe a ISAAC..."
           style="resize: none; overflow-y: hidden; min-height: 40px;"
@@ -1086,6 +1104,10 @@ document.addEventListener('DOMContentLoaded', function() {
         ? `<img class="avatar avatar-sm avatar-circle" src="${avatarUrl}" alt="${userName}" style="object-fit: cover;">`
         : `<div class="avatar avatar-sm avatar-circle avatar-soft-primary"><span class="avatar-initials">${initials}</span></div>`;
 
+    const isaacStatus = document.getElementById('isaacStatus');
+    const attachBtn = document.getElementById('attachBtn');
+    const attachMenu = document.getElementById('attachMenu');
+
     function appendUserMessage(text) {
         const badgeHtml = isAdmin ? '<i class="bi-patch-check-fill text-primary" style="font-size: 0.65rem;"></i>' : '';
         const msgHtml = `
@@ -1107,7 +1129,37 @@ document.addEventListener('DOMContentLoaded', function() {
         scrollToBottom();
     }
 
+    // Efecto de máquina de escribir
+    function typeWriter(element, text, speed = 20) {
+        let i = 0;
+        const formattedText = text.replace(/\n/g, '<br>');
+        // Para manejar etiquetas <br> correctamente durante la escritura
+        const parts = text.split('\n');
+        let currentLine = 0;
+        let currentChar = 0;
+        
+        function type() {
+            if (currentLine < parts.length) {
+                if (currentChar < parts[currentLine].length) {
+                    element.innerHTML += parts[currentLine].charAt(currentChar);
+                    currentChar++;
+                    scrollToBottom();
+                    setTimeout(type, speed);
+                } else {
+                    if (currentLine < parts.length - 1) {
+                        element.innerHTML += '<br>';
+                    }
+                    currentLine++;
+                    currentChar = 0;
+                    setTimeout(type, speed);
+                }
+            }
+        }
+        type();
+    }
+
     function appendIsaacMessage(text) {
+        const messageId = 'isaac-msg-' + Date.now();
         const msgHtml = `
             <div class="d-flex mb-3">
                 <div class="flex-shrink-0">
@@ -1117,7 +1169,7 @@ document.addEventListener('DOMContentLoaded', function() {
                 </div>
                 <div class="flex-grow-1 ms-2">
                     <div class="border rounded p-2 text-body d-inline-block">
-                        <p class="mb-0" style="font-size: 0.85rem;">${text.replace(/\n/g, '<br>')}</p>
+                        <p class="mb-0" id="${messageId}" style="font-size: 0.85rem; min-height: 1.25rem;"></p>
                     </div>
                     <div class="mt-1" style="font-size: 0.7rem; opacity: 0.8;">
                         ISAAC <i class="bi-patch-check-fill text-primary" style="font-size: 0.65rem;"></i>
@@ -1126,7 +1178,8 @@ document.addEventListener('DOMContentLoaded', function() {
             </div>
         `;
         chatWindow.insertAdjacentHTML('beforeend', msgHtml);
-        scrollToBottom();
+        const element = document.getElementById(messageId);
+        typeWriter(element, text);
     }
 
     function scrollToBottom() {
@@ -1139,11 +1192,14 @@ document.addEventListener('DOMContentLoaded', function() {
             sendChatSpinner.classList.remove('d-none');
             sendChatBtn.disabled = true;
             chatInput.disabled = true;
+            isaacStatus.classList.remove('d-none');
+            scrollToBottom();
         } else {
             sendChatSpinner.classList.add('d-none');
             sendChatIcon.classList.remove('d-none');
             sendChatBtn.disabled = false;
             chatInput.disabled = false;
+            isaacStatus.classList.add('d-none');
             chatInput.focus();
         }
     }
@@ -1182,6 +1238,19 @@ document.addEventListener('DOMContentLoaded', function() {
             console.error(err);
         });
     }
+
+    // Menú de adjuntos
+    attachBtn.addEventListener('click', function(e) {
+        e.stopPropagation();
+        const isVisible = attachMenu.style.display === 'block';
+        attachMenu.style.display = isVisible ? 'none' : 'block';
+    });
+
+    document.addEventListener('click', function(e) {
+        if (!attachBtn.contains(e.target) && !attachMenu.contains(e.target)) {
+            attachMenu.style.display = 'none';
+        }
+    });
 
     sendChatBtn.addEventListener('click', sendMessage);
 
