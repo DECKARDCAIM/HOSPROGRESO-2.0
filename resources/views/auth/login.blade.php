@@ -3,6 +3,7 @@
 
 @section('content')
 
+<div id="login-form-wrapper">
 @if ($errors->any())
 <div class="alert alert-danger text-white" role="alert">
     <strong>¡Ups! Ha ocurrido un problema:</strong>
@@ -40,9 +41,9 @@
     </div>
 
     <div class="mb-4">
-        <label class="form-label w-100" for="signupSrPassword" <span
-            class="d-flex justify-content-between align-items-center">
-            <span>Contraseña</span>
+        <label class="form-label w-100" for="signupSrPassword">
+            <span class="d-flex justify-content-between align-items-center">
+                <span>Contraseña</span>
             </span>
         </label>
         <div class="input-group input-group-merge" data-hs-validation-validate-class>
@@ -56,4 +57,35 @@
         <button type="submit" class="btn btn-primary btn-lg">Iniciar Sesión</button>
     </div>
 </form>
+</div>
+
+@endsection
+
+@section('scripts')
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        const syncText = document.querySelector('#global-sync-loader p');
+        
+        // Sincronización PROFUNDA de 6 segundos para cargar todo el sistema en cache
+        if (window.showGlobalLoader) {
+            window.showGlobalLoader(6000);
+        }
+
+        // Mensajes dinámicos durante la sincronización
+        if (syncText) {
+            setTimeout(() => { syncText.textContent = "Sincronizando activos del sistema..."; }, 1500);
+            setTimeout(() => { syncText.textContent = "Optimizando bases de datos y caché..."; }, 3500);
+            setTimeout(() => { syncText.textContent = "Finalizando descarga de interfaz..."; }, 5500);
+        }
+
+        window.addEventListener('load', function() {
+            // Terminamos el loader exactamente a los 6 segundos, sin añadir tiempos extra después
+            setTimeout(() => {
+                if (window.hideGlobalLoader) {
+                    window.hideGlobalLoader();
+                }
+            }, 6000); 
+        });
+    });
+</script>
 @endsection

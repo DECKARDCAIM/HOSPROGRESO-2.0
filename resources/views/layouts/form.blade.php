@@ -13,6 +13,17 @@
     <link rel="stylesheet" href="{{ asset('vendor/tom-select/dist/css/tom-select.bootstrap5.css') }}">
     <link rel="preload" href="{{ asset('css/theme.min.css') }}" data-hs-appearance="default" as="style">
     <link rel="preload" href="{{ asset('css/theme-dark.min.css') }}" data-hs-appearance="dark" as="style">
+    <link rel="preload" href="{{ asset('js/theme.min.js') }}" as="script">
+    <link rel="preload" href="{{ asset('vendor/jquery/dist/jquery.min.js') }}" as="script">
+
+    <!-- Pre-carga de Activos del Panel (Optimización de Caché) -->
+    <link rel="prefetch" href="{{ asset('vendor/hs-navbar-vertical-aside/dist/hs-navbar-vertical-aside.min.js') }}">
+    <link rel="prefetch" href="{{ asset('vendor/hs-form-search/dist/hs-form-search.min.js') }}">
+    <link rel="prefetch" href="{{ asset('vendor/hs-toggle-password/dist/js/hs-toggle-password.js') }}">
+    <link rel="prefetch" href="{{ asset('vendor/tom-select/dist/js/tom-select.complete.min.js') }}">
+    <link rel="prefetch" href="{{ asset('js/sweetalert2.all.min.js') }}">
+    <link rel="prefetch" href="{{ asset('js/hs.theme-appearance.js') }}">
+    <link rel="prefetch" href="{{ route('home') }}">
     @yield('styles')
     <style data-hs-appearance-onload-styles>
         * {
@@ -23,90 +34,12 @@
             opacity: 1 !important;
         }
 
-        body> :not(#loading-spinner) {
+        body> :not(#global-sync-loader) {
             opacity: 0 !important;
         }
     </style>
 
-    <!-- ========== PRELOADER ========== -->
-    <style>
-        .preloader-overlay {
-            background-color: rgba(var(--bs-body-bg-rgb), 0.8) !important;
-        }
-    </style>
-    <div id="loading-spinner"
-        class="position-fixed top-0 start-0 w-100 h-100 d-flex align-items-center justify-content-center preloader-overlay"
-        style="z-index: 9999;">
-        <div class="spinner-border text-primary" role="status" style="width: 3rem; height: 3rem;">
-            <span class="visually-hidden">Loading...</span>
-        </div>
-    </div>
-    <script>
-        (function () {
-            var preloader = document.getElementById('loading-spinner');
-
-            function showLoader() {
-                if (preloader) {
-                    preloader.style.transition = 'none';
-                    preloader.style.opacity = '1';
-                    preloader.style.display = 'flex';
-                    preloader.style.pointerEvents = 'auto';
-                }
-            }
-
-            window.addEventListener('load', function () {
-                if (preloader) {
-                    preloader.style.transition = 'opacity 0.3s ease-out';
-                    preloader.style.opacity = '0';
-                    preloader.style.pointerEvents = 'none';
-                    setTimeout(function () {
-                        if (preloader.style.opacity === '0') {
-                            preloader.style.display = 'none';
-                        }
-                    }, 300);
-                }
-            });
-
-            window.addEventListener('pageshow', function (event) {
-                if (event.persisted && preloader) {
-                    preloader.style.transition = 'none';
-                    preloader.style.opacity = '1';
-                    preloader.style.display = 'flex';
-                    preloader.style.pointerEvents = 'auto';
-
-                    setTimeout(function () {
-                        preloader.style.transition = 'opacity 0.3s ease-out';
-                        preloader.style.opacity = '0';
-                        preloader.style.pointerEvents = 'none';
-                        setTimeout(function () {
-                            if (preloader.style.opacity === '0') {
-                                preloader.style.display = 'none';
-                            }
-                        }, 300);
-                    }, 50);
-                }
-            });
-
-            document.addEventListener('click', function (e) {
-                var link = e.target.closest('a');
-                if (link &&
-                    link.getAttribute('href') &&
-                    !link.getAttribute('href').startsWith('#') &&
-                    !link.getAttribute('href').startsWith('javascript:') &&
-                    link.getAttribute('target') !== '_blank' &&
-                    !e.ctrlKey && !e.metaKey && !e.shiftKey) {
-                    showLoader();
-                }
-            });
-
-            document.addEventListener('submit', function (e) {
-                if (!e.target.closest('.js-step-form')) {
-                    showLoader();
-                }
-            });
-        })();
-    </script>
-    <!-- ========== END PRELOADER ========== -->
+    @include('includes.loading-screen')
     <script>
         window.hs_config = {
             "autopath": "@@autopath",
