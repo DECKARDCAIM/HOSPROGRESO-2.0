@@ -2,9 +2,9 @@
     class="col-lg-6 d-none d-lg-flex justify-content-center align-items-center min-vh-lg-100 position-relative bg-light px-0">
     <div style="max-width: 23rem;">
         <div class="text-center mb-5">
-            <img class="w-100" src="{{ asset('img/logotipo.svg') }}" alt="Image Description"
+            <img class="w-100" src="{{ asset('img/Logotipo.svg') }}" alt="Image Description"
                 data-hs-theme-appearance="default" style="min-width: 20rem; max-width: 20rem;">
-            <img class="w-100" src="{{ asset('img/logotipo-white.svg') }}" alt="Image Description"
+            <img class="w-100" src="{{ asset('img/Logotipo-white.svg') }}" alt="Image Description"
                 data-hs-theme-appearance="dark" style="min-width: 20rem; max-width: 20rem;">
         </div>
 

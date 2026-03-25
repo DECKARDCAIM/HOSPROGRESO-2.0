@@ -190,16 +190,6 @@ class PatientController extends Controller
         // Calcular edad si se proporciona fecha de nacimiento
         if (isset($validated['birth_date'])) {
             $birthDate = Carbon::parse($validated['birth_date']);
-            $age = $birthDate->age;
-            
-            // Si es menor de edad, validar que los datos de la madre estén presentes
-            if ($age < 18) {
-                if (empty($request->mother)) {
-                    return back()->withErrors([
-                        'mother' => 'Debe registrar la madre del paciente menor de edad.'
-                    ])->withInput();
-                }
-            }
         }
 
         // Se usa una transacción para asegurar que ambos registros se creen exitosamente
@@ -251,8 +241,13 @@ class PatientController extends Controller
             }
         });
 
+        $notification = [
+            'message' => 'Paciente registrado exitosamente.',
+            'alert-type' => 'success'
+        ];
+
         return redirect()->route('patients.index')
-            ->with('success', 'Paciente registrado exitosamente.');
+            ->with('notification', $notification);
     }
 
     /**
@@ -321,22 +316,17 @@ class PatientController extends Controller
         // Calcular edad si se proporciona fecha de nacimiento
         if (isset($validated['birth_date'])) {
             $birthDate = Carbon::parse($validated['birth_date']);
-            $age = $birthDate->age;
-            
-            // Si es menor de edad, validar que los datos de la madre estén presentes
-            if ($age < 18) {
-                if (empty($validated['mother_first_name']) || empty($validated['mother_first_last_name'])) {
-                    return back()->withErrors([
-                        'birth_date' => 'Para menores de edad, los datos de la madre son obligatorios.'
-                    ])->withInput();
-                }
-            }
         }
 
         $patient->update($validated);
 
+        $notification = [
+            'message' => 'Paciente actualizado exitosamente.',
+            'alert-type' => 'info'
+        ];
+
         return redirect()->route('patients.index')
-            ->with('success', 'Paciente actualizado exitosamente.');
+            ->with('notification', $notification);
     }
 
     /**
@@ -346,8 +336,13 @@ class PatientController extends Controller
     {
         $patient->delete(); // Soft delete
 
+        $notification = [
+            'message' => 'Paciente eliminado exitosamente.',
+            'alert-type' => 'warning'
+        ];
+
         return redirect()->route('patients.index')
-            ->with('success', 'Paciente eliminado exitosamente.');
+            ->with('notification', $notification);
     }
 
     /**
@@ -376,8 +371,13 @@ class PatientController extends Controller
         $patient = Patient::withTrashed()->findOrFail($id);
         $patient->restore();
 
+        $notification = [
+            'message' => 'Paciente reactivado exitosamente.',
+            'alert-type' => 'success'
+        ];
+
         return redirect()->route('patients.index')
-            ->with('success', 'Paciente reactivado exitosamente.');
+            ->with('notification', $notification);
     }
 
     /**

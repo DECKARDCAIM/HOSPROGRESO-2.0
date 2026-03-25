@@ -205,13 +205,13 @@
     <script src="{{ asset('js/hs.theme-appearance.js') }}"></script>
     <script src="{{ asset('vendor/hs-navbar-vertical-aside/dist/hs-navbar-vertical-aside-mini-cache.js') }}"></script>
 
-    @include('includes.panel.userOptions')
+    @include('includes.panel.UserOptions')
 
     @include('includes.panel.menu')
 
     @yield('content')
 
-    @include('includes.panel.activity')
+    @include('includes.panel.Activity')
 
     <script src="{{ asset('vendor/jquery/dist/jquery.min.js') }}"></script>
     <script src="{{ asset('vendor/bootstrap/dist/js/bootstrap.bundle.min.js') }}"></script>

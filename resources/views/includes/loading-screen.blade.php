@@ -2,7 +2,7 @@
     class="position-fixed top-0 start-0 w-100 h-100 d-flex flex-column align-items-center justify-content-center"
     style="background-color: #0B1B3D; z-index: 99999; display: flex !important; opacity: 1; transition: opacity 0.5s ease; pointer-events: auto;">
     <div class="text-center">
-        <img src="{{ asset('img/logotipo-white.svg') }}" alt="Logo" class="img-fluid mb-4" style="max-width: 300px;">
+        <img src="{{ asset('img/Logotipo-white.svg') }}" alt="Logo" class="img-fluid mb-4" style="max-width: 300px;">
         <div class="mt-4">
             <div class="spinner-border text-white" role="status" style="width: 2.5rem; height: 2.5rem;">
                 <span class="visually-hidden">Cargando...</span>
@@ -17,7 +17,7 @@
 </div>
 
 <script>
-    (function () {
+    (function() {
         const loader = document.getElementById('global-sync-loader');
         const progressBar = document.getElementById('global-sync-progress-bar');
         const syncText = document.getElementById('global-sync-text');
@@ -26,7 +26,7 @@
         let loadedResources = 0;
 
         // Función que calcula el progreso matemáticamente
-        window.updateRealProgress = function () {
+        window.updateRealProgress = function() {
             loadedResources++;
             let percentage = Math.floor((loadedResources / totalResources) * 100);
             if (percentage > 100) percentage = 100;
@@ -47,7 +47,7 @@
             }
         };
 
-        window.startRealLoader = function () {
+        window.startRealLoader = function() {
             if (!loader) return;
             loader.style.opacity = '1';
             loader.style.display = 'flex';
@@ -55,7 +55,8 @@
             document.body.style.overflow = 'hidden';
 
             // 1. Buscar todos los archivos que toman tiempo en descargar
-            const elements = document.querySelectorAll('img, script[src], link[rel="stylesheet"], link[rel="preload"]');
+            const elements = document.querySelectorAll(
+                'img, script[src], link[rel="stylesheet"], link[rel="preload"]');
             totalResources = elements.length;
             loadedResources = 0;
 
@@ -77,7 +78,7 @@
             });
         };
 
-        window.hideGlobalLoader = function () {
+        window.hideGlobalLoader = function() {
             if (!loader) return;
             setTimeout(() => {
                 loader.style.transition = 'opacity 0.6s ease-out';
@@ -101,7 +102,7 @@
         });
 
         // Función para mostrar el loader manualmente con un texto personalizado
-        window.showManualLoader = function (text = "Cargando...") {
+        window.showManualLoader = function(text = "Cargando...") {
             if (!loader) return;
             loader.style.transition = 'none';
             loader.style.opacity = '1';
@@ -113,10 +114,11 @@
         };
 
         // Intercepción de enlaces para navegación entre páginas
-        document.addEventListener('click', function (e) {
+        document.addEventListener('click', function(e) {
             const link = e.target.closest('a');
             if (link && link.getAttribute('href') && !link.getAttribute('href').startsWith('#') &&
-                !link.getAttribute('href').startsWith('javascript:') && link.getAttribute('target') !== '_blank' &&
+                !link.getAttribute('href').startsWith('javascript:') && link.getAttribute('target') !==
+                '_blank' &&
                 !e.ctrlKey && !e.metaKey && !e.shiftKey) {
 
                 // Evitamos mostrar el loader si es el botón de cerrar sesión (que ya tiene su propio onsubmit)
@@ -127,7 +129,7 @@
         });
 
         // Intercepción global de formularios para mostrar el loader al enviar
-        document.addEventListener('submit', function (e) {
+        document.addEventListener('submit', function(e) {
             const form = e.target;
             // No mostramos loader si el formulario tiene un target o si es una búsqueda rápida (opcional)
             if (form.getAttribute('target') === '_blank') return;
@@ -136,7 +138,7 @@
             window.showManualLoader("Procesando...");
         });
 
-        window.addEventListener('pageshow', function (event) {
+        window.addEventListener('pageshow', function(event) {
             if (event.persisted) window.hideGlobalLoader();
         });
     })();

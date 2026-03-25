@@ -21,19 +21,19 @@ class StorePatientRequest extends FormRequest
     {
         return [
             // Datos personales
-            'first_name'             => ['nullable', 'string', 'max:100'],
+                        'first_name'             => ['required', 'string', 'max:100'],
             'second_name'            => ['nullable', 'string', 'max:100'],
             'third_name'             => ['nullable', 'string', 'max:100'],
-            'first_last_name'        => ['nullable', 'string', 'max:100'],
+                        'first_last_name'        => ['required', 'string', 'max:100'],
             'second_last_name'       => ['nullable', 'string', 'max:100'],
             'married_last_name'      => ['nullable', 'string', 'max:100'],
             'email'                  => ['nullable', 'email', 'max:255', 'unique:patients,email'],
             'phone'                  => ['nullable', 'string', 'max:8'],
             'dpi'                    => ['nullable', 'string', 'max:20', 'unique:patients,dpi'],
-            'birth_date'             => ['nullable', 'date'],
+                        'birth_date'             => ['required', 'date'],
 
             // Catálogos
-            'gender_id'              => ['nullable', 'integer', 'exists:genders,id'],
+                        'gender_id'              => ['required', 'integer', 'exists:genders,id'],
             'civil_status_id'        => ['nullable', 'integer', 'exists:civil_statuses,id'],
             'ethnicity_id'           => ['nullable', 'integer', 'exists:ethnicities,id'],
             'linguistic_community_id'=> ['nullable', 'integer', 'exists:linguistic_communities,id'],
@@ -59,7 +59,7 @@ class StorePatientRequest extends FormRequest
 
             // Familiares dinámicos (array)
             'relatives'                        => ['nullable', 'array'],
-            'relatives.*.relationship'         => ['required_with:relatives', 'string', 'in:madre,padre,tutor,tutor legal,otro'],
+                        'relatives.*.relationship_type_id' => ['required_with:relatives', 'integer', 'exists:relationship_types,id'],
             'relatives.*.first_name'           => ['required_with:relatives', 'string', 'max:100'],
             'relatives.*.second_name'          => ['nullable', 'string', 'max:100'],
             'relatives.*.first_last_name'      => ['required_with:relatives', 'string', 'max:100'],

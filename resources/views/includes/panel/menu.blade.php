@@ -6,13 +6,13 @@
         <div class="navbar-vertical-footer-offset">
 
             <a class="navbar-brand" href="/" aria-label="Front">
-                <img class="navbar-brand-logo" src="{{ asset('img/logotipo.svg') }}" alt="Logo"
+                <img class="navbar-brand-logo" src="{{ asset('img/Logotipo.svg') }}" alt="Logo"
                     data-hs-theme-appearance="default">
-                <img class="navbar-brand-logo" src="{{ asset('img/logotipo-white.svg') }}" alt="Logo"
+                <img class="navbar-brand-logo" src="{{ asset('img/Logotipo-white.svg') }}" alt="Logo"
                     data-hs-theme-appearance="dark">
-                <img class="navbar-brand-logo-mini" src="{{ asset('img/logotipo.svg') }}" alt="Logo"
+                <img class="navbar-brand-logo-mini" src="{{ asset('img/Logotipo.svg') }}" alt="Logo"
                     data-hs-theme-appearance="default">
-                <img class="navbar-brand-logo-mini" src="{{ asset('img/logotipo-white.svg') }}" alt="Logo"
+                <img class="navbar-brand-logo-mini" src="{{ asset('img/Logotipo-white.svg') }}" alt="Logo"
                     data-hs-theme-appearance="dark">
             </a>
             <button type="button" class="js-navbar-vertical-aside-toggle-invoker navbar-aside-toggler">
@@ -219,16 +219,16 @@
                                         id="selectThemeDropdown" data-bs-toggle="dropdown" aria-expanded="false"
                                         data-bs-dropdown-animation>
                                         @php
-                                        $userTheme =
-                                        Auth::check() && Auth::user()->theme_preference
-                                        ? Auth::user()->theme_preference
-                                        : 'auto';
-                                        $iconMap = [
-                                        'auto' => 'bi-moon-stars',
-                                        'default' => 'bi-brightness-high',
-                                        'dark' => 'bi-moon',
-                                        ];
-                                        $currentIcon = $iconMap[$userTheme] ?? $iconMap['auto'];
+                                            $userTheme =
+                                                Auth::check() && Auth::user()->theme_preference
+                                                    ? Auth::user()->theme_preference
+                                                    : 'auto';
+                                            $iconMap = [
+                                                'auto' => 'bi-moon-stars',
+                                                'default' => 'bi-brightness-high',
+                                                'dark' => 'bi-moon',
+                                            ];
+                                            $currentIcon = $iconMap[$userTheme] ?? $iconMap['auto'];
                                         @endphp
                                         <i class="{{ $currentIcon }}"></i>
                                     </button>
@@ -236,27 +236,27 @@
                                     <div class="dropdown-menu navbar-dropdown-menu navbar-dropdown-menu-borderless"
                                         aria-labelledby="selectThemeDropdown">
                                         @php
-                                        $userTheme =
-                                        Auth::check() && Auth::user()->theme_preference
-                                        ? Auth::user()->theme_preference
-                                        : 'auto';
+                                            $userTheme =
+                                                Auth::check() && Auth::user()->theme_preference
+                                                    ? Auth::user()->theme_preference
+                                                    : 'auto';
                                         @endphp
-                                        <a class="dropdown-item {{ $userTheme === 'auto' ? 'active' : '' }}" href="#"
-                                            data-icon="bi-moon-stars" data-value="auto">
+                                        <a class="dropdown-item {{ $userTheme === 'auto' ? 'active' : '' }}"
+                                            href="#" data-icon="bi-moon-stars" data-value="auto">
                                             <i class="bi-moon-stars me-2"></i>
                                             <span class="text-truncate"
                                                 title="Automático (Sistema Predeterminado)">Automático (Sistema
                                                 Predeterminado)
                                             </span>
                                         </a>
-                                        <a class="dropdown-item {{ $userTheme === 'default' ? 'active' : '' }}" href="#"
-                                            data-icon="bi-brightness-high" data-value="default">
+                                        <a class="dropdown-item {{ $userTheme === 'default' ? 'active' : '' }}"
+                                            href="#" data-icon="bi-brightness-high" data-value="default">
                                             <i class="bi-brightness-high me-2"></i>
                                             <span class="text-truncate" title="Claro (Modo Light)">Claro (Modo Light)
                                             </span>
                                         </a>
-                                        <a class="dropdown-item {{ $userTheme === 'dark' ? 'active' : '' }}" href="#"
-                                            data-icon="bi-moon" data-value="dark">
+                                        <a class="dropdown-item {{ $userTheme === 'dark' ? 'active' : '' }}"
+                                            href="#" data-icon="bi-moon" data-value="dark">
                                             <i class="bi-moon me-2"></i>
                                             <span class="text-truncate" title="Oscuro (Modo Dark)">Oscuro (Modo Dark)
                                             </span>
