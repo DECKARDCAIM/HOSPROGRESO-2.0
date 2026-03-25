@@ -21,7 +21,6 @@
     <link rel="prefetch" href="{{ asset('vendor/hs-form-search/dist/hs-form-search.min.js') }}">
     <link rel="prefetch" href="{{ asset('vendor/hs-toggle-password/dist/js/hs-toggle-password.js') }}">
     <link rel="prefetch" href="{{ asset('vendor/tom-select/dist/js/tom-select.complete.min.js') }}">
-    <link rel="prefetch" href="{{ asset('js/sweetalert2.all.min.js') }}">
     <link rel="prefetch" href="{{ asset('js/hs.theme-appearance.js') }}">
     @yield('styles')
     <style data-hs-appearance-onload-styles>

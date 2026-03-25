@@ -218,15 +218,14 @@
     <script src="{{ asset('vendor/hs-navbar-vertical-aside/dist/hs-navbar-vertical-aside.min.js') }}"></script>
     <script src="{{ asset('vendor/hs-form-search/dist/hs-form-search.min.js') }}"></script>
     <script src="{{ asset('js/theme.min.js') }}"></script>
-    <script src="{{ asset('js/sweetalert2.all.min.js') }}"></script>
 
     <script>
-        (function () {
-            @if (!Auth:: check() || !Auth:: user() -> theme_preference)
-            localStorage.removeItem('hs_theme')
+        (function() {
+            @if (!Auth::check() || !Auth::user()->theme_preference)
+                localStorage.removeItem('hs_theme')
             @endif
 
-            window.onload = function () {
+            window.onload = function() {
                 new HSSideNav('.js-navbar-vertical-aside').init()
                 new HSFormSearch('.js-form-search')
                 HSBsDropdown.init()
@@ -244,7 +243,7 @@
                 const $variants = document.querySelectorAll(`[aria-labelledby="selectThemeDropdown"] [data-icon]`)
                 if (!$variants.length) return false
 
-                const setActiveStyle = function () {
+                const setActiveStyle = function() {
                     const originalTheme = HSThemeAppearance.getOriginalAppearance() || 'default'
 
                     $variants.forEach($item => {
@@ -285,8 +284,6 @@
     </script>
 
     @include ('includes.notification-toast')
-
-    @include ('includes.sweet-alert')
 
     @stack('scripts')
 </body>

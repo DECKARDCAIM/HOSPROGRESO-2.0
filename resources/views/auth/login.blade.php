@@ -15,7 +15,8 @@
     </div>
     @endif
 
-    <form method="POST" action="{{ route('login') }}" role="form" class="text-start" novalidate autocomplete="off">
+    <form method="POST" action="{{ route('login') }}" role="form" class="text-start" novalidate autocomplete="off"
+        onsubmit="if(window.showManualLoader) window.showManualLoader('Iniciando sesión...');">
         @csrf
         <div class="text-center">
             <div class="mb-5">
