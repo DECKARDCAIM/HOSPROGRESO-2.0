@@ -1,5 +1,5 @@
 @extends('layouts.panel')
-@section('title', 'Crear Paciente')
+@section('title', 'Editar Paciente')
 
 @section('content')
     <main id="content" role="main" class="main">
@@ -12,25 +12,26 @@
                         <ol class="breadcrumb breadcrumb-no-gutter">
                             <li class="breadcrumb-item"><a class="breadcrumb-link" href="{{ route('home') }}">Inicio</a></li>
                             <li class="breadcrumb-item"><a class="breadcrumb-link" href="{{ route('patients.index') }}">Pacientes</a></li>
-                            <li class="breadcrumb-item active" aria-current="page">Crear</li>
+                            <li class="breadcrumb-item active" aria-current="page">Editar</li>
                         </ol>
                     </nav>
-                    <h1 class="page-header-title">Crear paciente</h1>
+                    <h1 class="page-header-title">Editar paciente</h1>
                 </div>
-                
+
                 <div class="col-auto">
-                        <a href="{{ route('patients.index') }}" class="btn btn-primary">
-                            <i class="bi-arrow-left"></i> Regresar
-                        </a>
-                    </div>
+                    <a href="{{ route('patients.index') }}" class="btn btn-primary">
+                        <i class="bi-arrow-left"></i> Regresar
+                    </a>
+                </div>
 
             </div>
         </div>
         <!-- End Page Header -->
-            <form id="addPatientForm" action="{{ route('patients.store') }}" method="POST" class="js-step-form py-md-5"
+            <form id="editPatientForm" action="{{ route('patients.update', $patient) }}" method="POST" class="js-step-form py-md-5"
                 autocomplete="off"
                 data-hs-step-form-options='{"progressSelector": "#addUserStepFormProgress","stepsSelector": "#addUserStepFormContent","endSelector": "#addUserFinishBtn","isValidate": false}'>
                 @csrf
+                @method('PUT')
                 <div class="row justify-content-lg-center">
                     <div class="col-lg-8">
 
@@ -80,16 +81,15 @@
                         <div id="addUserStepFormContent">
                             <div id="addUserStepProfile" class="card card-lg active">
                                 <div class="card-body">
+
+                                    {{-- Expediente (solo lectura) --}}
                                     <div class="row mb-4">
-                                        <label class="col-sm-3 col-form-label form-label">Expediente Clínico <i
-                                                class="bi-question-circle text-body ms-1" data-bs-toggle="tooltip"
-                                                data-bs-placement="top"
-                                                title="El número de expediente clínico será generado automáticamente al guardar"></i></label>
+                                        <label class="col-sm-3 col-form-label form-label">Expediente Clínico</label>
                                         <div class="col-sm-9">
                                             <div class="input-group input-group-sm-vertical">
                                                 <input type="text" class="form-control bg-light"
-                                                    value="Generado automáticamente al guardar (EXP-AÑO-MES-CORRELATIVO)"
-                                                    readonly disabled>
+                                                    value="{{ $patient->clinicalRecord->record_number ?? 'Sin expediente asignado' }}"
+                                                    readonly disabled autocomplete="off">
                                             </div>
                                         </div>
                                     </div>
@@ -109,13 +109,19 @@
                                             <div class="input-group input-group-sm-vertical">
                                                 <input type="text" class="form-control" name="first_name"
                                                     id="firstNameLabel" placeholder="Primer nombre"
-                                                    aria-label="Primer nombre" required>
+                                                    aria-label="Primer nombre"
+                                                    value="{{ old('first_name', $patient->first_name) }}"
+                                                    autocomplete="off" required>
                                                 <input type="text" class="form-control" name="second_name"
                                                     id="secondNameLabel" placeholder="Segundo nombre"
-                                                    aria-label="Segundo nombre">
+                                                    aria-label="Segundo nombre"
+                                                    value="{{ old('second_name', $patient->second_name) }}"
+                                                    autocomplete="off">
                                                 <input type="text" class="form-control" name="third_name"
                                                     id="thirdNameLabel" placeholder="Tercer nombre"
-                                                    aria-label="Tercer nombre">
+                                                    aria-label="Tercer nombre"
+                                                    value="{{ old('third_name', $patient->third_name) }}"
+                                                    autocomplete="off">
                                             </div>
                                         </div>
                                     </div>
@@ -129,13 +135,19 @@
                                             <div class="input-group input-group-sm-vertical">
                                                 <input type="text" class="form-control" name="first_last_name"
                                                     id="firstLastNameLabel" placeholder="Primer apellido"
-                                                    aria-label="Primer apellido" required>
+                                                    aria-label="Primer apellido"
+                                                    value="{{ old('first_last_name', $patient->first_last_name) }}"
+                                                    autocomplete="off" required>
                                                 <input type="text" class="form-control" name="second_last_name"
                                                     id="secondLastNameLabel" placeholder="Segundo apellido"
-                                                    aria-label="Segundo apellido">
+                                                    aria-label="Segundo apellido"
+                                                    value="{{ old('second_last_name', $patient->second_last_name) }}"
+                                                    autocomplete="off">
                                                 <input type="text" class="form-control" name="married_last_name"
                                                     id="marriedLastNameLabel" placeholder="Apellido de casada"
-                                                    aria-label="Apellido de casada">
+                                                    aria-label="Apellido de casada"
+                                                    value="{{ old('married_last_name', $patient->married_last_name) }}"
+                                                    autocomplete="off">
                                             </div>
                                         </div>
                                     </div>
@@ -151,18 +163,20 @@
                                                     <input type="text" class="js-input-mask form-control"
                                                         name="dpi" id="dpiLabel" placeholder="0000 00000 0000"
                                                         aria-label="DPI"
+                                                        value="{{ old('dpi', $patient->dpi) }}"
+                                                        autocomplete="off"
                                                         data-hs-mask-options='{"mask": "0000 00000 0000"}'>
                                                 </div>
                                             </div>
 
                                             <div class="col-md-6">
                                                 <label for="birthDateLabel"
-                                                    class="col-sm-6 col-form-label form-label">Fecha
-                                                    de
-                                                    nacimiento</label>
+                                                    class="col-sm-6 col-form-label form-label">Fecha de nacimiento</label>
                                                 <div class="col-sm-9">
                                                     <input type="date" class="form-control" name="birth_date"
-                                                        id="birthDateLabel" required>
+                                                        id="birthDateLabel"
+                                                        value="{{ old('birth_date', $patient->birth_date ? $patient->birth_date->format('Y-m-d') : '') }}"
+                                                        autocomplete="off" required>
                                                 </div>
                                             </div>
                                         </div>
@@ -176,6 +190,7 @@
 
 
                                     <div class="row mb-12">
+
                                         <div class="row mb-3">
 
                                             <div class="col-md-6">
@@ -185,7 +200,9 @@
                                                 <div class="col-sm-9">
                                                     <input type="email" class="form-control" name="email"
                                                         id="emailLabel" placeholder="ejemplo@correo.com"
-                                                        aria-label="ejemplo@correo.com">
+                                                        aria-label="ejemplo@correo.com"
+                                                        value="{{ old('email', $patient->email) }}"
+                                                        autocomplete="off">
                                                 </div>
                                             </div>
 
@@ -196,7 +213,10 @@
                                                 <div class="col-sm-9">
                                                     <input type="text" class="js-input-mask form-control"
                                                         name="phone" id="phoneLabel" placeholder="00000000"
-                                                        aria-label="00000000" data-hs-mask-options='{"mask": "00000000"}'>
+                                                        aria-label="00000000"
+                                                        value="{{ old('phone', $patient->phone) }}"
+                                                        autocomplete="off"
+                                                        data-hs-mask-options='{"mask": "00000000"}'>
                                                 </div>
                                             </div>
                                         </div>
@@ -220,7 +240,8 @@
                                                     id="genderLabel">
                                                     <option value="">Seleccione</option>
                                                     @foreach ($genders as $gender)
-                                                        <option value="{{ $gender->id }}">{{ $gender->name }}</option>
+                                                        <option value="{{ $gender->id }}"
+                                                            {{ old('gender_id', $patient->gender_id) == $gender->id ? 'selected' : '' }}>{{ $gender->name }}</option>
                                                     @endforeach
                                                 </select>
                                             </div>
@@ -233,7 +254,8 @@
                                                     id="civilStatusLabel">
                                                     <option value="">Seleccione</option>
                                                     @foreach ($civilStatuses as $status)
-                                                        <option value="{{ $status->id }}">{{ $status->name }}</option>
+                                                        <option value="{{ $status->id }}"
+                                                            {{ old('civil_status_id', $patient->civil_status_id) == $status->id ? 'selected' : '' }}>{{ $status->name }}</option>
                                                     @endforeach
                                                 </select>
                                             </div>
@@ -250,7 +272,8 @@
                                                     id="ethnicityLabel">
                                                     <option value="">Seleccione</option>
                                                     @foreach ($ethnicities as $ethnicity)
-                                                        <option value="{{ $ethnicity->id }}">{{ $ethnicity->name }}
+                                                        <option value="{{ $ethnicity->id }}"
+                                                            {{ old('ethnicity_id', $patient->ethnicity_id) == $ethnicity->id ? 'selected' : '' }}>{{ $ethnicity->name }}
                                                         </option>
                                                     @endforeach
                                                 </select>
@@ -264,7 +287,8 @@
                                                     id="linguisticCommunityLabel">
                                                     <option value="">Seleccione</option>
                                                     @foreach ($linguisticCommunities as $community)
-                                                        <option value="{{ $community->id }}">{{ $community->name }}
+                                                        <option value="{{ $community->id }}"
+                                                            {{ old('linguistic_community_id', $patient->linguistic_community_id) == $community->id ? 'selected' : '' }}>{{ $community->name }}
                                                         </option>
                                                     @endforeach
                                                 </select>
@@ -291,12 +315,12 @@
                                                 <select class="form-select form-select-sm" name="education"
                                                     id="educationLabel">
                                                     <option value="">Seleccione</option>
-                                                    <option value="ninguna">Ninguna</option>
-                                                    <option value="primaria">Primaria</option>
-                                                    <option value="basico">Básico</option>
-                                                    <option value="diversificado">Diversificado</option>
-                                                    <option value="universitario">Universitario</option>
-                                                    <option value="postgrado">Postgrado</option>
+                                                    <option value="ninguna" {{ old('education', $patient->education) == 'ninguna' ? 'selected' : '' }}>Ninguna</option>
+                                                    <option value="primaria" {{ old('education', $patient->education) == 'primaria' ? 'selected' : '' }}>Primaria</option>
+                                                    <option value="basico" {{ old('education', $patient->education) == 'basico' ? 'selected' : '' }}>Básico</option>
+                                                    <option value="diversificado" {{ old('education', $patient->education) == 'diversificado' ? 'selected' : '' }}>Diversificado</option>
+                                                    <option value="universitario" {{ old('education', $patient->education) == 'universitario' ? 'selected' : '' }}>Universitario</option>
+                                                    <option value="postgrado" {{ old('education', $patient->education) == 'postgrado' ? 'selected' : '' }}>Postgrado</option>
                                                 </select>
                                             </div>
 
@@ -306,7 +330,9 @@
                                                 </label>
                                                 <input type="text" class="form-control form-control-sm"
                                                     name="occupation" id="occupationLabel"
-                                                    placeholder="Ej: Agricultor, Estudiante, Ama de casa...">
+                                                    placeholder="Ej: Agricultor, Estudiante, Ama de casa..."
+                                                    value="{{ old('occupation', $patient->occupation) }}"
+                                                    autocomplete="off">
                                             </div>
 
                                         </div>
@@ -332,7 +358,8 @@
                                             <select class="form-select" name="country_id" id="countryLabel">
                                                 <option value="">Seleccione un país</option>
                                                 @foreach ($countries as $country)
-                                                    <option value="{{ $country->id }}">{{ $country->name }}
+                                                    <option value="{{ $country->id }}"
+                                                        {{ old('country_id', $patient->country_id) == $country->id ? 'selected' : '' }}>{{ $country->name }}
                                                     </option>
                                                 @endforeach
                                             </select>
@@ -344,8 +371,12 @@
                                             class="col-sm-3 col-form-label form-label">Departamento</label>
                                         <div class="col-sm-9">
                                             <select class="form-select" name="department_id" id="departmentLabel"
-                                                disabled>
+                                                {{ $departments->isEmpty() ? 'disabled' : '' }}>
                                                 <option value="">Seleccione primero un país</option>
+                                                @foreach ($departments as $dept)
+                                                    <option value="{{ $dept->id }}"
+                                                        {{ old('department_id', $patient->department_id) == $dept->id ? 'selected' : '' }}>{{ $dept->name }}</option>
+                                                @endforeach
                                             </select>
                                         </div>
                                     </div>
@@ -355,8 +386,12 @@
                                             class="col-sm-3 col-form-label form-label">Municipio</label>
                                         <div class="col-sm-9">
                                             <select class="form-select" name="municipality_id" id="municipalityLabel"
-                                                disabled>
+                                                {{ $municipalities->isEmpty() ? 'disabled' : '' }}>
                                                 <option value="">Seleccione primero un departamento</option>
+                                                @foreach ($municipalities as $muni)
+                                                    <option value="{{ $muni->id }}"
+                                                        {{ old('municipality_id', $patient->municipality_id) == $muni->id ? 'selected' : '' }}>{{ $muni->name }}</option>
+                                                @endforeach
                                             </select>
                                         </div>
                                     </div>
@@ -366,7 +401,9 @@
                                             Dirección</label>
                                         <div class="col-sm-9">
                                             <input type="text" class="form-control" name="place" id="placeLabel"
-                                                placeholder="Dirección exacta" aria-label="Dirección exacta">
+                                                placeholder="Dirección exacta" aria-label="Dirección exacta"
+                                                value="{{ old('place', $patient->place) }}"
+                                                autocomplete="off">
                                         </div>
                                     </div>
                                 </div>
@@ -431,37 +468,37 @@
                                                 <div class="col-md-6">
                                                     <label class="form-label form-label-sm">Primer Nombre *</label>
                                                     <input type="text" class="form-control form-control-sm"
-                                                        id="newRelFirstName" placeholder="Primer nombre">
+                                                        id="newRelFirstName" placeholder="Primer nombre" autocomplete="off">
                                                 </div>
                                                 <div class="col-md-6">
                                                     <label class="form-label form-label-sm">Segundo Nombre</label>
                                                     <input type="text" class="form-control form-control-sm"
-                                                        id="newRelSecondName" placeholder="Segundo nombre">
+                                                        id="newRelSecondName" placeholder="Segundo nombre" autocomplete="off">
                                                 </div>
                                                 <div class="col-md-6">
                                                     <label class="form-label form-label-sm">Primer Apellido
                                                         *</label>
                                                     <input type="text" class="form-control form-control-sm"
-                                                        id="newRelFirstLastName" placeholder="Primer apellido">
+                                                        id="newRelFirstLastName" placeholder="Primer apellido" autocomplete="off">
                                                 </div>
                                                 <div class="col-md-6">
                                                     <label class="form-label form-label-sm">Segundo
                                                         Apellido</label>
                                                     <input type="text" class="form-control form-control-sm"
-                                                        id="newRelSecondLastName" placeholder="Segundo apellido">
+                                                        id="newRelSecondLastName" placeholder="Segundo apellido" autocomplete="off">
                                                 </div>
                                                 <div class="col-md-6">
                                                     <label class="form-label form-label-sm">Apellido de
                                                         casada</label>
                                                     <input type="text" class="form-control form-control-sm"
-                                                        id="newRelMarriedLastName" placeholder="Apellido de casada">
+                                                        id="newRelMarriedLastName" placeholder="Apellido de casada" autocomplete="off">
                                                 </div>
                                                 <div class="col-md-6">
                                                     <label class="form-label form-label-sm">DPI</label>
                                                     <input type="text"
                                                         class="form-control form-control-sm js-input-mask" id="newRelDpi"
                                                         placeholder="0000 00000 0000"
-                                                        data-hs-mask-options='{"mask": "0000 00000 0000"}'>
+                                                        data-hs-mask-options='{"mask": "0000 00000 0000"}' autocomplete="off">
                                                 </div>
                                                 <div class="col-md-6 d-flex align-items-end">
                                                     <button type="button" class="btn btn-primary btn-sm w-100"
@@ -525,7 +562,9 @@
                                     <dl class="row">
 
                                         <dt class="col-sm-6 text-sm-end">Expediente Clínico:</dt>
-                                        <dd class="col-sm-6" id="confirm-expediente"><em class="text-muted">Se generará al guardar</em></dd>
+                                        <dd class="col-sm-6" id="confirm-expediente">
+                                            <strong>{{ $patient->clinicalRecord->record_number ?? 'Sin expediente' }}</strong>
+                                        </dd>
 
                                         <dt class="col-sm-6 text-sm-end"><hr class="my-2 w-100"></dt>
                                         <dd class="col-sm-6"><hr class="my-2 w-100"></dd>
@@ -611,8 +650,8 @@
                                     </button>
                                     <div class="ms-auto">
                                         <button id="addUserFinishBtn" type="button" class="btn btn-primary"
-                                            onclick="document.getElementById('addPatientForm').submit();">
-                                            <i class="bi-person-plus-fill me-1"></i> Guardar paciente
+                                            onclick="document.getElementById('editPatientForm').submit();">
+                                            <i class="bi-pencil-fill me-1"></i> Guardar cambios
                                         </button>
                                     </div>
                                 </div>
@@ -640,31 +679,20 @@
         (function() {
             window.onload = function() {
 
-
                 // INITIALIZATION OF NAVBAR VERTICAL ASIDE
-                // =======================================================
                 new HSSideNav('.js-navbar-vertical-aside').init()
 
-
                 // INITIALIZATION OF FORM SEARCH
-                // =======================================================
                 new HSFormSearch('.js-form-search')
 
-
                 // INITIALIZATION OF BOOTSTRAP DROPDOWN
-                // =======================================================
                 HSBsDropdown.init()
 
-
                 // INITIALIZATION OF FILE ATTACH
-                // =======================================================
                 new HSFileAttach('.js-file-attach')
 
-
                 // INITIALIZATION OF STEP FORM
-                // =======================================================
                 new HSStepForm('.js-step-form', {
-
                     onNextStep: function() {
                         scrollToTop();
                         updateConfirmationStep();
@@ -701,45 +729,33 @@
                         }
                     };
 
-                    setEl('confirm-firstName',         getVal('firstNameLabel'));
-                    setEl('confirm-secondName',        getVal('secondNameLabel'));
-                    setEl('confirm-thirdName',         getVal('thirdNameLabel'));
-                    setEl('confirm-firstLastName',     getVal('firstLastNameLabel'));
-                    setEl('confirm-secondLastName',    getVal('secondLastNameLabel'));
-                    setEl('confirm-marriedLastName',   getVal('marriedLastNameLabel'));
-                    setEl('confirm-dpi',               getVal('dpiLabel'));
-                    setEl('confirm-birthDate',         getVal('birthDateLabel'));
-                    setEl('confirm-gender',            getText('genderLabel'));
-                    setEl('confirm-civilStatus',       getText('civilStatusLabel'));
-                    setEl('confirm-ethnicity',         getText('ethnicityLabel'));
+                    setEl('confirm-firstName',           getVal('firstNameLabel'));
+                    setEl('confirm-secondName',          getVal('secondNameLabel'));
+                    setEl('confirm-thirdName',           getVal('thirdNameLabel'));
+                    setEl('confirm-firstLastName',       getVal('firstLastNameLabel'));
+                    setEl('confirm-secondLastName',      getVal('secondLastNameLabel'));
+                    setEl('confirm-marriedLastName',     getVal('marriedLastNameLabel'));
+                    setEl('confirm-dpi',                 getVal('dpiLabel'));
+                    setEl('confirm-birthDate',           getVal('birthDateLabel'));
+                    setEl('confirm-gender',              getText('genderLabel'));
+                    setEl('confirm-civilStatus',         getText('civilStatusLabel'));
+                    setEl('confirm-ethnicity',           getText('ethnicityLabel'));
                     setEl('confirm-linguisticCommunity', getText('linguisticCommunityLabel'));
-                    setEl('confirm-education',         getText('educationLabel'));
-                    setEl('confirm-occupation',        getVal('occupationLabel'));
-                    setEl('confirm-email',             getVal('emailLabel'));
-                    setEl('confirm-phone',             getVal('phoneLabel'));
-                    setEl('confirm-country',           getText('countryLabel'));
-                    setEl('confirm-department',        getText('departmentLabel'));
-                    setEl('confirm-municipality',      getText('municipalityLabel'));
-                    setEl('confirm-place',             getVal('placeLabel'));
+                    setEl('confirm-education',           getText('educationLabel'));
+                    setEl('confirm-occupation',          getVal('occupationLabel'));
+                    setEl('confirm-email',               getVal('emailLabel'));
+                    setEl('confirm-phone',               getVal('phoneLabel'));
+                    setEl('confirm-country',             getText('countryLabel'));
+                    setEl('confirm-department',          getText('departmentLabel'));
+                    setEl('confirm-municipality',        getText('municipalityLabel'));
+                    setEl('confirm-place',               getVal('placeLabel'));
                 }
 
-
-
-                // INITIALIZATION OF ADD FIELD
-                // =======================================================
-                new HSAddField('.js-add-field', {
-                    addedField: field => {
-                        if (window.HSCore && window.HSCore.components && window.HSCore.components
-                            .HSMask) {
-                            HSCore.components.HSMask.init(field.querySelector('.js-input-mask'))
-                        }
-                    }
-                })
+                // Run immediately so pre-filled values show on confirm step
+                updateConfirmationStep();
 
                 // INITIALIZATION OF INPUT MASK
-                // =======================================================
                 HSCore.components.HSMask.init('.js-input-mask')
-
 
                 // =====================================================
                 // RELATIVES SEARCH + SELECT + INLINE CREATE LOGIC
@@ -776,18 +792,15 @@
                                             `<div class="list-group-item text-muted small py-2"><i class="bi-info-circle me-1"></i>No se encontraron resultados. Prueba «Crear nuevo».</div>`;
                                     } else {
                                         data.forEach(rel => {
-                                            const item = document.createElement(
-                                                'button');
+                                            const item = document.createElement('button');
                                             item.type = 'button';
-                                            item.className =
-                                                'list-group-item list-group-item-action py-2';
+                                            item.className = 'list-group-item list-group-item-action py-2';
                                             item.innerHTML =
                                                 `<strong>${rel.name}</strong>${rel.married_last_name ? ` (de ${rel.married_last_name})` : ''}${rel.dpi ? ` <span class="text-muted small">· DPI: ${rel.dpi}</span>` : ''}`;
                                             item.addEventListener('click', () => {
                                                 addSelectedRelative(rel);
                                                 searchInput.value = '';
-                                                searchResults.style.display =
-                                                    'none';
+                                                searchResults.style.display = 'none';
                                             });
                                             searchResults.appendChild(item);
                                         });
@@ -829,12 +842,10 @@
                         second_name: document.getElementById('newRelSecondName').value.trim(),
                         first_last_name: firstLastName,
                         second_last_name: document.getElementById('newRelSecondLastName').value.trim(),
-                        married_last_name: document.getElementById('newRelMarriedLastName').value
-                            .trim(),
+                        married_last_name: document.getElementById('newRelMarriedLastName').value.trim(),
                         dpi: document.getElementById('newRelDpi').value.trim(),
                         name: [firstName, document.getElementById('newRelSecondName').value.trim(),
-                            firstLastName, document.getElementById('newRelSecondLastName').value
-                            .trim()
+                            firstLastName, document.getElementById('newRelSecondLastName').value.trim()
                         ].filter(Boolean).join(' ')
                     };
                     addSelectedRelative(relData);
@@ -844,10 +855,8 @@
 
                 function clearCreateForm() {
                     ['newRelFirstName', 'newRelSecondName', 'newRelFirstLastName', 'newRelSecondLastName',
-                        'newRelMarriedLastName',
-                        'newRelDpi'
-                    ]
-                    .forEach(id => {
+                        'newRelMarriedLastName', 'newRelDpi'
+                    ].forEach(id => {
                         const el = document.getElementById(id);
                         if (el) el.value = '';
                     });
@@ -882,7 +891,6 @@
                     <button type="button" class="btn btn-xs btn-soft-danger flex-shrink-0" onclick="removeSelectedRelative(${idx})">
                         <i class="bi-trash"></i>
                     </button>
-                    {{-- Hidden data fields --}}
                     <input type="hidden" name="relatives[${idx}][first_name]"       value="${rel.first_name || ''}">
                     <input type="hidden" name="relatives[${idx}][second_name]"      value="${rel.second_name || ''}">
                     <input type="hidden" name="relatives[${idx}][first_last_name]"  value="${rel.first_last_name || ''}">
@@ -901,6 +909,7 @@
                         document.getElementById('noRelativesData').style.display = 'block';
                     }
                 };
+
                 // =====================================================
                 // CASCADING DROPDOWNS: País → Departamento → Municipio
                 // =====================================================
@@ -914,12 +923,13 @@
                     select.value = '';
                 }
 
-                function populateSelect(select, items, placeholder) {
+                function populateSelect(select, items, placeholder, selectedId = null) {
                     select.innerHTML = `<option value="">${placeholder}</option>`;
                     items.forEach(item => {
                         const opt = document.createElement('option');
                         opt.value = item.id;
                         opt.textContent = item.name;
+                        if (selectedId && item.id == selectedId) opt.selected = true;
                         select.appendChild(opt);
                     });
                     select.disabled = false;
@@ -928,28 +938,19 @@
                 if (countrySelect) {
                     countrySelect.addEventListener('change', function() {
                         const countryId = this.value;
-
-                        // Reset downstream
                         resetSelect(departmentSelect, 'Seleccione primero un país');
                         resetSelect(municipalitySelect, 'Seleccione primero un departamento');
-
                         if (!countryId) return;
-
                         departmentSelect.innerHTML = '<option value="">Cargando...</option>';
-
                         fetch(`{{ route('patients.get-departments-by-country') }}?country_id=${countryId}`, {
-                                headers: {
-                                    'X-Requested-With': 'XMLHttpRequest',
-                                    'Accept': 'application/json'
-                                }
+                                headers: { 'X-Requested-With': 'XMLHttpRequest', 'Accept': 'application/json' }
                             })
                             .then(r => r.json())
                             .then(data => {
                                 if (data.length === 0) {
                                     resetSelect(departmentSelect, 'Sin departamentos disponibles');
                                 } else {
-                                    populateSelect(departmentSelect, data,
-                                        'Seleccione un departamento');
+                                    populateSelect(departmentSelect, data, 'Seleccione un departamento');
                                 }
                             })
                             .catch(() => resetSelect(departmentSelect, 'Error al cargar'));
@@ -959,19 +960,11 @@
                 if (departmentSelect) {
                     departmentSelect.addEventListener('change', function() {
                         const deptId = this.value;
-
-                        // Reset downstream
                         resetSelect(municipalitySelect, 'Seleccione primero un departamento');
-
                         if (!deptId) return;
-
                         municipalitySelect.innerHTML = '<option value="">Cargando...</option>';
-
                         fetch(`{{ route('patients.get-municipalities-by-department') }}?department_id=${deptId}`, {
-                                headers: {
-                                    'X-Requested-With': 'XMLHttpRequest',
-                                    'Accept': 'application/json'
-                                }
+                                headers: { 'X-Requested-With': 'XMLHttpRequest', 'Accept': 'application/json' }
                             })
                             .then(r => r.json())
                             .then(data => {
@@ -989,39 +982,26 @@
         })()
     </script>
 
-    <!-- Style Switcher JS -->
-
     <script>
         (function() {
             // STYLE SWITCHER
-            // =======================================================
-            const $dropdownBtn = document.getElementById('selectThemeDropdown') // Dropdowon trigger
-            const $variants = document.querySelectorAll(
-                `[aria-labelledby="selectThemeDropdown"] [data-icon]`) // All items of the dropdown
-
-            // Function to set active style in the dorpdown menu and set icon for dropdown trigger
+            const $dropdownBtn = document.getElementById('selectThemeDropdown')
+            const $variants = document.querySelectorAll(`[aria-labelledby="selectThemeDropdown"] [data-icon]`)
             const setActiveStyle = function() {
                 $variants.forEach($item => {
                     if ($item.getAttribute('data-value') === HSThemeAppearance.getOriginalAppearance()) {
                         $dropdownBtn.innerHTML = `<i class="${$item.getAttribute('data-icon')}" />`
                         return $item.classList.add('active')
                     }
-
                     $item.classList.remove('active')
                 })
             }
-
-            // Add a click event to all items of the dropdown to set the style
             $variants.forEach(function($item) {
                 $item.addEventListener('click', function() {
                     HSThemeAppearance.setAppearance($item.getAttribute('data-value'))
                 })
             })
-
-            // Call the setActiveStyle on load page
             setActiveStyle()
-
-            // Add event listener on change style to call the setActiveStyle function
             window.addEventListener('on-hs-appearance-change', function() {
                 setActiveStyle()
             })

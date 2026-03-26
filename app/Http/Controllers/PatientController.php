@@ -34,7 +34,7 @@ class PatientController extends Controller
             'country',
             'department',
             'municipality',
-            'relatives'
+            'relatives',
         ]);
 
         // Aplicar filtros de búsqueda
