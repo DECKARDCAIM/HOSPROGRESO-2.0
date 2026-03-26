@@ -301,10 +301,8 @@
                                         $iniciales = 'U';
                                         }
                                         @endphp
-                                        @if ($user->avatar_url || $user->avatar)
-                                        <img class="avatar-img"
-                                            src="{{ $user->avatar_url ?? asset('storage/img/profiles/' . $user->avatar) }}"
-                                            alt="Avatar">
+                                        @if ($user->avatar_url)
+                                        <img class="avatar-img" src="{{ $user->avatar_url }}" alt="Avatar">
                                         @else
                                         <span class="avatar-initials">{{ $iniciales }}</span>
                                         @endif

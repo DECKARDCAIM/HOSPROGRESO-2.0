@@ -119,11 +119,10 @@ class User extends Authenticatable
      *
      * @return string|null
      */
-    public function getAvatarUrlAttribute($value)
+    public function getAvatarUrlAttribute()
     {
-        // Si hay un avatar guardado, generar URL usando la solicitud actual
-        if ($this->avatar) {
-            return $this->getImageUrl('storage/avatars/' . basename($this->avatar));
+        if ($this->profile_photo_path) {
+            return asset('storage/' . $this->profile_photo_path);
         }
         
         return null;
@@ -134,11 +133,10 @@ class User extends Authenticatable
      *
      * @return string|null
      */
-    public function getBannerUrlAttribute($value)
+    public function getBannerUrlAttribute()
     {
-        // Si hay un banner guardado, generar URL usando la solicitud actual
-        if ($this->banner) {
-            return $this->getImageUrl('storage/banners/' . basename($this->banner));
+        if ($this->banner_photo_path) {
+            return asset('storage/' . $this->banner_photo_path);
         }
         
         return null;

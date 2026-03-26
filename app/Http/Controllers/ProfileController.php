@@ -291,57 +291,30 @@ class ProfileController extends Controller
             ], 422);
         }
 
-        $request->validate([
-            'profile_photo_path' => 'nullable|image|mimes:jpeg,png,jpg'
-        ]);
-
         try {
             $user = Auth::user();
             
-            // Eliminar avatar anterior si existe
+            // Eliminar anterior si existe
             if ($user->profile_photo_path) {
-                // Eliminar de storage
-                if (Storage::disk('public')->exists($user->profile_photo_path)) {
-                    Storage::disk('public')->delete($user->profile_photo_path);
-                }
-                // Eliminar de public/storage
-                $oldFileName = basename($user->profile_photo_path);
-                $oldPublicFile = public_path('storage/avatars/' . $oldFileName);
+                $oldPublicFile = public_path('storage/' . $user->profile_photo_path);
                 if (File::exists($oldPublicFile)) {
-                    File::delete($oldPublicFile);
+                    try {
+                        File::delete($oldPublicFile);
+                    } catch (\Exception $e) {}
                 }
             }
 
-            // Guardar nuevo avatar en storage
-            $profilePhotoPath = $file->store('profile_photos', 'public');
+            // Guardar nuevo avatar
+            $avatarName = Str::random(40) . '.' . $file->getClientOriginalExtension();
+            $avatarPath = 'profile_photos/' . $avatarName;
             
-            // Copiar también a public/storage para acceso directo
-            $publicStoragePath = public_path('storage');
-            if (!File::exists($publicStoragePath)) {
-                File::makeDirectory($publicStoragePath, 0755, true);
-            }
-            $publicProfilePhotosPath = $publicStoragePath . '/profile_photos';
-            if (!File::exists($publicAvatarsPath)) {
-                File::makeDirectory($publicAvatarsPath, 0755, true);
-            }
+            $file->move(public_path('storage/profile_photos'), $avatarName);
             
-            $fileName = basename($avatarPath);
-            $sourceFile = storage_path('app/public/' . $avatarPath);
-            $destinationFile = $publicAvatarsPath . '/' . $fileName;
-            
-            if (File::exists($sourceFile)) {
-                File::copy($sourceFile, $destinationFile);
-            }
-            
-            // Generar URL usando asset() para que funcione tanto en desktop como móvil
-            $avatarUrl = asset('storage/avatars/' . $fileName);
-            
-            // Actualizar en la base de datos (ruta y URL)
+            // Actualizar en la base de datos
             DB::table('users')
                 ->where('id', $user->id)
                 ->update([
-                    'avatar' => $avatarPath,
-                    'avatar_url' => $avatarUrl
+                    'profile_photo_path' => $avatarPath
                 ]);
             
             $user->refresh();
@@ -349,7 +322,7 @@ class ProfileController extends Controller
             return response()->json([
                 'success' => true,
                 'message' => 'Avatar actualizado correctamente',
-                'avatar_url' => $avatarUrl
+                'avatar_url' => $user->avatar_url
             ]);
         } catch (\Exception $e) {
             \Log::error('Error al actualizar avatar: ' . $e->getMessage());
@@ -365,8 +338,7 @@ class ProfileController extends Controller
      */
     public function updateBanner(Request $request)
     {
-        // Validar que haya un archivo (puede ser 'banner' o 'banner_photo')
-        $file = $request->hasFile('banner_photo_path') ? $request->file('banner_photo_path') : $request->file('banner_photo_path');
+        $file = $request->hasFile('banner') ? $request->file('banner') : $request->file('banner_photo');
         
         if (!$file) {
             return response()->json([
@@ -375,57 +347,30 @@ class ProfileController extends Controller
             ], 422);
         }
 
-        $request->validate([
-            'banner_photo_path' => 'nullable|image|mimes:jpeg,png,jpg'
-        ]);
-
         try {
             $user = Auth::user();
             
-            // Eliminar banner anterior si existe
+            // Eliminar anterior si existe
             if ($user->banner_photo_path) {
-                // Eliminar de storage
-                if (Storage::disk('public')->exists($user->banner_photo_path)) {
-                    Storage::disk('public')->delete($user->banner_photo_path);
-                }
-                // Eliminar de public/storage
-                $oldFileName = basename($user->banner);
-                $oldPublicFile = public_path('storage/banners/' . $oldFileName);
+                $oldPublicFile = public_path('storage/' . $user->banner_photo_path);
                 if (File::exists($oldPublicFile)) {
-                    File::delete($oldPublicFile);
+                    try {
+                        File::delete($oldPublicFile);
+                    } catch (\Exception $e) {}
                 }
             }
 
-            // Guardar nuevo banner en storage
-            $bannerPhotoPath = $file->store('banner_photos', 'public');
+            // Guardar nuevo banner
+            $bannerName = Str::random(40) . '.' . $file->getClientOriginalExtension();
+            $bannerPath = 'banner_photos/' . $bannerName;
             
-            // Copiar también a public/storage para acceso directo
-            $publicStoragePath = public_path('storage');
-            if (!File::exists($publicStoragePath)) {
-                File::makeDirectory($publicStoragePath, 0755, true);
-            }
-            $publicBannersPath = $publicStoragePath . '/banners';
-            if (!File::exists($publicBannersPath)) {
-                File::makeDirectory($publicBannersPath, 0755, true);
-            }
+            $file->move(public_path('storage/banner_photos'), $bannerName);
             
-            $fileName = basename($bannerPath);
-            $sourceFile = storage_path('app/public/' . $bannerPath);
-            $destinationFile = $publicBannersPath . '/' . $fileName;
-            
-            if (File::exists($sourceFile)) {
-                File::copy($sourceFile, $destinationFile);
-            }
-            
-            // Generar URL usando asset() para que funcione tanto en desktop como móvil
-            $bannerUrl = asset('storage/banners/' . $fileName);
-            
-            // Actualizar en la base de datos (ruta y URL)
+            // Actualizar en la base de datos
             DB::table('users')
                 ->where('id', $user->id)
                 ->update([
-                    'banner' => $bannerPath,
-                    'banner_url' => $bannerUrl
+                    'banner_photo_path' => $bannerPath
                 ]);
             
             $user->refresh();
@@ -433,7 +378,7 @@ class ProfileController extends Controller
             return response()->json([
                 'success' => true,
                 'message' => 'Banner actualizado correctamente',
-                'banner_url' => $bannerUrl
+                'banner_url' => $user->banner_url
             ]);
         } catch (\Exception $e) {
             \Log::error('Error al actualizar banner: ' . $e->getMessage());

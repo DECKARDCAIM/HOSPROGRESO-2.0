@@ -12,6 +12,9 @@ use App\Models\Country;
 use App\Models\Department;
 use App\Models\Municipality;
 use App\Models\Specialty;
+use Illuminate\Support\Facades\Storage;
+use Illuminate\Support\Facades\File;
+use Illuminate\Support\Str;
 
 class UserController extends Controller
 {
@@ -230,9 +233,11 @@ class UserController extends Controller
         $departments   = Department::orderBy('name')->get();
         $municipalities = Municipality::orderBy('name')->get();
         $specialties   = Specialty::where('is_active', true)->orderBy('name')->get();
+        $unityExecutions = \App\Models\UnityExecution::orderBy('name')->get();
+        $workDepartments = \App\Models\WorkDepartment::orderBy('name')->get();
 
         return view('modules.user.create', compact(
-            'roles', 'schedules', 'countries', 'departments', 'municipalities', 'specialties'
+            'roles', 'schedules', 'countries', 'departments', 'municipalities', 'specialties', 'unityExecutions', 'workDepartments'
         ));
     }
 
@@ -249,7 +254,7 @@ class UserController extends Controller
         try {
             DB::beginTransaction();
 
-            $user = \App\Models\User::create([
+            $userData = [
                 'first_name' => $request->first_name,
                 'second_name' => $request->second_name,
                 'third_name' => $request->third_name,
@@ -273,7 +278,19 @@ class UserController extends Controller
                 'address' => $request->address,
                 'is_active' => true,
                 'estado' => 'disponible'
-            ]);
+            ];
+
+            // Subir Avatar si existe
+            if ($request->hasFile('profile_photo')) {
+                $avatarFile = $request->file('profile_photo');
+                $avatarName = Str::random(40) . '.' . $avatarFile->getClientOriginalExtension();
+                $avatarPath = 'profile_photos/' . $avatarName;
+                
+                $avatarFile->move(public_path('storage/profile_photos'), $avatarName);
+                $userData['profile_photo_path'] = $avatarPath;
+            }
+
+            $user = \App\Models\User::create($userData);
 
             DB::commit();
 
@@ -288,7 +305,93 @@ class UserController extends Controller
     public function edit($id)
     {
         $user = \App\Models\User::findOrFail($id);
-        return view('modules.user.edit', compact('user'));
+        
+        $roles         = Role::where('is_active', true)->get();
+        $schedules     = Schedule::where('is_active', true)->get();
+        $countries     = Country::orderBy('name')->get();
+        $departments   = Department::orderBy('name')->get();
+        $municipalities = Municipality::orderBy('name')->get();
+        $specialties   = Specialty::where('is_active', true)->orderBy('name')->get();
+        $unityExecutions = \App\Models\UnityExecution::orderBy('name')->get();
+        $workDepartments = \App\Models\WorkDepartment::orderBy('name')->get();
+
+        return view('modules.user.edit', compact(
+            'user', 'roles', 'schedules', 'countries', 'departments', 'municipalities', 'specialties', 'unityExecutions', 'workDepartments'
+        ));
+    }
+
+    public function update(Request $request, $id)
+    {
+        $user = \App\Models\User::findOrFail($id);
+
+        $request->validate([
+            'first_name' => 'required|string|max:255',
+            'first_last_name' => 'required|string|max:255',
+            'email' => 'required|string|email|max:255|unique:users,email,' . $user->id,
+            'password' => 'nullable|string|min:8',
+            'role_id' => 'nullable|exists:roles,id',
+        ]);
+
+        try {
+            DB::beginTransaction();
+
+            $updateData = [
+                'first_name' => $request->first_name,
+                'second_name' => $request->second_name,
+                'third_name' => $request->third_name,
+                'first_last_name' => $request->first_last_name,
+                'second_last_name' => $request->second_last_name,
+                'married_last_name' => $request->married_last_name,
+                'email' => $request->email,
+                'cui' => $request->cui,
+                'nit' => $request->nit,
+                'marital_status' => $request->marital_status,
+                'phone' => $request->phone,
+                'birth_date' => $request->birth_date,
+                'gender' => $request->gender,
+                'role_id' => $request->role_id,
+                'specialty_id' => $request->specialty_id,
+                'schedule_id' => $request->schedule_id,
+                'country_id' => $request->country_id,
+                'department_id' => $request->department_id,
+                'municipality_id' => $request->municipality_id,
+                'address' => $request->address,
+            ];
+
+            if ($request->filled('password')) {
+                $updateData['password'] = $request->password;
+            }
+
+            // Subir Avatar si existe
+            if ($request->hasFile('profile_photo')) {
+                // Eliminar anterior
+                if ($user->profile_photo_path) {
+                    $oldPublicFile = public_path('storage/' . $user->profile_photo_path);
+                    if (File::exists($oldPublicFile)) {
+                        try {
+                            File::delete($oldPublicFile);
+                        } catch (\Exception $e) {}
+                    }
+                }
+
+                $avatarFile = $request->file('profile_photo');
+                $avatarName = Str::random(40) . '.' . $avatarFile->getClientOriginalExtension();
+                $avatarPath = 'profile_photos/' . $avatarName;
+                
+                $avatarFile->move(public_path('storage/profile_photos'), $avatarName);
+                $updateData['profile_photo_path'] = $avatarPath;
+            }
+
+            $user->update($updateData);
+
+            DB::commit();
+
+            return redirect()->route('users.index')->with('success', 'Usuario actualizado exitosamente.');
+        } catch (\Exception $e) {
+            DB::rollBack();
+            Log::error('Error al actualizar usuario: ' . $e->getMessage());
+            return back()->withInput()->with('error', 'Ocurrió un error al actualizar el usuario: ' . $e->getMessage());
+        }
     }
 
     /**
