@@ -205,6 +205,15 @@
                             <a class="nav-link" href="#">
                                 <i class="bi-translate nav-icon"></i> Idiomas
                             </a>
+
+                            {{-- Sub-módulo: Gestionar Médicos --}}
+                            <small class="nav-subtitle mt-2">Gestionar Médicos</small>
+                            <a class="nav-link" href="#">
+                                <i class="bi-calendar-range nav-icon"></i> Turnos
+                            </a>
+                            <a class="nav-link" href="#">
+                                <i class="bi-award nav-icon"></i> Especialidades
+                            </a>
                         </div>
                     </div>
 

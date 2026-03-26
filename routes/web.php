@@ -101,11 +101,8 @@ Route::middleware(['auth', 'PreventBackHistory'])->group(function () {
     Route::post('/patients/{id}/restore', [PatientController::class , 'restore'])->name('patients.restore');
 
 
-    Route::get('/users', [UserController::class , 'index'])->name('users.index');
-    Route::get('/users/create', [UserController::class , 'create'])->name('users.create');
-    Route::post('/users', [UserController::class , 'store'])->name('users.store');
-    Route::get('/users/{id}/edit', [UserController::class , 'edit'])->name('users.edit');
-    Route::get('/users/{id}/profile', [UserController::class , 'showProfile'])->name('users.profile');
+    Route::resource('users', UserController::class);
+    Route::post('/users/{id}/restore', [UserController::class, 'restore'])->name('users.restore');
 
     // ==========================================
     // MÓDULO: MÉTRICAS

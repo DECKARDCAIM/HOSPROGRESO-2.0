@@ -254,9 +254,9 @@
                                 @endif
                             </td>
                             <td>
-                                <div class="d-flex gap-2">
-                                    <a href="{{ route('countries.edit', $country->id) }}" class="btn btn-white btn-sm">
-                                        <i class="bi-pencil-fill me-1"></i> Editar
+                                <div class="d-flex gap-1">
+                                    <a href="{{ route('countries.edit', $country->id) }}" class="btn btn-white btn-sm" title="Editar">
+                                        <i class="bi-pencil-fill"></i>
                                     </a>
 
                                     @if ($country->is_active)

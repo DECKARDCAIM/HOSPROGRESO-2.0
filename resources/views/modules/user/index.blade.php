@@ -25,7 +25,7 @@
             </div>
         </div>
         <div class="row">
-            <div class="col-sm-6 col-lg-3 mb-3 mb-lg-5">
+            <div class="col-sm-6 col-md-4 mb-3 mb-lg-5">
                 <div class="card h-100">
                     <div class="card-body">
                         <h6 class="card-subtitle mb-2">Total usuarios registrados</h6>
@@ -39,7 +39,7 @@
                 </div>
             </div>
 
-            <div class="col-sm-6 col-lg-3 mb-3 mb-lg-5">
+            <div class="col-sm-6 col-md-4 mb-3 mb-lg-5">
                 <div class="card h-100">
                     <div class="card-body">
                         <h6 class="card-subtitle mb-2">Usuarios activos</h6>
@@ -53,7 +53,7 @@
                 </div>
             </div>
 
-            <div class="col-sm-6 col-lg-3 mb-3 mb-lg-5">
+            <div class="col-sm-6 col-md-4 mb-3 mb-lg-5">
                 <div class="card h-100">
                     <div class="card-body">
                         <h6 class="card-subtitle mb-2">Usuarios inactivos</h6>
@@ -103,47 +103,19 @@
                         </div>
                     </div>
 
-                    <div class="dropdown">
-                        <button type="button" class="btn btn-white btn-sm dropdown-toggle w-100"
-                            id="usersExportDropdown" data-bs-toggle="dropdown" aria-expanded="false">
-                            <i class="bi-download me-2"></i> Exportar
-                        </button>
 
-                        <div class="dropdown-menu dropdown-menu-sm-end" aria-labelledby="usersExportDropdown">
-                            <span class="dropdown-header">Opciones</span>
-                            <a id="export-copy" class="dropdown-item" href="javascript:;">
-                                <img class="avatar avatar-xss avatar-4x3 me-2"
-                                    src="{{ asset('svg/illustrations/copy-icon.svg') }}" alt="Copiar">
-                                Copiar
-                            </a>
-                            <a id="export-print" class="dropdown-item" href="javascript:;">
-                                <img class="avatar avatar-xss avatar-4x3 me-2"
-                                    src="{{ asset('svg/illustrations/print-icon.svg') }}" alt="Imprimir">
-                                Imprimir
-                            </a>
-                            <div class="dropdown-divider"></div>
-                            <span class="dropdown-header">Opciones de descarga</span>
-                            <a id="export-excel" class="dropdown-item" href="javascript:;">
-                                <img class="avatar avatar-xss avatar-4x3 me-2"
-                                    src="{{ asset('svg/brands/excel-icon.svg') }}" alt="Excel">
-                                Excel
-                            </a>
-                            <a id="export-csv" class="dropdown-item" href="javascript:;">
-                                <img class="avatar avatar-xss avatar-4x3 me-2"
-                                    src="{{ asset('svg/components/placeholder-csv-format.svg') }}"
-                                    alt="CSV">
-                                .CSV
-                            </a>
-                            <a id="export-pdf" class="dropdown-item" href="javascript:;">
-                                <img class="avatar avatar-xss avatar-4x3 me-2"
-                                    src="{{ asset('svg/brands/pdf-icon.svg') }}" alt="PDF">
-                                PDF
-                            </a>
-                        </div>
-                    </div>
 
                     @php
-                        $activeFilters = count(array_filter(request()->only(['status'])));
+                        $activeFilters = 0;
+                        if (request()->filled('role_id')) $activeFilters++;
+                        if (request()->filled('work_department_id')) $activeFilters++;
+                        if (request()->filled('specialty_id')) $activeFilters++;
+                        if (request()->filled('status') && request('status') !== 'active') $activeFilters++;
+                        if (request()->filled('gender')) $activeFilters++;
+                        if (request()->filled('country_id')) $activeFilters++;
+                        if (request()->filled('department_id')) $activeFilters++;
+                        if (request()->filled('municipality_id')) $activeFilters++;
+                        if (request()->filled('birth_date_from') || request()->filled('birth_date_to')) $activeFilters++;
                     @endphp
                     <div class="dropdown">
                         <button type="button" class="btn btn-white btn-sm w-100" id="usersFilterDropdown"
@@ -155,92 +127,113 @@
                         </button>
 
                         <div class="dropdown-menu dropdown-menu-sm-end dropdown-card card-dropdown-filter-centered"
-                            aria-labelledby="usersFilterDropdown" style="min-width: 22rem;">
+                            aria-labelledby="usersFilterDropdown" style="min-width: 25rem;">
                             <div class="card">
                                 <div class="card-header card-header-content-between">
                                     <h5 class="card-header-title">Filtrar usuarios</h5>
                                 </div>
 
                                 <div class="card-body">
-                                    <form>
-                                        <div class="mb-4">
-                                            <small class="text-cap text-body">Rol</small>
-
-                                            <div class="row">
-                                                <div class="col">
-                                                    <div class="form-check">
-                                                        <input class="form-check-input" type="checkbox" value=""
-                                                            id="usersFilterCheckAll" checked>
-                                                        <label class="form-check-label" for="usersFilterCheckAll">
-                                                            Todos
-                                                        </label>
-                                                    </div>
-                                                </div>
-
-                                                <div class="col">
-                                                    <div class="form-check">
-                                                        <input class="form-check-input" type="checkbox" value=""
-                                                            id="usersFilterCheckEmployee">
-                                                        <label class="form-check-label" for="usersFilterCheckEmployee">
-                                                            Empleado
-                                                        </label>
-                                                    </div>
-                                                </div>
-                                            </div>
-                                        </div>
+                                    <form action="{{ route('users.index') }}" method="GET">
+                                        @if(request('search')) <input type="hidden" name="search" value="{{ request('search') }}"> @endif
+                                        @if(request('per_page')) <input type="hidden" name="per_page" value="{{ request('per_page') }}"> @endif
 
                                         <div class="row">
-                                            <div class="col-sm mb-4">
-                                                <small class="text-cap text-body">Posición</small>
+                                            <div class="col-12 mb-3">
+                                                <label class="form-label">Estado</label>
+                                                <select name="status" class="js-select form-select form-select-sm">
+                                                    <option value="active" {{ request('status') == 'active' || !request()->has('status') ? 'selected' : '' }}>Activos</option>
+                                                    <option value="inactive" {{ request('status') == 'inactive' ? 'selected' : '' }}>Inactivos</option>
+                                                </select>
+                                            </div>
 
-                                                <div class="tom-select-custom">
-                                                    <select
-                                                        class="js-select js-datatable-filter form-select form-select-sm"
-                                                        data-target-column-index="2" data-hs-tom-select-options='{
-                                      "placeholder": "Cualquiera",
-                                      "searchInDropdown": false,
-                                      "hideSearch": true,
-                                      "dropdownWidth": "10rem"
-                                    }'>
-                                                        <option value="">Cualquiera</option>
-                                                        <option value="Accountant">Accountant</option>
-                                                        <option value="Co-founder">Co-founder</option>
-                                                        <option value="Designer">Designer</option>
-                                                        <option value="Developer">Developer</option>
-                                                        <option value="Director">Director</option>
+                                            <div class="col-12 mb-3">
+                                                <label class="form-label">Rol</label>
+                                                <select name="role_id" class="js-select form-select form-select-sm">
+                                                    <option value="">Todos</option>
+                                                    @foreach($roles as $role)
+                                                        <option value="{{ $role->id }}" {{ request('role_id') == $role->id ? 'selected' : '' }}>{{ $role->name }}</option>
+                                                    @endforeach
+                                                </select>
+                                            </div>
+
+                                            <div class="col-12 mb-3">
+                                                <label class="form-label">Departamento de Trabajo</label>
+                                                <select name="work_department_id" class="js-select form-select form-select-sm">
+                                                    <option value="">Todos</option>
+                                                    @foreach($workDepartments as $wd)
+                                                        <option value="{{ $wd->id }}" {{ request('work_department_id') == $wd->id ? 'selected' : '' }}>{{ $wd->name }}</option>
+                                                    @endforeach
+                                                </select>
+                                            </div>
+
+                                            <div class="col-12 mb-3">
+                                                <label class="form-label">Especialidad</label>
+                                                <select name="specialty_id" class="js-select form-select form-select-sm">
+                                                    <option value="">Todas</option>
+                                                    @foreach($specialties as $specialty)
+                                                        <option value="{{ $specialty->id }}" {{ request('specialty_id') == $specialty->id ? 'selected' : '' }}>{{ $specialty->name }}</option>
+                                                    @endforeach
+                                                </select>
+                                            </div>
+
+                                            <div class="col-12 mb-3">
+                                                <label class="form-label">Género</label>
+                                                <select name="gender" class="js-select form-select form-select-sm">
+                                                    <option value="">Todos</option>
+                                                    <option value="masculino" {{ request('gender') == 'masculino' ? 'selected' : '' }}>Masculino</option>
+                                                    <option value="femenino" {{ request('gender') == 'femenino' ? 'selected' : '' }}>Femenino</option>
+                                                </select>
+                                            </div>
+
+                                            <div class="col-12 mb-3">
+                                                <label class="form-label">Ubicación</label>
+                                                <div class="mb-2">
+                                                    <select name="country_id" id="filter_country_id" class="js-select form-select form-select-sm">
+                                                        <option value="">País (Todos)</option>
+                                                        @foreach($countries as $country)
+                                                            <option value="{{ $country->id }}" {{ request('country_id') == $country->id ? 'selected' : '' }}>{{ $country->name }}</option>
+                                                        @endforeach
+                                                    </select>
+                                                </div>
+                                                <div class="mb-2">
+                                                    <select name="department_id" id="filter_department_id" class="js-select form-select form-select-sm">
+                                                        <option value="">Departamento (Todos)</option>
+                                                        @if(request('country_id'))
+                                                            @foreach($departments->where('country_id', request('country_id')) as $dept)
+                                                                <option value="{{ $dept->id }}" {{ request('department_id') == $dept->id ? 'selected' : '' }}>{{ $dept->name }}</option>
+                                                            @endforeach
+                                                        @endif
+                                                    </select>
+                                                </div>
+                                                <div>
+                                                    <select name="municipality_id" id="filter_municipality_id" class="js-select form-select form-select-sm">
+                                                        <option value="">Municipio (Todos)</option>
+                                                        @if(request('department_id'))
+                                                            @foreach($municipalities->where('department_id', request('department_id')) as $mun)
+                                                                <option value="{{ $mun->id }}" {{ request('municipality_id') == $mun->id ? 'selected' : '' }}>{{ $mun->name }}</option>
+                                                            @endforeach
+                                                        @endif
                                                     </select>
                                                 </div>
                                             </div>
 
-                                            <div class="col-sm mb-4">
-                                                <small class="text-cap text-body">Status</small>
-
-                                                <div class="tom-select-custom">
-                                                    <select
-                                                        class="js-select js-datatable-filter form-select form-select-sm"
-                                                        data-target-column-index="4" data-hs-tom-select-options='{
-                                      "placeholder": "Cualquiera status",
-                                      "searchInDropdown": false,
-                                      "hideSearch": true,
-                                      "dropdownWidth": "10rem"
-                                    }'>
-                                                        <option value="">Cualquiera status</option>
-                                                        <option value="Completed"
-                                                            data-option-template='<span class="d-flex align-items-center"><span class="legend-indicator bg-success"></span>Completed</span>'>
-                                                            Completed</option>
-                                                        <option value="In progress"
-                                                            data-option-template='<span class="d-flex align-items-center"><span class="legend-indicator bg-warning"></span>In progress</span>'>
-                                                            In progress</option>
-                                                        <option value="To do"
-                                                            data-option-template='<span class="d-flex align-items-center"><span class="legend-indicator bg-danger"></span>To do</span>'>
-                                                            To do</option>
-                                                    </select>
+                                            <div class="col-12 mb-3">
+                                                <label class="form-label">Fecha de Nacimiento</label>
+                                                <div class="row">
+                                                    <div class="col-6">
+                                                        <input type="date" name="birth_date_from" class="form-control form-control-sm" value="{{ request('birth_date_from') }}" placeholder="Desde">
+                                                    </div>
+                                                    <div class="col-6">
+                                                        <input type="date" name="birth_date_to" class="form-control form-control-sm" value="{{ request('birth_date_to') }}" placeholder="Hasta">
+                                                    </div>
                                                 </div>
                                             </div>
                                         </div>
 
-                                        <div class="d-grid">
-                                            <a class="btn btn-primary" href="javascript:;">Apply</a>
+                                        <div class="d-grid gap-2">
+                                            <button type="submit" class="btn btn-primary btn-sm">Aplicar Filtros</button>
+                                            <a href="{{ route('users.index') }}" class="btn btn-white btn-sm">Limpiar Filtros</a>
                                         </div>
                                     </form>
                                 </div>
@@ -277,8 +270,6 @@
                             <th>Rol / Departamento</th>
                             <th>Especialidad</th>
                             <th>Estado</th>
-                            <th>Unidad Ejecutora</th>
-                            <th>No. Colegiado</th>
                             <th>Acciones</th>
                         </tr>
                     </thead>
@@ -331,7 +322,8 @@
                                     }}</span>
                             </td>
                             <td>
-                                {{ $user->specialty->name ?? 'No especificada' }}
+                                <span class="d-block h5 mb-0">{{ $user->specialty->name ?? 'No especificada' }}</span>
+                                <span class="d-block fs-5">{{ $user->collegiate_number ?? 'N/A' }}</span>
                             </td>
                             <td>
                                 @if ($user->is_active)
@@ -341,19 +333,35 @@
                                 @endif
                             </td>
                             <td>
-                                {{ $user->unityExecution->name ?? 'Sin Unidad' }}
-                            </td>
-                            <td>{{ $user->collegiate_number ?? 'N/A' }}</td>
-                            <td>
-                                <button type="button" class="btn btn-white btn-sm" data-bs-toggle="modal"
-                                    data-bs-target="#editUserModal{{ $user->id }}">
-                                    <i class="bi-pencil-fill me-1"></i> Edit
-                                </button>
+                                <div class="d-flex gap-1">
+                                    <a class="btn btn-white btn-sm" href="{{ route('users.show', $user->id) }}" title="Ver">
+                                        <i class="bi-eye-fill"></i>
+                                    </a>
+                                    <a class="btn btn-white btn-sm" href="{{ route('users.edit', $user->id) }}" title="Editar">
+                                        <i class="bi-pencil-fill"></i>
+                                    </a>
+                                    @if($user->is_active)
+                                    <form action="{{ route('users.destroy', $user->id) }}" method="POST" class="d-inline" onsubmit="return confirm('¿Está seguro de desactivar este usuario?');">
+                                        @csrf
+                                        @method('DELETE')
+                                        <button type="submit" class="btn btn-white btn-sm" title="Eliminar">
+                                            <i class="bi-trash"></i>
+                                        </button>
+                                    </form>
+                                    @else
+                                    <form action="{{ route('users.restore', $user->id) }}" method="POST" class="d-inline">
+                                        @csrf
+                                        <button type="submit" class="btn btn-white btn-sm" title="Reactivar">
+                                            <i class="bi-arrow-clockwise"></i>
+                                        </button>
+                                    </form>
+                                    @endif
+                                </div>
                             </td>
                         </tr>
                         @empty
                         <tr>
-                            <td colspan="8" class="text-center">No hay usuarios registrados.</td>
+                            <td colspan="5" class="text-center">No hay usuarios registrados.</td>
                         </tr>
                         @endforelse
                     </tbody>
@@ -414,4 +422,46 @@
 <script src="{{ asset('vendor/datatables.net-buttons/js/buttons.html5.min.js') }}"></script>
 <script src="{{ asset('vendor/datatables.net-buttons/js/buttons.print.min.js') }}"></script>
 <script src="{{ asset('vendor/datatables.net-buttons/js/buttons.colVis.min.js') }}"></script>
+
+<script>
+    $(document).ready(function() {
+        $('#filter_country_id').on('change', function() {
+            var countryId = $(this).val();
+            if (countryId) {
+                $.ajax({
+                    url: '{{ route('patients.get-departments-by-country') }}',
+                    type: 'GET',
+                    data: { country_id: countryId },
+                }).done(function(response) {
+                    $('#filter_department_id').empty().append('<option value="">Departamento (Todos)</option>');
+                    $('#filter_municipality_id').empty().append('<option value="">Municipio (Todos)</option>');
+                    $.each(response, function(index, department) {
+                        $('#filter_department_id').append('<option value="' + department.id + '">' + department.name + '</option>');
+                    });
+                });
+            } else {
+                $('#filter_department_id').empty().append('<option value="">Departamento (Todos)</option>');
+                $('#filter_municipality_id').empty().append('<option value="">Municipio (Todos)</option>');
+            }
+        });
+
+        $('#filter_department_id').on('change', function() {
+            var departmentId = $(this).val();
+            if (departmentId) {
+                $.ajax({
+                    url: '{{ route('patients.get-municipalities-by-department') }}',
+                    type: 'GET',
+                    data: { department_id: departmentId },
+                }).done(function(response) {
+                    $('#filter_municipality_id').empty().append('<option value="">Municipio (Todos)</option>');
+                    $.each(response, function(index, municipality) {
+                        $('#filter_municipality_id').append('<option value="' + municipality.id + '">' + municipality.name + '</option>');
+                    });
+                });
+            } else {
+                $('#filter_municipality_id').empty().append('<option value="">Municipio (Todos)</option>');
+            }
+        });
+    });
+</script>
 @endpush

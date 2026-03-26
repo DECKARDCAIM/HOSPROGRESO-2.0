@@ -228,7 +228,7 @@
                                                             Chatear
                                                         </a>
                                                         <a class="dropdown-item"
-                                                            href="{{ route('users.profile', $member->id) }}">
+                                                            href="{{ route('users.show', $member->id) }}">
                                                             <i class="bi-person dropdown-item-icon"></i> Ver perfil
                                                         </a>
                                                     </div>

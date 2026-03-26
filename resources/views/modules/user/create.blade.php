@@ -5,6 +5,31 @@
 <main id="content" role="main" class="main">
     <!-- Content -->
     <div class="content container-fluid">
+
+<!-- Page Header -->
+        <div class="page-header">
+            <div class="row align-items-end">
+                <div class="col-sm mb-2 mb-sm-0">
+                    <nav aria-label="breadcrumb">
+                        <ol class="breadcrumb breadcrumb-no-gutter">
+                            <li class="breadcrumb-item"><a class="breadcrumb-link" href="{{ route('home') }}">Inicio</a></li>
+                            <li class="breadcrumb-item"><a class="breadcrumb-link" href="{{ route('users.index') }}">Usuarios</a></li>
+                            <li class="breadcrumb-item active" aria-current="page">Crear</li>
+                        </ol>
+                    </nav>
+                    <h1 class="page-header-title">Crear usuario</h1>
+                </div>
+                
+                <div class="col-auto">
+                        <a href="{{ route('users.index') }}" class="btn btn-primary">
+                            <i class="bi-arrow-left"></i> Regresar
+                        </a>
+                    </div>
+
+            </div>
+        </div>
+        <!-- End Page Header -->
+
         <!-- Step Form -->
         <form action="{{ route('users.store') }}" method="POST" class="js-step-form py-md-5" data-hs-step-form-options='{
               "progressSelector": "#addUserStepFormProgress",

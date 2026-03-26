@@ -458,7 +458,7 @@
                                     <td>{{ $patient->department ? $patient->department->name : '-' }}</td>
                                     <td>{{ $patient->municipality ? $patient->municipality->name : '-' }}</td>
                                     <td>
-                                        <div class="btn-group" role="group">
+                                        <div class="d-flex gap-1">
                                             <a class="btn btn-white btn-sm" href="{{ route('patients.show', $patient) }}"
                                                 title="Ver">
                                                 <i class="bi-eye-fill"></i>

@@ -20,13 +20,15 @@ class UserController extends Controller
         $perPage = $request->get('per_page', 25);
         $search = $request->get('search');
 
-        $query = \App\Models\User::with(['role', 'workDepartment', 'unityExecution', 'specialty', 'schedule']);
+        $query = \App\Models\User::with(['role', 'workDepartment', 'unityExecution', 'specialty', 'schedule', 'country', 'department', 'municipality']);
 
+        // Buscador
         if ($search) {
             $query->where(function($q) use ($search) {
                 $q->where('first_name', 'like', "%{$search}%")
                   ->orWhere('first_last_name', 'like', "%{$search}%")
                   ->orWhere('email', 'like', "%{$search}%")
+                  ->orWhere('collegiate_number', 'like', "%{$search}%")
                   ->orWhereHas('role', function($q) use ($search) {
                       $q->where('name', 'like', "%{$search}%");
                   })
@@ -36,14 +38,69 @@ class UserController extends Controller
             });
         }
 
+        // Filtros avanzados
+        if ($request->filled('role_id')) {
+            $query->where('role_id', $request->role_id);
+        }
+
+        if ($request->filled('work_department_id')) {
+            $query->where('work_department_id', $request->work_department_id);
+        }
+
+        if ($request->filled('specialty_id')) {
+            $query->where('specialty_id', $request->specialty_id);
+        }
+
+        if ($request->filled('status')) {
+            $query->where('is_active', $request->status === 'active');
+        } else {
+            // Por defecto mostrar solo activos
+            $query->where('is_active', true);
+        }
+
+        if ($request->filled('gender')) {
+            $query->where('gender', $request->gender);
+        }
+
+        if ($request->filled('country_id')) {
+            $query->where('country_id', $request->country_id);
+        }
+
+        if ($request->filled('department_id')) {
+            $query->where('department_id', $request->department_id);
+        }
+
+        if ($request->filled('municipality_id')) {
+            $query->where('municipality_id', $request->municipality_id);
+        }
+
+        if ($request->filled('birth_date_from')) {
+            $query->whereDate('birth_date', '>=', $request->birth_date_from);
+        }
+
+        if ($request->filled('birth_date_to')) {
+            $query->whereDate('birth_date', '<=', $request->birth_date_to);
+        }
+
         $users = $query->paginate($perPage)->appends($request->query());
         
-        // Para los contadores seguimos queriendo el total sin paginar
+        // Datos para los filtros
+        $roles = Role::where('is_active', true)->orderBy('name')->get();
+        $workDepartments = \App\Models\WorkDepartment::orderBy('name')->get();
+        $specialties = Specialty::where('is_active', true)->orderBy('name')->get();
+        $countries = Country::orderBy('name')->get();
+        $departments = Department::orderBy('name')->get();
+        $municipalities = Municipality::orderBy('name')->get();
+
+        // Contadores
         $totalUsers = \App\Models\User::count();
         $activeUsers = \App\Models\User::where('is_active', true)->count();
         $inactiveUsers = \App\Models\User::where('is_active', false)->count();
 
-        return view('modules.user.index', compact('users', 'totalUsers', 'activeUsers', 'inactiveUsers'));
+        return view('modules.user.index', compact(
+            'users', 'totalUsers', 'activeUsers', 'inactiveUsers',
+            'roles', 'workDepartments', 'specialties', 'countries', 'departments', 'municipalities'
+        ));
     }
 
     /**
@@ -143,7 +200,7 @@ class UserController extends Controller
     /**
      * Mostrar el perfil público de un usuario y los miembros de su departamento
      */
-    public function showProfile($id)
+    public function show($id)
     {
         $user = \App\Models\User::with(['role', 'workDepartment', 'unityExecution'])->findOrFail($id);
 
@@ -240,5 +297,39 @@ class UserController extends Controller
     public function ping()
     {
         return response()->json(['success' => true]);
+    }
+
+    /**
+     * Desactivar un usuario (Borrado lógico)
+     */
+    public function destroy($id)
+    {
+        try {
+            $user = \App\Models\User::findOrFail($id);
+            $user->is_active = false;
+            $user->save();
+
+            return redirect()->route('users.index')->with('success', 'El usuario ' . $user->first_name . ' has sido desactivado correctamente.');
+        } catch (\Exception $e) {
+            Log::error('Error al desactivar usuario: ' . $e->getMessage());
+            return back()->with('error', 'Ocurrió un error al desactivar el usuario.');
+        }
+    }
+
+    /**
+     * Reactivar un usuario
+     */
+    public function restore($id)
+    {
+        try {
+            $user = \App\Models\User::findOrFail($id);
+            $user->is_active = true;
+            $user->save();
+
+            return redirect()->route('users.index')->with('success', 'El usuario ' . $user->first_name . ' ha sido reactivado correctamente.');
+        } catch (\Exception $e) {
+            Log::error('Error al reactivar usuario: ' . $e->getMessage());
+            return back()->with('error', 'Ocurrió un error al reactivar el usuario.');
+        }
     }
 }
