@@ -227,17 +227,15 @@ class UserController extends Controller
 
     public function create()
     {
-        $roles         = Role::where('is_active', true)->get();
-        $schedules     = Schedule::where('is_active', true)->get();
-        $countries     = Country::orderBy('name')->get();
-        $departments   = Department::orderBy('name')->get();
-        $municipalities = Municipality::orderBy('name')->get();
-        $specialties   = Specialty::where('is_active', true)->orderBy('name')->get();
+        $roles           = Role::where('is_active', true)->get();
+        $schedules       = Schedule::where('is_active', true)->get();
+        $countries       = Country::orderBy('name')->get();
+        $specialties     = Specialty::where('is_active', true)->orderBy('name')->get();
         $unityExecutions = \App\Models\UnityExecution::orderBy('name')->get();
         $workDepartments = \App\Models\WorkDepartment::orderBy('name')->get();
 
         return view('modules.user.create', compact(
-            'roles', 'schedules', 'countries', 'departments', 'municipalities', 'specialties', 'unityExecutions', 'workDepartments'
+            'roles', 'schedules', 'countries', 'specialties', 'unityExecutions', 'workDepartments'
         ));
     }
 
@@ -276,7 +274,7 @@ class UserController extends Controller
                 'department_id' => $request->department_id,
                 'municipality_id' => $request->municipality_id,
                 'address' => $request->address,
-                'is_active' => true,
+                'is_active' => $request->input('is_active', 1) == '1',
                 'estado' => 'disponible'
             ];
 
@@ -305,18 +303,27 @@ class UserController extends Controller
     public function edit($id)
     {
         $user = \App\Models\User::findOrFail($id);
-        
-        $roles         = Role::where('is_active', true)->get();
-        $schedules     = Schedule::where('is_active', true)->get();
-        $countries     = Country::orderBy('name')->get();
-        $departments   = Department::orderBy('name')->get();
-        $municipalities = Municipality::orderBy('name')->get();
-        $specialties   = Specialty::where('is_active', true)->orderBy('name')->get();
+
+        $roles           = Role::where('is_active', true)->get();
+        $schedules       = Schedule::where('is_active', true)->get();
+        $countries       = Country::orderBy('name')->get();
+        $specialties     = Specialty::where('is_active', true)->orderBy('name')->get();
         $unityExecutions = \App\Models\UnityExecution::orderBy('name')->get();
         $workDepartments = \App\Models\WorkDepartment::orderBy('name')->get();
 
+        // Cargar departamentos según el país del usuario (igual que PatientController)
+        $departments = $user->country_id
+            ? Department::where('country_id', $user->country_id)->where('is_active', true)->orderBy('name')->get()
+            : collect();
+
+        // Cargar municipios según el departamento del usuario
+        $municipalities = $user->department_id
+            ? Municipality::where('department_id', $user->department_id)->where('is_active', true)->orderBy('name')->get()
+            : collect();
+
         return view('modules.user.edit', compact(
-            'user', 'roles', 'schedules', 'countries', 'departments', 'municipalities', 'specialties', 'unityExecutions', 'workDepartments'
+            'user', 'roles', 'schedules', 'countries', 'departments', 'municipalities',
+            'specialties', 'unityExecutions', 'workDepartments'
         ));
     }
 
@@ -356,6 +363,7 @@ class UserController extends Controller
                 'department_id' => $request->department_id,
                 'municipality_id' => $request->municipality_id,
                 'address' => $request->address,
+                'is_active' => $request->input('is_active', 1) == '1',
             ];
 
             if ($request->filled('password')) {
