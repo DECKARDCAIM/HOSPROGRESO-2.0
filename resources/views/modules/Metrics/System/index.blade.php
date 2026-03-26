@@ -36,15 +36,18 @@
                                     <div class="dropdown-menu dropdown-menu-sm-end" aria-labelledby="exportDropdown1">
                                         <span class="dropdown-header">Opciones</span>
                                         <a class="dropdown-item print-chart-btn" href="javascript:;" data-chart-id="chart1">
-                                            <i class="bi-printer me-2"></i> Imprimir
+                                            <img class="avatar avatar-xss avatar-4x3 me-2"
+                                                src="{{ asset('svg/illustrations/print-icon.svg') }}" alt="Imprimir"> Imprimir
                                         </a>
                                         <div class="dropdown-divider"></div>
-                                        <span class="dropdown-header">Descargar</span>
+                                        <span class="dropdown-header">Opciones de descarga</span>
                                         <a class="dropdown-item export-pdf-btn" href="javascript:;" data-chart-id="chart1">
-                                            <i class="bi-file-earmark-pdf me-2 text-danger"></i> PDF
+                                            <img class="avatar avatar-xss avatar-4x3 me-2"
+                                                src="{{ asset('svg/brands/pdf-icon.svg') }}" alt="PDF"> PDF
                                         </a>
                                         <a class="dropdown-item export-svg-btn" href="javascript:;" data-chart-id="chart1">
-                                            <i class="bi-file-earmark-image me-2 text-success"></i> SVG
+                                            <img class="avatar avatar-xss avatar-4x3 me-2"
+                                                src="{{ asset('svg/components/placeholder-csv-format.svg') }}" alt="SVG"> SVG
                                         </a>
                                     </div>
                                 </div>

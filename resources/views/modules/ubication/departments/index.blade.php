@@ -11,8 +11,7 @@
                         <ol class="breadcrumb breadcrumb-no-gutter">
                             <li class="breadcrumb-item"><a class="breadcrumb-link" href="{{ route('home') }}">Inicio</a>
                             </li>
-                            <li class="breadcrumb-item"><span>Mantenimiento</span></li>
-                            <li class="breadcrumb-item"><span>Gestionar Ubicaciones</span></li>
+                            <li class="breadcrumb-item"><a class="breadcrumb-link" href="{{ route('home') }}">Mantenimiento</a></li>
                             <li class="breadcrumb-item active" aria-current="page">Departamentos</li>
                         </ol>
                     </nav>
@@ -117,16 +116,16 @@
                     <div class="dropdown">
                         <button type="button" class="btn btn-white btn-sm dropdown-toggle w-100"
                             id="departmentsExportDropdown" data-bs-toggle="dropdown" aria-expanded="false">
-                            <i class="bi-download me-2"></i> Export
+                            <i class="bi-download me-2"></i> Exportar
                         </button>
                         <div class="dropdown-menu dropdown-menu-sm-end" aria-labelledby="departmentsExportDropdown">
-                            <span class="dropdown-header">Options</span>
+                            <span class="dropdown-header">Opciones</span>
                             <a id="export-print" class="dropdown-item" href="javascript:;">
                                 <img class="avatar avatar-xss avatar-4x3 me-2"
-                                    src="{{ asset('svg/illustrations/print-icon.svg') }}" alt="Print"> Print
+                                    src="{{ asset('svg/illustrations/print-icon.svg') }}" alt="Imprimir"> Imprimir
                             </a>
                             <div class="dropdown-divider"></div>
-                            <span class="dropdown-header">Download options</span>
+                            <span class="dropdown-header">Opciones de descarga</span>
                             <a id="export-excel" class="dropdown-item" href="javascript:;">
                                 <img class="avatar avatar-xss avatar-4x3 me-2"
                                     src="{{ asset('svg/brands/excel-icon.svg') }}" alt="Excel"> Excel
@@ -143,14 +142,14 @@
                     </div>
 
                     @php
-                        $activeFilters = count(array_filter(request()->only(['search', 'country_id', 'status'])));
+                        $activeFilters = count(array_filter(request()->only(['country_id', 'status'])));
                     @endphp
                     <div class="dropdown">
                         <button type="button" class="btn btn-white btn-sm w-100" id="departmentsFilterDropdown"
                             data-bs-toggle="dropdown" data-bs-auto-close="outside" aria-expanded="false">
-                            <i class="bi-filter me-1"></i> Filtrar
+                            <i class="bi-filter" style="font-style: normal;"> Filtrar </i>
                             @if($activeFilters > 0)
-                                <span class="badge bg-soft-info text-info rounded-circle ms-1">{{ $activeFilters }}</span>
+                                <span class="badge bg-soft-dark text-dark rounded-circle ms-1">{{ $activeFilters }}</span>
                             @endif
                         </button>
                         <div class="dropdown-menu dropdown-menu-sm-end dropdown-card card-dropdown-filter-centered"
@@ -158,9 +157,6 @@
                             <div class="card">
                                 <div class="card-header card-header-content-between">
                                     <h5 class="card-header-title">Filtrar departamentos</h5>
-                                    <button type="button" class="btn btn-ghost-secondary btn-icon btn-sm ms-2">
-                                        <i class="bi-x-lg"></i>
-                                    </button>
                                 </div>
                                 <div class="card-body">
                                     <form action="{{ route('departments.index') }}" method="GET">
@@ -170,19 +166,18 @@
                                             value="{{ request('per_page') }}"> @endif
 
                                         <div class="row">
-                                            <div class="col-sm mb-4">
+                                            <div class="col-12 mb-4">
                                                 <small class="text-cap text-body">País</small>
                                                 <div class="tom-select-custom">
                                                     <select name="country_id"
                                                         class="js-select form-select form-select-sm"
-                                                        onchange="this.form.submit()"
                                                         data-hs-tom-select-options='{
-                                                                "placeholder": "Cualquier país",
+                                                                "placeholder": "Todos",
                                                                 "searchInDropdown": false,
                                                                 "hideSearch": true,
                                                                 "dropdownWidth": "10rem"
                                                             }'>
-                                                        <option value="">Cualquier país</option>
+                                                        <option value="">Todos</option>
                                                         @foreach ($countries as $country)
                                                         <option value="{{ $country->id }}" {{
                                                             request('country_id')==$country->id ? 'selected' : '' }}>
@@ -192,11 +187,10 @@
                                                     </select>
                                                 </div>
                                             </div>
-                                            <div class="col-sm mb-4">
+                                            <div class="col-12 mb-4">
                                                 <small class="text-cap text-body">Estado</small>
                                                 <div class="tom-select-custom">
                                                     <select name="status" class="js-select form-select form-select-sm"
-                                                        onchange="this.form.submit()"
                                                         data-hs-tom-select-options='{
                                                                 "searchInDropdown": false,
                                                                 "hideSearch": true,
@@ -293,7 +287,7 @@
                                     </a>
 
                                     @if ($department->is_active)
-                                    <form action="{{ route('departments.destroy', $department->id) }}" method="POST" class="requires-confirmation" data-message="¿Desactivar el departamento {{ addslashes($department->name) }}? Esto también desactivará todos sus municipios asociados.">
+                                    <form action="{{ route('departments.destroy', $department->id) }}" method="POST">
                                         @csrf
                                         @method('DELETE')
                                         <button type="submit" class="btn btn-white btn-sm" title="Desactivar">
@@ -301,7 +295,7 @@
                                         </button>
                                     </form>
                                     @else
-                                    <form action="{{ route('departments.restore', $department->id) }}" method="POST" class="requires-confirmation" data-message="¿Reactivar el departamento {{ addslashes($department->name) }}? Esto también reactivará todos sus municipios asociados.">
+                                    <form action="{{ route('departments.restore', $department->id) }}" method="POST">
                                         @csrf
                                         <button type="submit" class="btn btn-white btn-sm" title="Reactivar">
                                             <i class="bi-arrow-counterclockwise"></i>
@@ -484,20 +478,16 @@
         const bulkDeleteBtn = document.getElementById('bulk-delete');
         if (bulkDeleteBtn) {
             bulkDeleteBtn.addEventListener('click', function() {
-                if (confirm('¿Estás seguro de que deseas eliminar los departamentos seleccionados? Se desactivarán en cascada sus municipios asociados.')) {
-                    sendBulkRequest('{{ route("departments.destroy-multiple") }}');
-                    sessionStorage.removeItem(storageKey);
-                }
+                sendBulkRequest('{{ route("departments.destroy-multiple") }}');
+                sessionStorage.removeItem(storageKey);
             });
         }
 
         const bulkRestoreBtn = document.getElementById('bulk-restore');
         if (bulkRestoreBtn) {
             bulkRestoreBtn.addEventListener('click', function() {
-                if (confirm('¿Estás seguro de que deseas reactivar los departamentos seleccionados? Se reactivarán en cascada.')) {
-                    sendBulkRequest('{{ route("departments.restore-multiple") }}');
-                    sessionStorage.removeItem(storageKey);
-                }
+                sendBulkRequest('{{ route("departments.restore-multiple") }}');
+                sessionStorage.removeItem(storageKey);
             });
         }
 

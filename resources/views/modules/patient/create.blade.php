@@ -4,7 +4,29 @@
 @section('content')
     <main id="content" role="main" class="main">
         <div class="content container-fluid">
+<!-- Page Header -->
+        <div class="page-header">
+            <div class="row align-items-end">
+                <div class="col-sm mb-2 mb-sm-0">
+                    <nav aria-label="breadcrumb">
+                        <ol class="breadcrumb breadcrumb-no-gutter">
+                            <li class="breadcrumb-item"><a class="breadcrumb-link" href="{{ route('home') }}">Inicio</a></li>
+                            <li class="breadcrumb-item"><a class="breadcrumb-link" href="{{ route('patients.index') }}">Pacientes</a></li>
+                            <li class="breadcrumb-item active" aria-current="page">Crear</li>
+                        </ol>
+                    </nav>
+                    <h1 class="page-header-title">Crear paciente</h1>
+                </div>
+                
+                <div class="col-auto">
+                        <a href="{{ route('patients.index') }}" class="btn btn-primary">
+                            <i class="bi-arrow-left"></i> Regresar
+                        </a>
+                    </div>
 
+            </div>
+        </div>
+        <!-- End Page Header -->
             <form id="addPatientForm" action="{{ route('patients.store') }}" method="POST" class="js-step-form py-md-5"
                 data-hs-step-form-options='{"progressSelector": "#addUserStepFormProgress","stepsSelector": "#addUserStepFormContent","endSelector": "#addUserFinishBtn","isValidate": false}'>
                 @csrf

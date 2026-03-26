@@ -147,34 +147,33 @@
 
                         <div class="dropdown">
                             <button type="button" class="btn btn-white btn-sm dropdown-toggle w-100"
-                                id="usersExportDropdown" data-bs-toggle="dropdown" aria-expanded="false"
-                                title="Exportar">
-                                <style>
-                                    #usersExportDropdown::after {
-                                        display: none;
-                                    }
-                                </style>
-                                <i class="bi-download" style="font-style: normal;"> Exportar </i>
+                                id="usersExportDropdown" data-bs-toggle="dropdown" aria-expanded="false">
+                                <i class="bi-download me-2"></i> Exportar
                             </button>
 
                             <div class="dropdown-menu dropdown-menu-sm-end" aria-labelledby="usersExportDropdown">
                                 <span class="dropdown-header">Opciones</span>
-                                <a id="export-copy" class="dropdown-item" href="javascript:;" title="Copiar">
-                                    <i class="bi-clipboard me-2"></i> Copiar
+                                <a id="export-copy" class="dropdown-item" href="javascript:;">
+                                    <img class="avatar avatar-xss avatar-4x3 me-2"
+                                        src="{{ asset('svg/illustrations/copy-icon.svg') }}" alt="Copiar"> Copiar
                                 </a>
-                                <a id="export-print" class="dropdown-item" href="javascript:;" title="Imprimir">
-                                    <i class="bi-printer me-2"></i> Imprimir
+                                <a id="export-print" class="dropdown-item" href="javascript:;">
+                                    <img class="avatar avatar-xss avatar-4x3 me-2"
+                                        src="{{ asset('svg/illustrations/print-icon.svg') }}" alt="Imprimir"> Imprimir
                                 </a>
                                 <div class="dropdown-divider"></div>
-                                <span class="dropdown-header">Opciones de Descarga</span>
-                                <a id="export-excel" class="dropdown-item" href="javascript:;" title="Excel">
-                                    <i class="bi-file-earmark-spreadsheet me-2"></i> Excel (.xlsx)
+                                <span class="dropdown-header">Opciones de descarga</span>
+                                <a id="export-excel" class="dropdown-item" href="javascript:;">
+                                    <img class="avatar avatar-xss avatar-4x3 me-2"
+                                        src="{{ asset('svg/brands/excel-icon.svg') }}" alt="Excel"> Excel
                                 </a>
-                                <a id="export-csv" class="dropdown-item" href="javascript:;" title="CSV">
-                                    <i class="bi-filetype-csv me-2"></i> CSV (.csv)
+                                <a id="export-csv" class="dropdown-item" href="javascript:;">
+                                    <img class="avatar avatar-xss avatar-4x3 me-2"
+                                        src="{{ asset('svg/components/placeholder-csv-format.svg') }}" alt="CSV"> .CSV
                                 </a>
-                                <a id="export-pdf" class="dropdown-item" href="javascript:;" title="PDF">
-                                    <i class="bi-file-earmark-pdf me-2"></i> PDF (.pdf)
+                                <a id="export-pdf" class="dropdown-item" href="javascript:;">
+                                    <img class="avatar avatar-xss avatar-4x3 me-2"
+                                        src="{{ asset('svg/brands/pdf-icon.svg') }}" alt="PDF"> PDF
                                 </a>
                             </div>
                         </div>

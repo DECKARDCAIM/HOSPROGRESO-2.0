@@ -11,8 +11,7 @@
                         <ol class="breadcrumb breadcrumb-no-gutter">
                             <li class="breadcrumb-item"><a class="breadcrumb-link" href="{{ route('home') }}">Inicio</a>
                             </li>
-                            <li class="breadcrumb-item"><span>Mantenimiento</span></li>
-                            <li class="breadcrumb-item"><span>Gestionar Ubicaciones</span></li>
+                            <li class="breadcrumb-item"><a class="breadcrumb-link" href="{{ route('home') }}">Mantenimiento</a></li>
                             <li class="breadcrumb-item active" aria-current="page">Municipios</li>
                         </ol>
                     </nav>
@@ -119,16 +118,16 @@
                     <div class="dropdown">
                         <button type="button" class="btn btn-white btn-sm dropdown-toggle w-100"
                             id="municipalitiesExportDropdown" data-bs-toggle="dropdown" aria-expanded="false">
-                            <i class="bi-download me-2"></i> Export
+                            <i class="bi-download me-2"></i> Exportar
                         </button>
                         <div class="dropdown-menu dropdown-menu-sm-end" aria-labelledby="municipalitiesExportDropdown">
-                            <span class="dropdown-header">Options</span>
+                            <span class="dropdown-header">Opciones</span>
                             <a id="export-print" class="dropdown-item" href="javascript:;">
                                 <img class="avatar avatar-xss avatar-4x3 me-2"
-                                    src="{{ asset('svg/illustrations/print-icon.svg') }}" alt="Print"> Print
+                                    src="{{ asset('svg/illustrations/print-icon.svg') }}" alt="Imprimir"> Imprimir
                             </a>
                             <div class="dropdown-divider"></div>
-                            <span class="dropdown-header">Download options</span>
+                            <span class="dropdown-header">Opciones de descarga</span>
                             <a id="export-excel" class="dropdown-item" href="javascript:;">
                                 <img class="avatar avatar-xss avatar-4x3 me-2"
                                     src="{{ asset('svg/brands/excel-icon.svg') }}" alt="Excel"> Excel
@@ -145,14 +144,14 @@
                     </div>
 
                     @php
-                        $activeFilters = count(array_filter(request()->only(['search', 'country_id', 'department_id', 'status'])));
+                        $activeFilters = count(array_filter(request()->only(['country_id', 'department_id', 'status'])));
                     @endphp
                     <div class="dropdown">
                         <button type="button" class="btn btn-white btn-sm w-100" id="municipalitiesFilterDropdown"
                             data-bs-toggle="dropdown" data-bs-auto-close="outside" aria-expanded="false">
-                            <i class="bi-filter me-1"></i> Filtrar
+                            <i class="bi-filter" style="font-style: normal;"> Filtrar </i>
                             @if($activeFilters > 0)
-                                <span class="badge bg-soft-info text-info rounded-circle ms-1">{{ $activeFilters }}</span>
+                                <span class="badge bg-soft-dark text-dark rounded-circle ms-1">{{ $activeFilters }}</span>
                             @endif
                         </button>
                         <div class="dropdown-menu dropdown-menu-sm-end dropdown-card card-dropdown-filter-centered"
@@ -160,9 +159,6 @@
                             <div class="card">
                                 <div class="card-header card-header-content-between">
                                     <h5 class="card-header-title">Filtrar municipios</h5>
-                                    <button type="button" class="btn btn-ghost-secondary btn-icon btn-sm ms-2">
-                                        <i class="bi-x-lg"></i>
-                                    </button>
                                 </div>
                                 <div class="card-body">
                                     <form action="{{ route('municipalities.index') }}" method="GET">
@@ -172,18 +168,18 @@
                                             value="{{ request('per_page') }}"> @endif
 
                                         <div class="row">
-                                            <div class="col-sm mb-4">
+                                            <div class="col-12 mb-4">
                                                 <small class="text-cap text-body">País</small>
                                                 <div class="tom-select-custom">
                                                     <select name="country_id"
                                                         class="js-select form-select form-select-sm"
                                                         data-hs-tom-select-options='{
-                                                                "placeholder": "Cualquier país",
+                                                                "placeholder": "Todos",
                                                                 "searchInDropdown": false,
                                                                 "hideSearch": true,
                                                                 "dropdownWidth": "10rem"
-                                                            }' onchange="this.form.submit()">
-                                                        <option value="">Cualquier país</option>
+                                                            }'>
+                                                        <option value="">Todos</option>
                                                         @foreach ($countries as $country)
                                                         <option value="{{ $country->id }}" {{
                                                             request('country_id')==$country->id ? 'selected' : '' }}>
@@ -193,19 +189,18 @@
                                                     </select>
                                                 </div>
                                             </div>
-                                            <div class="col-sm mb-4">
+                                            <div class="col-12 mb-4">
                                                 <small class="text-cap text-body">Departamento</small>
                                                 <div class="tom-select-custom">
                                                     <select name="department_id"
                                                         class="js-select form-select form-select-sm"
-                                                        onchange="this.form.submit()"
                                                         data-hs-tom-select-options='{
-                                                                "placeholder": "Cualquier depto.",
+                                                                "placeholder": "Todos",
                                                                 "searchInDropdown": false,
                                                                 "hideSearch": true,
                                                                 "dropdownWidth": "10rem"
                                                             }'>
-                                                        <option value="">Cualquier departamento</option>
+                                                        <option value="">Todos</option>
                                                         @foreach ($departments as $dept)
                                                         <option value="{{ $dept->id }}" {{
                                                             request('department_id')==$dept->id ? 'selected' : '' }}>
@@ -217,11 +212,10 @@
                                             </div>
                                         </div>
                                         <div class="row">
-                                            <div class="col-sm mb-4">
+                                            <div class="col-12 mb-4">
                                                 <small class="text-cap text-body">Estado</small>
                                                 <div class="tom-select-custom">
                                                     <select name="status" class="js-select form-select form-select-sm"
-                                                        onchange="this.form.submit()"
                                                         data-hs-tom-select-options='{
                                                                 "searchInDropdown": false,
                                                                 "hideSearch": true,
@@ -322,7 +316,7 @@
 
                                     @if ($municipality->is_active)
                                     <form action="{{ route('municipalities.destroy', $municipality->id) }}"
-                                        method="POST" class="requires-confirmation" data-message="¿Desactivar el municipio {{ addslashes($municipality->name) }}?">
+                                        method="POST">
                                         @csrf
                                         @method('DELETE')
                                         <button type="submit" class="btn btn-white btn-sm" title="Desactivar">
@@ -331,7 +325,7 @@
                                     </form>
                                     @else
                                     <form action="{{ route('municipalities.restore', $municipality->id) }}"
-                                        method="POST" class="requires-confirmation" data-message="¿Reactivar el municipio {{ addslashes($municipality->name) }}?">
+                                        method="POST">
                                         @csrf
                                         <button type="submit" class="btn btn-white btn-sm" title="Reactivar">
                                             <i class="bi-arrow-counterclockwise"></i>
@@ -514,20 +508,16 @@
         const bulkDeleteBtn = document.getElementById('bulk-delete');
         if (bulkDeleteBtn) {
             bulkDeleteBtn.addEventListener('click', function() {
-                if (confirm('¿Estás seguro de que deseas eliminar los municipios seleccionados? Se desactivarán.')) {
-                    sendBulkRequest('{{ route("municipalities.destroy-multiple") }}');
-                    sessionStorage.removeItem(storageKey);
-                }
+                sendBulkRequest('{{ route("municipalities.destroy-multiple") }}');
+                sessionStorage.removeItem(storageKey);
             });
         }
 
         const bulkRestoreBtn = document.getElementById('bulk-restore');
         if (bulkRestoreBtn) {
             bulkRestoreBtn.addEventListener('click', function() {
-                if (confirm('¿Estás seguro de que deseas reactivar los municipios seleccionados? Se reactivarán.')) {
-                    sendBulkRequest('{{ route("municipalities.restore-multiple") }}');
-                    sessionStorage.removeItem(storageKey);
-                }
+                sendBulkRequest('{{ route("municipalities.restore-multiple") }}');
+                sessionStorage.removeItem(storageKey);
             });
         }
 

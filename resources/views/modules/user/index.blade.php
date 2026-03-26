@@ -106,63 +106,65 @@
                     <div class="dropdown">
                         <button type="button" class="btn btn-white btn-sm dropdown-toggle w-100"
                             id="usersExportDropdown" data-bs-toggle="dropdown" aria-expanded="false">
-                            <i class="bi-download me-2"></i> Export
+                            <i class="bi-download me-2"></i> Exportar
                         </button>
 
                         <div class="dropdown-menu dropdown-menu-sm-end" aria-labelledby="usersExportDropdown">
-                            <span class="dropdown-header">Options</span>
+                            <span class="dropdown-header">Opciones</span>
                             <a id="export-copy" class="dropdown-item" href="javascript:;">
                                 <img class="avatar avatar-xss avatar-4x3 me-2"
-                                    src="{{ asset('svg/illustrations/copy-icon.svg') }}" alt="Image Description">
-                                Copy
+                                    src="{{ asset('svg/illustrations/copy-icon.svg') }}" alt="Copiar">
+                                Copiar
                             </a>
                             <a id="export-print" class="dropdown-item" href="javascript:;">
                                 <img class="avatar avatar-xss avatar-4x3 me-2"
-                                    src="{{ asset('svg/illustrations/print-icon.svg') }}" alt="Image Description">
-                                Print
+                                    src="{{ asset('svg/illustrations/print-icon.svg') }}" alt="Imprimir">
+                                Imprimir
                             </a>
                             <div class="dropdown-divider"></div>
-                            <span class="dropdown-header">Download options</span>
+                            <span class="dropdown-header">Opciones de descarga</span>
                             <a id="export-excel" class="dropdown-item" href="javascript:;">
                                 <img class="avatar avatar-xss avatar-4x3 me-2"
-                                    src="{{ asset('svg/brands/excel-icon.svg') }}" alt="Image Description">
+                                    src="{{ asset('svg/brands/excel-icon.svg') }}" alt="Excel">
                                 Excel
                             </a>
                             <a id="export-csv" class="dropdown-item" href="javascript:;">
                                 <img class="avatar avatar-xss avatar-4x3 me-2"
                                     src="{{ asset('svg/components/placeholder-csv-format.svg') }}"
-                                    alt="Image Description">
+                                    alt="CSV">
                                 .CSV
                             </a>
                             <a id="export-pdf" class="dropdown-item" href="javascript:;">
                                 <img class="avatar avatar-xss avatar-4x3 me-2"
-                                    src="{{ asset('svg/brands/pdf-icon.svg') }}" alt="Image Description">
+                                    src="{{ asset('svg/brands/pdf-icon.svg') }}" alt="PDF">
                                 PDF
                             </a>
                         </div>
                     </div>
 
+                    @php
+                        $activeFilters = count(array_filter(request()->only(['status'])));
+                    @endphp
                     <div class="dropdown">
                         <button type="button" class="btn btn-white btn-sm w-100" id="usersFilterDropdown"
                             data-bs-toggle="dropdown" data-bs-auto-close="outside" aria-expanded="false">
-                            <i class="bi-filter me-1"></i> Filter <span
-                                class="badge bg-soft-dark text-dark rounded-circle ms-1">2</span>
+                            <i class="bi-filter" style="font-style: normal;"> Filtrar </i>
+                            @if($activeFilters > 0)
+                                <span class="badge bg-soft-dark text-dark rounded-circle ms-1">{{ $activeFilters }}</span>
+                            @endif
                         </button>
 
                         <div class="dropdown-menu dropdown-menu-sm-end dropdown-card card-dropdown-filter-centered"
                             aria-labelledby="usersFilterDropdown" style="min-width: 22rem;">
                             <div class="card">
                                 <div class="card-header card-header-content-between">
-                                    <h5 class="card-header-title">Filter users</h5>
-                                    <button type="button" class="btn btn-ghost-secondary btn-icon btn-sm ms-2">
-                                        <i class="bi-x-lg"></i>
-                                    </button>
+                                    <h5 class="card-header-title">Filtrar usuarios</h5>
                                 </div>
 
                                 <div class="card-body">
                                     <form>
                                         <div class="mb-4">
-                                            <small class="text-cap text-body">Role</small>
+                                            <small class="text-cap text-body">Rol</small>
 
                                             <div class="row">
                                                 <div class="col">
@@ -170,7 +172,7 @@
                                                         <input class="form-check-input" type="checkbox" value=""
                                                             id="usersFilterCheckAll" checked>
                                                         <label class="form-check-label" for="usersFilterCheckAll">
-                                                            All
+                                                            Todos
                                                         </label>
                                                     </div>
                                                 </div>
@@ -180,7 +182,7 @@
                                                         <input class="form-check-input" type="checkbox" value=""
                                                             id="usersFilterCheckEmployee">
                                                         <label class="form-check-label" for="usersFilterCheckEmployee">
-                                                            Employee
+                                                            Empleado
                                                         </label>
                                                     </div>
                                                 </div>
@@ -189,18 +191,18 @@
 
                                         <div class="row">
                                             <div class="col-sm mb-4">
-                                                <small class="text-cap text-body">Position</small>
+                                                <small class="text-cap text-body">Posición</small>
 
                                                 <div class="tom-select-custom">
                                                     <select
                                                         class="js-select js-datatable-filter form-select form-select-sm"
                                                         data-target-column-index="2" data-hs-tom-select-options='{
-                                      "placeholder": "Any",
+                                      "placeholder": "Cualquiera",
                                       "searchInDropdown": false,
                                       "hideSearch": true,
                                       "dropdownWidth": "10rem"
                                     }'>
-                                                        <option value="">Any</option>
+                                                        <option value="">Cualquiera</option>
                                                         <option value="Accountant">Accountant</option>
                                                         <option value="Co-founder">Co-founder</option>
                                                         <option value="Designer">Designer</option>
@@ -217,12 +219,12 @@
                                                     <select
                                                         class="js-select js-datatable-filter form-select form-select-sm"
                                                         data-target-column-index="4" data-hs-tom-select-options='{
-                                      "placeholder": "Any status",
+                                      "placeholder": "Cualquiera status",
                                       "searchInDropdown": false,
                                       "hideSearch": true,
                                       "dropdownWidth": "10rem"
                                     }'>
-                                                        <option value="">Any status</option>
+                                                        <option value="">Cualquiera status</option>
                                                         <option value="Completed"
                                                             data-option-template='<span class="d-flex align-items-center"><span class="legend-indicator bg-success"></span>Completed</span>'>
                                                             Completed</option>
