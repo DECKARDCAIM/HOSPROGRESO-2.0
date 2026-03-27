@@ -154,4 +154,9 @@ class User extends Authenticatable
         // El JavaScript se encargará de ajustar las URLs según el hostname
         return asset($path);
     }
+
+    public function readReleases()
+    {
+        return $this->belongsToMany(Release::class, 'release_user')->withPivot('read_at')->withTimestamps();
+    }
 }

@@ -124,12 +124,25 @@
     </div>
 </div>
 
+{{-- Audio para notificaciones --}}
+<audio id="notification-bell" preload="auto">
+    <source src="{{ asset('sound/notification.wav') }}" type="audio/wav">
+</audio>
+
 <script>
     document.addEventListener('DOMContentLoaded', function () {
         // --- GLOBAL TOAST FUNCTION ---
-        window.showToast = function(title, message, type = 'info') {
+        window.showToast = function(title, message, type = 'info', sticky = false, playSound = false) {
             const container = document.querySelector('.toast-container');
             if (!container) return;
+
+            if (playSound) {
+                const bell = document.getElementById('notification-bell');
+                if (bell) {
+                    bell.currentTime = 0;
+                    bell.play().catch(e => console.log("Audio play blocked by browser. Interaction required."));
+                }
+            }
 
             const toastId = 'toast-' + Math.random().toString(36).substr(2, 9);
             const iconMap = {
@@ -153,54 +166,63 @@
                     <button type="button" class="toast-close-btn" data-bs-dismiss="toast" aria-label="Close">
                         <i class="bi-x-lg"></i>
                     </button>
-                    <div class="toast-progress"></div>
+                    ${!sticky ? '<div class="toast-progress"></div>' : ''}
                 </div>
             `;
 
             container.insertAdjacentHTML('beforeend', toastHTML);
             const toastEl = document.getElementById(toastId);
-            const progressEl = toastEl.querySelector('.toast-progress');
             
             // Forzar reflow para la animación de entrada
             setTimeout(() => toastEl.classList.add('force-show'), 10);
 
             const DURATION = 8000;
-            const bsToast = new bootstrap.Toast(toastEl, { delay: DURATION, autohide: true });
+            const bsToast = new bootstrap.Toast(toastEl, { 
+                delay: DURATION, 
+                autohide: !sticky 
+            });
             bsToast.show();
 
-            // Progress Bar Logic
-            let remaining = DURATION;
-            let lastTime = performance.now();
-            let isPaused = false;
-            let animationFrameId;
+            if (!sticky) {
+                const progressEl = toastEl.querySelector('.toast-progress');
+                // Progress Bar Logic
+                let remaining = DURATION;
+                let lastTime = performance.now();
+                let isPaused = false;
+                let animationFrameId;
 
-            function updateProgress(currentTime) {
-                if (!isPaused) {
-                    const delta = currentTime - lastTime;
-                    remaining -= delta;
-                    let pct = Math.max(0, remaining / DURATION);
-                    progressEl.style.transform = `scaleX(${pct})`;
-                    if (remaining <= 0) {
-                        toastEl.classList.remove('force-show');
-                        return;
+                function updateProgress(currentTime) {
+                    if (!isPaused) {
+                        const delta = currentTime - lastTime;
+                        remaining -= delta;
+                        let pct = Math.max(0, remaining / DURATION);
+                        if (progressEl) progressEl.style.transform = `scaleX(${pct})`;
+                        if (remaining <= 0) {
+                            toastEl.classList.remove('force-show');
+                            return;
+                        }
                     }
+                    lastTime = currentTime;
+                    animationFrameId = requestAnimationFrame(updateProgress);
                 }
-                lastTime = currentTime;
+
                 animationFrameId = requestAnimationFrame(updateProgress);
+
+                toastEl.addEventListener('mouseenter', () => { isPaused = true; });
+                toastEl.addEventListener('mouseleave', () => { 
+                    isPaused = false; 
+                    lastTime = performance.now(); 
+                });
+                
+                toastEl.addEventListener('hidden.bs.toast', () => {
+                    cancelAnimationFrame(animationFrameId);
+                    toastEl.remove();
+                });
+            } else {
+                toastEl.addEventListener('hidden.bs.toast', () => {
+                    toastEl.remove();
+                });
             }
-
-            animationFrameId = requestAnimationFrame(updateProgress);
-
-            toastEl.addEventListener('mouseenter', () => { isPaused = true; });
-            toastEl.addEventListener('mouseleave', () => { 
-                isPaused = false; 
-                lastTime = performance.now(); 
-            });
-            
-            toastEl.addEventListener('hidden.bs.toast', () => {
-                cancelAnimationFrame(animationFrameId);
-                toastEl.remove();
-            });
         };
 
         // --- SESSION TIMEOUT LOGIC ---
@@ -299,14 +321,52 @@
                     $finalType = 'warning'; $title = 'Aviso';
                 }
             @endphp
-            window.showToast('{{ $title }}', '{{ $notif['message'] }}', '{{ $finalType }}');
+            window.showToast('{{ $title }}', '{{ $notif['message'] }}', '{{ $finalType }}', true, true);
         @endif
 
         @if($errors->any())
             @foreach($errors->all() as $error)
-                window.showToast('Atención', '{{ $error }}', 'warning');
+                window.showToast('Atención', '{{ $error }}', 'warning', true, true);
             @endforeach
         @endif
+
+        // --- REAL-TIME POLLING FOR NOTIFICATIONS ---
+        let lastNotificationCheck = "2000-01-01 00:00:00"; 
+        let isFirstPoll = true;
+
+        function pollNotifications() {
+            $.get("{{ route('releases.get-unread') }}", { since: lastNotificationCheck }, function(data) {
+                if (data.notifications && data.notifications.length > 0) {
+                    if (isFirstPoll) {
+                        window.showToast('Nuevos Comunicados', 'Tienes mensajes nuevos sin leer en tu bandeja. Por favor, revísalos.', 'info', true, true);
+                        isFirstPoll = false;
+                    }
+
+                    data.notifications.forEach(notif => {
+                        window.showToast(notif.title, notif.message, notif.type, true, true);
+                    });
+                    
+                    if (window.refreshNotificationDropdown) {
+                        window.refreshNotificationDropdown();
+                    }
+                } else {
+                    isFirstPoll = false;
+                }
+                
+                if (data.server_time) {
+                    lastNotificationCheck = data.server_time;
+                }
+            }).fail(function(xhr, status, error) {
+                console.error("Notification poll failed:", error);
+                isFirstPoll = false;
+            });
+        }
+
+        // Poll inicial después de 1 segundo
+        setTimeout(pollNotifications, 1000);
+
+        // Iniciar polling regular cada 30 segundos
+        setInterval(pollNotifications, 30000);
     });
 </script>
 @endauth

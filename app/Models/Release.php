@@ -33,4 +33,9 @@ class Release extends Model
     {
         return $query->where('status', 'published');
     }
+
+    public function readByUsers()
+    {
+        return $this->belongsToMany(User::class, 'release_user')->withPivot('read_at')->withTimestamps();
+    }
 }

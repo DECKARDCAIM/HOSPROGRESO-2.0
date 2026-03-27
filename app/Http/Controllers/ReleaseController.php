@@ -137,4 +137,72 @@ class ReleaseController extends Controller
         $release->delete();
         return redirect()->route('releases.index')->with('success', 'Comunicado eliminado exitosamente.');
     }
+
+    /**
+     * Mark a release as read for the current user.
+     */
+    public function markAsRead(Request $request, $id)
+    {
+        $user = auth()->user();
+        $user->readReleases()->syncWithoutDetaching([
+            $id => ['read_at' => now()]
+        ]);
+
+        return response()->json(['success' => true]);
+    }
+
+    /**
+     * Mark all releases as read for the current user.
+     */
+    public function markAllAsRead()
+    {
+        $user = auth()->user();
+        $unreadReleases = Release::published()
+            ->where('published_at', '<=', now())
+            ->whereDoesntHave('readByUsers', function ($query) use ($user) {
+                $query->where('user_id', $user->id);
+            })
+            ->get();
+
+        foreach ($unreadReleases as $release) {
+            $user->readReleases()->syncWithoutDetaching([
+                $release->id => ['read_at' => now()]
+            ]);
+        }
+
+        return response()->json(['success' => true]);
+    }
+
+    /**
+     * Get unread notifications since a specific time.
+     */
+    public function getUnread(Request $request)
+    {
+        $user = auth()->user();
+        $sinceParam = $request->input('since');
+        $since = $sinceParam ? \Carbon\Carbon::parse($sinceParam) : now()->subMinutes(1);
+
+        $unread = Release::published()
+            ->with('author')
+            ->where('published_at', '>', $since)
+            ->whereDoesntHave('readByUsers', function ($query) use ($user) {
+                $query->where('user_id', $user->id);
+            })
+            ->latest('published_at')
+            ->get();
+
+        return response()->json([
+            'notifications' => $unread->map(function($notif) {
+                return [
+                    'id' => $notif->id,
+                    'title' => $notif->title,
+                    'message' => strip_tags($notif->content),
+                    'type' => $notif->type === 'actualizacion' ? 'info' : 'success',
+                    'author' => $notif->author ? $notif->author->first_name : 'Sistema',
+                    'published_at' => $notif->published_at->toDateTimeString()
+                ];
+            }),
+            'server_time' => now()->toDateTimeString()
+        ]);
+    }
 }
