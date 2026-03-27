@@ -100,7 +100,7 @@ class UserController extends Controller
         $activeUsers = \App\Models\User::where('is_active', true)->count();
         $inactiveUsers = \App\Models\User::where('is_active', false)->count();
 
-        return view('modules.user.index', compact(
+        return view('modules.administration.user.index', compact(
             'users', 'totalUsers', 'activeUsers', 'inactiveUsers',
             'roles', 'workDepartments', 'specialties', 'countries', 'departments', 'municipalities'
         ));
@@ -222,7 +222,7 @@ class UserController extends Controller
             ->limit(10)
             ->get();
 
-        return view('modules.users.profile', compact('user', 'departamentMembers'));
+        return view('modules.administration.user.profile', compact('user', 'departamentMembers'));
     }
 
     public function create()
@@ -234,7 +234,7 @@ class UserController extends Controller
         $unityExecutions = \App\Models\UnityExecution::orderBy('name')->get();
         $workDepartments = \App\Models\WorkDepartment::orderBy('name')->get();
 
-        return view('modules.user.create', compact(
+        return view('modules.administration.user.create', compact(
             'roles', 'schedules', 'countries', 'specialties', 'unityExecutions', 'workDepartments'
         ));
     }
@@ -321,7 +321,7 @@ class UserController extends Controller
             ? Municipality::where('department_id', $user->department_id)->where('is_active', true)->orderBy('name')->get()
             : collect();
 
-        return view('modules.user.edit', compact(
+        return view('modules.administration.user.edit', compact(
             'user', 'roles', 'schedules', 'countries', 'departments', 'municipalities',
             'specialties', 'unityExecutions', 'workDepartments'
         ));

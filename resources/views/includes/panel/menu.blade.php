@@ -152,6 +152,7 @@
                         <div id="navbarVerticalMenuAdministracion" class="nav-collapse collapse"
                             data-bs-parent="#navbarVerticalMenu">
                             <a class="nav-link" href="{{ route('users.index') }}">Usuarios</a>
+                            <a class="nav-link" href="{{ route('releases.index') }}">Comunicados</a>
                         </div>
                     </div>
 

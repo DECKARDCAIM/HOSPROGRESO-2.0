@@ -19,6 +19,7 @@ use App\Http\Controllers\LinguisticCommunityController;
 use App\Http\Controllers\DisabilityController;
 use App\Http\Controllers\ScheduleController;
 use App\Http\Controllers\SpecialtyController;
+use App\Http\Controllers\ReleaseController;
 
 Route::get('/', function () {
     if (Auth::check()) {
@@ -109,8 +110,15 @@ Route::middleware(['auth', 'PreventBackHistory'])->group(function () {
     Route::post('/patients/{id}/restore', [PatientController::class , 'restore'])->name('patients.restore');
 
 
-    Route::resource('users', UserController::class);
-    Route::post('/users/{id}/restore', [UserController::class, 'restore'])->name('users.restore');
+    // ==========================================
+    // MÓDULO: ADMINISTRACIÓN (Usuarios, Comunicados)
+    // ==========================================
+    Route::prefix('administration')->group(function () {
+        Route::resource('users', UserController::class);
+        Route::post('/users/{id}/restore', [UserController::class, 'restore'])->name('users.restore');
+        
+        Route::resource('releases', ReleaseController::class);
+    });
 
     // ==========================================
     // MÓDULO: MÉTRICAS
