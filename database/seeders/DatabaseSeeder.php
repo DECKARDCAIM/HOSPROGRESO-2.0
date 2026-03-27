@@ -26,6 +26,8 @@ class DatabaseSeeder extends Seeder
             RelationshipTypeSeeder::class,
             ScheduleSeeder::class,
             SpecialtySeeder::class,
+            AllergySeeder::class,
+            DisabilitySeeder::class,
         ]);
 
         $roleId = \App\Models\Role::where('name', 'Administrador')->first()->id ?? null;

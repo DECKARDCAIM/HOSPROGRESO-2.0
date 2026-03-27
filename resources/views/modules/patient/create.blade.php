@@ -4,29 +4,31 @@
 @section('content')
     <main id="content" role="main" class="main">
         <div class="content container-fluid">
-<!-- Page Header -->
-        <div class="page-header">
-            <div class="row align-items-end">
-                <div class="col-sm mb-2 mb-sm-0">
-                    <nav aria-label="breadcrumb">
-                        <ol class="breadcrumb breadcrumb-no-gutter">
-                            <li class="breadcrumb-item"><a class="breadcrumb-link" href="{{ route('home') }}">Inicio</a></li>
-                            <li class="breadcrumb-item"><a class="breadcrumb-link" href="{{ route('patients.index') }}">Pacientes</a></li>
-                            <li class="breadcrumb-item active" aria-current="page">Crear</li>
-                        </ol>
-                    </nav>
-                    <h1 class="page-header-title">Crear paciente</h1>
-                </div>
-                
-                <div class="col-auto">
+            <!-- Page Header -->
+            <div class="page-header">
+                <div class="row align-items-end">
+                    <div class="col-sm mb-2 mb-sm-0">
+                        <nav aria-label="breadcrumb">
+                            <ol class="breadcrumb breadcrumb-no-gutter">
+                                <li class="breadcrumb-item"><a class="breadcrumb-link" href="{{ route('home') }}">Inicio</a>
+                                </li>
+                                <li class="breadcrumb-item"><a class="breadcrumb-link"
+                                        href="{{ route('patients.index') }}">Pacientes</a></li>
+                                <li class="breadcrumb-item active" aria-current="page">Crear</li>
+                            </ol>
+                        </nav>
+                        <h1 class="page-header-title">Crear paciente</h1>
+                    </div>
+
+                    <div class="col-auto">
                         <a href="{{ route('patients.index') }}" class="btn btn-primary">
                             <i class="bi-arrow-left"></i> Regresar
                         </a>
                     </div>
 
+                </div>
             </div>
-        </div>
-        <!-- End Page Header -->
+            <!-- End Page Header -->
             <form id="addPatientForm" action="{{ route('patients.store') }}" method="POST" class="js-step-form py-md-5"
                 autocomplete="off"
                 data-hs-step-form-options='{"progressSelector": "#addUserStepFormProgress","stepsSelector": "#addUserStepFormContent","endSelector": "#addUserFinishBtn","isValidate": false}'>
@@ -88,8 +90,7 @@
                                         <div class="col-sm-9">
                                             <div class="input-group input-group-sm-vertical">
                                                 <input type="text" class="form-control bg-light"
-                                                    value="Generado automáticamente al guardar (EXP-AÑO-MES-CORRELATIVO)"
-                                                    readonly disabled>
+                                                    value="Generado automáticamente" readonly disabled>
                                             </div>
                                         </div>
                                     </div>
@@ -121,7 +122,8 @@
                                     </div>
 
                                     <div class="row mb-4">
-                                        <label for="firstLastNameLabel" class="col-sm-3 col-form-label form-label">Apellidos
+                                        <label for="firstLastNameLabel"
+                                            class="col-sm-3 col-form-label form-label">Apellidos
                                             <i class="bi-question-circle text-body ms-1" data-bs-toggle="tooltip"
                                                 data-bs-placement="top"
                                                 title="Rellene los apellidos del paciente"></i></label>
@@ -311,6 +313,74 @@
 
                                         </div>
 
+                                    </div>
+
+                                    <div class="row mb-4">
+                                        <div class="col-sm-12">
+                                            <hr>
+                                        </div>
+                                    </div>
+
+                                    {{-- Alergias --}}
+                                    <div class="row mb-3">
+                                        <label class="col-sm-3 col-form-label form-label">
+                                            Alergias <span class="form-label-secondary">(Opcional)</span>
+                                        </label>
+                                        <div class="col-sm-9">
+                                            @if($allergies->isEmpty())
+                                                <p class="text-muted small">No hay alergias registradas en el catálogo.</p>
+                                            @else
+                                                <div class="row g-2" id="allergiesCheckboxGroup">
+                                                    @foreach($allergies as $allergy)
+                                                        <div class="col-md-4 col-6">
+                                                            <div class="form-check">
+                                                                <input class="form-check-input allergy-check" type="checkbox"
+                                                                    name="allergies[]" value="{{ $allergy->id }}"
+                                                                    id="allergy_{{ $allergy->id }}"
+                                                                    data-label="{{ $allergy->name }}">
+                                                                <label class="form-check-label small" for="allergy_{{ $allergy->id }}">
+                                                                    {{ $allergy->name }}
+                                                                </label>
+                                                            </div>
+                                                        </div>
+                                                    @endforeach
+                                                </div>
+                                            @endif
+                                        </div>
+                                    </div>
+
+                                    <div class="row mb-4">
+                                        <div class="col-sm-12">
+                                            <hr>
+                                        </div>
+                                    </div>
+
+                                    {{-- Discapacidades --}}
+                                    <div class="row mb-4">
+                                        <label class="col-sm-3 col-form-label form-label">
+                                            Discapacidades <span class="form-label-secondary">(Opcional)</span>
+                                        </label>
+                                        <div class="col-sm-9">
+                                            @if($disabilities->isEmpty())
+                                                <p class="text-muted small">No hay discapacidades registradas en el catálogo.</p>
+                                            @else
+                                                <div class="row g-2" id="disabilitiesCheckboxGroup">
+                                                    @foreach($disabilities as $disability)
+                                                        <div class="col-md-4 col-6">
+                                                            <div class="form-check">
+                                                                <input class="form-check-input disability-check" type="checkbox"
+                                                                    name="disabilities[]" value="{{ $disability->id }}"
+                                                                    id="disability_{{ $disability->id }}"
+                                                                    data-label="{{ $disability->name }}">
+                                                                <label class="form-check-label small" for="disability_{{ $disability->id }}">
+                                                                    {{ $disability->name }}
+                                                                </label>
+                                                            </div>
+                                                        </div>
+                                                    @endforeach
+                                                </div>
+                                            @endif
+                                        </div>
                                     </div>
 
                                     <div class="card-footer d-flex justify-content-end align-items-center">
@@ -509,14 +579,16 @@
                                 <!-- Profile Cover -->
                                 <div class="profile-cover">
                                     <div class="profile-cover-img-wrapper">
-                                        <img class="profile-cover-img" src="{{ asset('img/1920x400/img1.jpg') }}" alt="Portada">
+                                        <img class="profile-cover-img" src="{{ asset('img/1920x400/img1.jpg') }}"
+                                            alt="Portada">
                                     </div>
                                 </div>
                                 <!-- End Profile Cover -->
 
                                 <!-- Avatar -->
                                 <label class="avatar avatar-xxl avatar-circle avatar-border-lg profile-cover-avatar">
-                                    <img id="confirmAvatarImg" class="avatar-img" src="{{ asset('img/160x160/img1.jpg') }}" alt="Avatar">
+                                    <img id="confirmAvatarImg" class="avatar-img"
+                                        src="{{ asset('img/160x160/img1.jpg') }}" alt="Avatar">
                                 </label>
                                 <!-- End Avatar -->
 
@@ -525,10 +597,15 @@
                                     <dl class="row">
 
                                         <dt class="col-sm-6 text-sm-end">Expediente Clínico:</dt>
-                                        <dd class="col-sm-6" id="confirm-expediente"><em class="text-muted">Se generará al guardar</em></dd>
+                                        <dd class="col-sm-6" id="confirm-expediente"><em class="text-muted">Se generará
+                                                al guardar</em></dd>
 
-                                        <dt class="col-sm-6 text-sm-end"><hr class="my-2 w-100"></dt>
-                                        <dd class="col-sm-6"><hr class="my-2 w-100"></dd>
+                                        <dt class="col-sm-6 text-sm-end">
+                                            <hr class="my-2 w-100">
+                                        </dt>
+                                        <dd class="col-sm-6">
+                                            <hr class="my-2 w-100">
+                                        </dd>
 
                                         <dt class="col-sm-6 text-sm-end">Primer nombre:</dt>
                                         <dd class="col-sm-6" id="confirm-firstName">—</dd>
@@ -548,8 +625,12 @@
                                         <dt class="col-sm-6 text-sm-end">Apellido de casada:</dt>
                                         <dd class="col-sm-6" id="confirm-marriedLastName">—</dd>
 
-                                        <dt class="col-sm-6 text-sm-end"><hr class="my-2 w-100"></dt>
-                                        <dd class="col-sm-6"><hr class="my-2 w-100"></dd>
+                                        <dt class="col-sm-6 text-sm-end">
+                                            <hr class="my-2 w-100">
+                                        </dt>
+                                        <dd class="col-sm-6">
+                                            <hr class="my-2 w-100">
+                                        </dd>
 
                                         <dt class="col-sm-6 text-sm-end">DPI:</dt>
                                         <dd class="col-sm-6" id="confirm-dpi">—</dd>
@@ -575,8 +656,12 @@
                                         <dt class="col-sm-6 text-sm-end">Ocupación:</dt>
                                         <dd class="col-sm-6" id="confirm-occupation">—</dd>
 
-                                        <dt class="col-sm-6 text-sm-end"><hr class="my-2 w-100"></dt>
-                                        <dd class="col-sm-6"><hr class="my-2 w-100"></dd>
+                                        <dt class="col-sm-6 text-sm-end">
+                                            <hr class="my-2 w-100">
+                                        </dt>
+                                        <dd class="col-sm-6">
+                                            <hr class="my-2 w-100">
+                                        </dd>
 
                                         <dt class="col-sm-6 text-sm-end">Correo electrónico:</dt>
                                         <dd class="col-sm-6" id="confirm-email">—</dd>
@@ -584,8 +669,12 @@
                                         <dt class="col-sm-6 text-sm-end">Teléfono:</dt>
                                         <dd class="col-sm-6" id="confirm-phone">—</dd>
 
-                                        <dt class="col-sm-6 text-sm-end"><hr class="my-2 w-100"></dt>
-                                        <dd class="col-sm-6"><hr class="my-2 w-100"></dd>
+                                        <dt class="col-sm-6 text-sm-end">
+                                            <hr class="my-2 w-100">
+                                        </dt>
+                                        <dd class="col-sm-6">
+                                            <hr class="my-2 w-100">
+                                        </dd>
 
                                         <dt class="col-sm-6 text-sm-end">País:</dt>
                                         <dd class="col-sm-6" id="confirm-country">—</dd>
@@ -598,6 +687,18 @@
 
                                         <dt class="col-sm-6 text-sm-end">Dirección:</dt>
                                         <dd class="col-sm-6" id="confirm-place">—</dd>
+
+                                        <dt class="col-sm-6 text-sm-end"><hr class="my-2 w-100"></dt>
+                                        <dd class="col-sm-6"><hr class="my-2 w-100"></dd>
+
+                                        <dt class="col-sm-6 text-sm-end">Alergias:</dt>
+                                        <dd class="col-sm-6" id="confirm-allergies">—</dd>
+
+                                        <dt class="col-sm-6 text-sm-end"><hr class="my-2 w-100"></dt>
+                                        <dd class="col-sm-6"><hr class="my-2 w-100"></dd>
+
+                                        <dt class="col-sm-6 text-sm-end">Discapacidades:</dt>
+                                        <dd class="col-sm-6" id="confirm-disabilities">—</dd>
 
                                     </dl>
                                 </div>
@@ -685,10 +786,12 @@
 
                 // Logic for auto-filling the confirmation step
                 function updateConfirmationStep() {
-                    const getVal = (id) => document.getElementById(id) ? document.getElementById(id).value.trim() : '';
+                    const getVal = (id) => document.getElementById(id) ? document.getElementById(id).value.trim() :
+                        '';
                     const getText = (id) => {
                         const el = document.getElementById(id);
-                        return el && el.options && el.selectedIndex >= 0 && el.value !== "" ? el.options[el.selectedIndex].text : '';
+                        return el && el.options && el.selectedIndex >= 0 && el.value !== "" ? el.options[el
+                            .selectedIndex].text : '';
                     };
                     const setEl = (id, val) => {
                         const el = document.getElementById(id);
@@ -701,26 +804,35 @@
                         }
                     };
 
-                    setEl('confirm-firstName',         getVal('firstNameLabel'));
-                    setEl('confirm-secondName',        getVal('secondNameLabel'));
-                    setEl('confirm-thirdName',         getVal('thirdNameLabel'));
-                    setEl('confirm-firstLastName',     getVal('firstLastNameLabel'));
-                    setEl('confirm-secondLastName',    getVal('secondLastNameLabel'));
-                    setEl('confirm-marriedLastName',   getVal('marriedLastNameLabel'));
-                    setEl('confirm-dpi',               getVal('dpiLabel'));
-                    setEl('confirm-birthDate',         getVal('birthDateLabel'));
-                    setEl('confirm-gender',            getText('genderLabel'));
-                    setEl('confirm-civilStatus',       getText('civilStatusLabel'));
-                    setEl('confirm-ethnicity',         getText('ethnicityLabel'));
+                    setEl('confirm-firstName', getVal('firstNameLabel'));
+                    setEl('confirm-secondName', getVal('secondNameLabel'));
+                    setEl('confirm-thirdName', getVal('thirdNameLabel'));
+                    setEl('confirm-firstLastName', getVal('firstLastNameLabel'));
+                    setEl('confirm-secondLastName', getVal('secondLastNameLabel'));
+                    setEl('confirm-marriedLastName', getVal('marriedLastNameLabel'));
+                    setEl('confirm-dpi', getVal('dpiLabel'));
+                    setEl('confirm-birthDate', getVal('birthDateLabel'));
+                    setEl('confirm-gender', getText('genderLabel'));
+                    setEl('confirm-civilStatus', getText('civilStatusLabel'));
+                    setEl('confirm-ethnicity', getText('ethnicityLabel'));
                     setEl('confirm-linguisticCommunity', getText('linguisticCommunityLabel'));
-                    setEl('confirm-education',         getText('educationLabel'));
-                    setEl('confirm-occupation',        getVal('occupationLabel'));
-                    setEl('confirm-email',             getVal('emailLabel'));
-                    setEl('confirm-phone',             getVal('phoneLabel'));
-                    setEl('confirm-country',           getText('countryLabel'));
-                    setEl('confirm-department',        getText('departmentLabel'));
-                    setEl('confirm-municipality',      getText('municipalityLabel'));
-                    setEl('confirm-place',             getVal('placeLabel'));
+                    setEl('confirm-education', getText('educationLabel'));
+                    setEl('confirm-occupation', getVal('occupationLabel'));
+                    setEl('confirm-email', getVal('emailLabel'));
+                    setEl('confirm-phone', getVal('phoneLabel'));
+                    setEl('confirm-country', getText('countryLabel'));
+                    setEl('confirm-department', getText('departmentLabel'));
+                    setEl('confirm-municipality', getText('municipalityLabel'));
+                    setEl('confirm-place', getVal('placeLabel'));
+
+                    // Alergias & discapacidades
+                    const getCheckedLabels = (selector) => {
+                        const labels = [];
+                        document.querySelectorAll(selector + ':checked').forEach(cb => labels.push(cb.dataset.label));
+                        return labels.join(', ');
+                    };
+                    setEl('confirm-allergies',   getCheckedLabels('.allergy-check'));
+                    setEl('confirm-disabilities', getCheckedLabels('.disability-check'));
                 }
 
 

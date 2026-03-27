@@ -17,6 +17,8 @@ use Carbon\Carbon;
 use Maatwebsite\Excel\Facades\Excel;
 use App\Exports\PatientsExport;
 use App\Models\RelationshipType;
+use App\Models\Allergy;
+use App\Models\Disability;
 
 class PatientController extends Controller
 {
@@ -95,7 +97,6 @@ class PatientController extends Controller
 
         // Estadísticas
         $totalPatients = Patient::count();
-        $todayPatients = Patient::whereDate('created_at', today())->count();
 
         // Estadísticas por género
         $genderStats = Patient::selectRaw('gender_id, COUNT(*) as total')
@@ -146,7 +147,6 @@ class PatientController extends Controller
             'ethnicities',
             'linguisticCommunities',
             'totalPatients',
-            'todayPatients',
             'malePercentage',
             'femalePercentage'
         ));
@@ -168,6 +168,9 @@ class PatientController extends Controller
 
         $relationshipTypes = RelationshipType::where('is_active', true)->orderBy('name')->get();
 
+        $allergies    = Allergy::where('is_active', true)->orderBy('name')->get();
+        $disabilities = Disability::where('is_active', true)->orderBy('name')->get();
+
         return view('modules.patient.create', compact(
             'countries',
             'departments',
@@ -176,7 +179,9 @@ class PatientController extends Controller
             'civilStatuses',
             'ethnicities',
             'linguisticCommunities',
-            'relationshipTypes'
+            'relationshipTypes',
+            'allergies',
+            'disabilities'
         ));
     }
 
@@ -239,6 +244,10 @@ class PatientController extends Controller
                     ]);
                 }
             }
+
+            // Sincronizar alergias y discapacidades (many-to-many)
+            $patient->allergies()->sync($request->input('allergies', []));
+            $patient->disabilities()->sync($request->input('disabilities', []));
         });
 
         $notification = [
@@ -293,6 +302,13 @@ class PatientController extends Controller
 
         $relationshipTypes = RelationshipType::where('is_active', true)->orderBy('name')->get();
 
+        $allergies    = Allergy::where('is_active', true)->orderBy('name')->get();
+        $disabilities = Disability::where('is_active', true)->orderBy('name')->get();
+
+        // IDs ya asignados al paciente (para pre-selección en la vista)
+        $selectedAllergyIds    = $patient->allergies()->pluck('allergies.id')->toArray();
+        $selectedDisabilityIds = $patient->disabilities()->pluck('disabilities.id')->toArray();
+
         return view('modules.patient.edit', compact(
             'patient',
             'countries',
@@ -302,7 +318,11 @@ class PatientController extends Controller
             'civilStatuses',
             'ethnicities',
             'linguisticCommunities',
-            'relationshipTypes'
+            'relationshipTypes',
+            'allergies',
+            'disabilities',
+            'selectedAllergyIds',
+            'selectedDisabilityIds'
         ));
     }
 
@@ -319,6 +339,10 @@ class PatientController extends Controller
         }
 
         $patient->update($validated);
+
+        // Sincronizar alergias y discapacidades (many-to-many)
+        $patient->allergies()->sync($request->input('allergies', []));
+        $patient->disabilities()->sync($request->input('disabilities', []));
 
         $notification = [
             'message' => 'Paciente actualizado exitosamente.',

@@ -97,6 +97,22 @@ class Patient extends Model
         return $this->belongsTo(Municipality::class);
     }
 
+    /**
+     * The allergies associated with the patient.
+     */
+    public function allergies()
+    {
+        return $this->belongsToMany(Allergy::class);
+    }
+
+    /**
+     * The disabilities associated with the patient.
+     */
+    public function disabilities()
+    {
+        return $this->belongsToMany(Disability::class);
+    }
+
     public function getAgeAttribute()
     {
         if (!$this->birth_date) {

@@ -339,6 +339,76 @@
 
                                     </div>
 
+                                    <div class="row mb-4">
+                                        <div class="col-sm-12">
+                                            <hr>
+                                        </div>
+                                    </div>
+
+                                    {{-- Alergias --}}
+                                    <div class="row mb-3">
+                                        <label class="col-sm-3 col-form-label form-label">
+                                            Alergias <span class="form-label-secondary">(Opcional)</span>
+                                        </label>
+                                        <div class="col-sm-9">
+                                            @if($allergies->isEmpty())
+                                                <p class="text-muted small">No hay alergias registradas en el catálogo.</p>
+                                            @else
+                                                <div class="row g-2" id="allergiesCheckboxGroup">
+                                                    @foreach($allergies as $allergy)
+                                                        <div class="col-md-4 col-6">
+                                                            <div class="form-check">
+                                                                <input class="form-check-input allergy-check" type="checkbox"
+                                                                    name="allergies[]" value="{{ $allergy->id }}"
+                                                                    id="allergy_{{ $allergy->id }}"
+                                                                    data-label="{{ $allergy->name }}"
+                                                                    {{ in_array($allergy->id, $selectedAllergyIds) ? 'checked' : '' }}>
+                                                                <label class="form-check-label small" for="allergy_{{ $allergy->id }}">
+                                                                    {{ $allergy->name }}
+                                                                </label>
+                                                            </div>
+                                                        </div>
+                                                    @endforeach
+                                                </div>
+                                            @endif
+                                        </div>
+                                    </div>
+
+                                    <div class="row mb-4">
+                                        <div class="col-sm-12">
+                                            <hr>
+                                        </div>
+                                    </div>
+
+                                    {{-- Discapacidades --}}
+                                    <div class="row mb-4">
+                                        <label class="col-sm-3 col-form-label form-label">
+                                            Discapacidades <span class="form-label-secondary">(Opcional)</span>
+                                        </label>
+                                        <div class="col-sm-9">
+                                            @if($disabilities->isEmpty())
+                                                <p class="text-muted small">No hay discapacidades registradas en el catálogo.</p>
+                                            @else
+                                                <div class="row g-2" id="disabilitiesCheckboxGroup">
+                                                    @foreach($disabilities as $disability)
+                                                        <div class="col-md-4 col-6">
+                                                            <div class="form-check">
+                                                                <input class="form-check-input disability-check" type="checkbox"
+                                                                    name="disabilities[]" value="{{ $disability->id }}"
+                                                                    id="disability_{{ $disability->id }}"
+                                                                    data-label="{{ $disability->name }}"
+                                                                    {{ in_array($disability->id, $selectedDisabilityIds) ? 'checked' : '' }}>
+                                                                <label class="form-check-label small" for="disability_{{ $disability->id }}">
+                                                                    {{ $disability->name }}
+                                                                </label>
+                                                            </div>
+                                                        </div>
+                                                    @endforeach
+                                                </div>
+                                            @endif
+                                        </div>
+                                    </div>
+
                                     <div class="card-footer d-flex justify-content-end align-items-center">
                                         <button type="button" class="btn btn-primary"
                                             data-hs-step-form-next-options='{ "targetSelector": "#addUserStepBillingAddress" }'>
@@ -638,6 +708,18 @@
                                         <dt class="col-sm-6 text-sm-end">Dirección:</dt>
                                         <dd class="col-sm-6" id="confirm-place">—</dd>
 
+                                        <dt class="col-sm-6 text-sm-end"><hr class="my-2 w-100"></dt>
+                                        <dd class="col-sm-6"><hr class="my-2 w-100"></dd>
+
+                                        <dt class="col-sm-6 text-sm-end">Alergias:</dt>
+                                        <dd class="col-sm-6" id="confirm-allergies">—</dd>
+
+                                        <dt class="col-sm-6 text-sm-end"><hr class="my-2 w-100"></dt>
+                                        <dd class="col-sm-6"><hr class="my-2 w-100"></dd>
+
+                                        <dt class="col-sm-6 text-sm-end">Discapacidades:</dt>
+                                        <dd class="col-sm-6" id="confirm-disabilities">—</dd>
+
                                     </dl>
                                 </div>
                                 <!-- End Body -->
@@ -749,6 +831,15 @@
                     setEl('confirm-department',          getText('departmentLabel'));
                     setEl('confirm-municipality',        getText('municipalityLabel'));
                     setEl('confirm-place',               getVal('placeLabel'));
+
+                    // Alergias & discapacidades
+                    const getCheckedLabels = (selector) => {
+                        const labels = [];
+                        document.querySelectorAll(selector + ':checked').forEach(cb => labels.push(cb.dataset.label));
+                        return labels.join(', ');
+                    };
+                    setEl('confirm-allergies',   getCheckedLabels('.allergy-check'));
+                    setEl('confirm-disabilities', getCheckedLabels('.disability-check'));
                 }
 
                 // Run immediately so pre-filled values show on confirm step
