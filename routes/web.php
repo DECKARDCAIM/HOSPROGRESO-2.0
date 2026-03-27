@@ -11,6 +11,14 @@ use App\Http\Controllers\CountryController;
 use App\Http\Controllers\DepartmentController;
 use App\Http\Controllers\MunicipalityController;
 use App\Http\Controllers\MetricsController;
+use App\Http\Controllers\AllergyController;
+use App\Http\Controllers\CivilStatusController;
+use App\Http\Controllers\GenderController;
+use App\Http\Controllers\EthnicityController;
+use App\Http\Controllers\LinguisticCommunityController;
+use App\Http\Controllers\DisabilityController;
+use App\Http\Controllers\ScheduleController;
+use App\Http\Controllers\SpecialtyController;
 
 Route::get('/', function () {
     if (Auth::check()) {
@@ -111,5 +119,109 @@ Route::middleware(['auth', 'PreventBackHistory'])->group(function () {
         Route::get('/system', [MetricsController::class, 'system'])->name('metrics.system.index');
         Route::get('/system/expand/{chart}', [MetricsController::class, 'expandSystem'])->name('metrics.system.expand');
     });
+
+    // ==========================================
+    // MÓDULO: CATÁLOGOS DE PACIENTES
+    // ==========================================
+
+    // Alergias
+    Route::controller(AllergyController::class)->prefix('allergies')->name('allergies.')->group(function () {
+        Route::post('export/excel', 'exportExcel')->name('export.excel');
+        Route::post('export/csv', 'exportCSV')->name('export.csv');
+        Route::post('export/pdf', 'exportPDF')->name('export.pdf');
+        Route::post('export/print', 'print')->name('print');
+        Route::post('destroy-multiple', 'destroyMultiple')->name('destroy-multiple');
+        Route::post('restore-multiple', 'restoreMultiple')->name('restore-multiple');
+        Route::post('{allergy}/restore', 'restore')->name('restore');
+    });
+    Route::resource('allergies', AllergyController::class);
+
+    // Estados Civiles
+    Route::controller(CivilStatusController::class)->prefix('civil-statuses')->name('civil-statuses.')->group(function () {
+        Route::post('export/excel', 'exportExcel')->name('export.excel');
+        Route::post('export/csv', 'exportCSV')->name('export.csv');
+        Route::post('export/pdf', 'exportPDF')->name('export.pdf');
+        Route::post('export/print', 'print')->name('print');
+        Route::post('destroy-multiple', 'destroyMultiple')->name('destroy-multiple');
+        Route::post('restore-multiple', 'restoreMultiple')->name('restore-multiple');
+        Route::post('{civilStatus}/restore', 'restore')->name('restore');
+    });
+    Route::resource('civil-statuses', CivilStatusController::class);
+
+    // Géneros
+    Route::controller(GenderController::class)->prefix('genders')->name('genders.')->group(function () {
+        Route::post('export/excel', 'exportExcel')->name('export.excel');
+        Route::post('export/csv', 'exportCSV')->name('export.csv');
+        Route::post('export/pdf', 'exportPDF')->name('export.pdf');
+        Route::post('export/print', 'print')->name('print');
+        Route::post('destroy-multiple', 'destroyMultiple')->name('destroy-multiple');
+        Route::post('restore-multiple', 'restoreMultiple')->name('restore-multiple');
+        Route::post('{gender}/restore', 'restore')->name('restore');
+    });
+    Route::resource('genders', GenderController::class);
+
+    // Etnias
+    Route::controller(EthnicityController::class)->prefix('ethnicities')->name('ethnicities.')->group(function () {
+        Route::post('export/excel', 'exportExcel')->name('export.excel');
+        Route::post('export/csv', 'exportCSV')->name('export.csv');
+        Route::post('export/pdf', 'exportPDF')->name('export.pdf');
+        Route::post('export/print', 'print')->name('print');
+        Route::post('destroy-multiple', 'destroyMultiple')->name('destroy-multiple');
+        Route::post('restore-multiple', 'restoreMultiple')->name('restore-multiple');
+        Route::post('{ethnicity}/restore', 'restore')->name('restore');
+    });
+    Route::resource('ethnicities', EthnicityController::class);
+
+    // Idiomas (Comunidades Lingüísticas)
+    Route::controller(LinguisticCommunityController::class)->prefix('linguistic-communities')->name('linguistic-communities.')->group(function () {
+        Route::post('export/excel', 'exportExcel')->name('export.excel');
+        Route::post('export/csv', 'exportCSV')->name('export.csv');
+        Route::post('export/pdf', 'exportPDF')->name('export.pdf');
+        Route::post('export/print', 'print')->name('print');
+        Route::post('destroy-multiple', 'destroyMultiple')->name('destroy-multiple');
+        Route::post('restore-multiple', 'restoreMultiple')->name('restore-multiple');
+        Route::post('{linguisticCommunity}/restore', 'restore')->name('restore');
+    });
+    Route::resource('linguistic-communities', LinguisticCommunityController::class);
+
+    // Discapacidades
+    Route::controller(DisabilityController::class)->prefix('disabilities')->name('disabilities.')->group(function () {
+        Route::post('export/excel', 'exportExcel')->name('export.excel');
+        Route::post('export/csv', 'exportCSV')->name('export.csv');
+        Route::post('export/pdf', 'exportPDF')->name('export.pdf');
+        Route::post('export/print', 'print')->name('print');
+        Route::post('destroy-multiple', 'destroyMultiple')->name('destroy-multiple');
+        Route::post('restore-multiple', 'restoreMultiple')->name('restore-multiple');
+        Route::post('{disability}/restore', 'restore')->name('restore');
+    });
+    Route::resource('disabilities', DisabilityController::class);
+
+    // ==========================================
+    // MÓDULO: CATÁLOGOS MÉDICOS
+    // ==========================================
+
+    // Turnos
+    Route::controller(ScheduleController::class)->prefix('schedules')->name('schedules.')->group(function () {
+        Route::post('export/excel', 'exportExcel')->name('export.excel');
+        Route::post('export/csv', 'exportCSV')->name('export.csv');
+        Route::post('export/pdf', 'exportPDF')->name('export.pdf');
+        Route::post('export/print', 'print')->name('print');
+        Route::post('destroy-multiple', 'destroyMultiple')->name('destroy-multiple');
+        Route::post('restore-multiple', 'restoreMultiple')->name('restore-multiple');
+        Route::post('{schedule}/restore', 'restore')->name('restore');
+    });
+    Route::resource('schedules', ScheduleController::class);
+
+    // Especialidades
+    Route::controller(SpecialtyController::class)->prefix('specialties')->name('specialties.')->group(function () {
+        Route::post('export/excel', 'exportExcel')->name('export.excel');
+        Route::post('export/csv', 'exportCSV')->name('export.csv');
+        Route::post('export/pdf', 'exportPDF')->name('export.pdf');
+        Route::post('export/print', 'print')->name('print');
+        Route::post('destroy-multiple', 'destroyMultiple')->name('destroy-multiple');
+        Route::post('restore-multiple', 'restoreMultiple')->name('restore-multiple');
+        Route::post('{specialty}/restore', 'restore')->name('restore');
+    });
+    Route::resource('specialties', SpecialtyController::class);
 
 });

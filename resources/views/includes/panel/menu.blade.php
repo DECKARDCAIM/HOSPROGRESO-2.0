@@ -190,28 +190,31 @@
 
                             {{-- Sub-módulo: Gestionar Paciente --}}
                             <small class="nav-subtitle mt-2">Gestionar Paciente</small>
-                            <a class="nav-link" href="#">
+                            <a class="nav-link" href="{{ route('allergies.index') }}">
                                 <i class="bi-exclamation-triangle nav-icon"></i> Alergias
                             </a>
-                            <a class="nav-link" href="#">
+                            <a class="nav-link" href="{{ route('civil-statuses.index') }}">
                                 <i class="bi-heart nav-icon"></i> Estado Civil
                             </a>
-                            <a class="nav-link" href="#">
+                            <a class="nav-link" href="{{ route('genders.index') }}">
                                 <i class="bi-gender-ambiguous nav-icon"></i> Género
                             </a>
-                            <a class="nav-link" href="#">
+                            <a class="nav-link" href="{{ route('ethnicities.index') }}">
                                 <i class="bi-people nav-icon"></i> Etnia
                             </a>
-                            <a class="nav-link" href="#">
+                            <a class="nav-link" href="{{ route('linguistic-communities.index') }}">
                                 <i class="bi-translate nav-icon"></i> Idiomas
+                            </a>
+                            <a class="nav-link" href="{{ route('disabilities.index') }}">
+                                <i class="bi-person-x nav-icon"></i> Discapacidad
                             </a>
 
                             {{-- Sub-módulo: Gestionar Médicos --}}
                             <small class="nav-subtitle mt-2">Gestionar Médicos</small>
-                            <a class="nav-link" href="#">
+                            <a class="nav-link" href="{{ route('schedules.index') }}">
                                 <i class="bi-calendar-range nav-icon"></i> Turnos
                             </a>
-                            <a class="nav-link" href="#">
+                            <a class="nav-link" href="{{ route('specialties.index') }}">
                                 <i class="bi-award nav-icon"></i> Especialidades
                             </a>
                         </div>
