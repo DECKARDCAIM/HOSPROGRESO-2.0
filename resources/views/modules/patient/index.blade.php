@@ -393,9 +393,8 @@
                                 <th>Nombre</th>
                                 <th>Expediente</th>
                                 <th>Nacimiento</th>
-                                <th>País</th>
-                                <th>Departamento</th>
-                                <th>Municipio</th>
+                                <th>Edad</th>
+                                <th>Ubicación</th>
                                 <th>Acciones</th>
                             </tr>
                         </thead>
@@ -437,9 +436,12 @@
                                         @endif
                                     </td>
                                     <td>{{ $patient->birth_date ? $patient->birth_date->format('d/m/Y') : '-' }}</td>
-                                    <td>{{ $patient->country ? $patient->country->name : '-' }}</td>
-                                    <td>{{ $patient->department ? $patient->department->name : '-' }}</td>
-                                    <td>{{ $patient->municipality ? $patient->municipality->name : '-' }}</td>
+                                    <td>{{ $patient->age ? $patient->age . ' años' : '-' }}</td>
+                                    <td>
+                                        <span class="d-block text-inherit mb-0">{{ $patient->country ? $patient->country->name : '-' }}</span>
+                                        <span class="d-block fs-6 text-body">{{ $patient->department ? $patient->department->name : '-' }}</span>
+                                        <span class="d-block fs-6 text-muted">{{ $patient->municipality ? $patient->municipality->name : '-' }}</span>
+                                    </td>
                                     <td>
                                         <div class="d-flex gap-1">
                                             <a class="btn btn-white btn-sm" href="{{ route('patients.show', $patient) }}"
@@ -475,7 +477,7 @@
                                 </tr>
                             @empty
                                 <tr>
-                                    <td colspan="8" class="text-center py-5">
+                                    <td colspan="7" class="text-center py-5">
                                         <img class="mb-3" src="{{ asset('svg/illustrations/oc-error.svg') }}"
                                             alt="Image Description" style="width: 10rem;"
                                             data-hs-theme-appearance="default">

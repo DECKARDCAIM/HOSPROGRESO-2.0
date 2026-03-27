@@ -851,13 +851,19 @@
                 // =====================================================
                 // RELATIVES SEARCH + SELECT + INLINE CREATE LOGIC
                 // =====================================================
-                let selectedRelatives = [];
+                // Pre-existing relatives from DB (populated by PHP)
+                let selectedRelatives = @json($existingRelatives);
+                let relativesSeed = [...selectedRelatives];
+                selectedRelatives = [];
                 let searchTimer = null;
 
                 const searchInput = document.getElementById('relativeSearchInput');
                 const searchResults = document.getElementById('relativeSearchResults');
                 const createForm = document.getElementById('relativeCreateForm');
                 const selectedContainer = document.getElementById('selectedRelativesContainer');
+
+                // Pre-load existing relatives on page ready
+                relativesSeed.forEach(rel => addSelectedRelative(rel));
 
                 // -- Debounced search --
                 if (searchInput) {
@@ -975,7 +981,7 @@
                         <select class="form-select form-select-sm" name="relatives[${idx}][relationship_type_id]" required>
                             <option value="">Relación *</option>
                             @foreach ($relationshipTypes as $type)
-                                <option value="{{ $type->id }}">{{ ucfirst($type->name) }}</option>
+                                <option value="{{ $type->id }}" ${rel.relationship_type_id == {{ $type->id }} ? 'selected' : ''}>{{ ucfirst($type->name) }}</option>
                             @endforeach
                         </select>
                     </div>

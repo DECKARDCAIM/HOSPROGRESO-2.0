@@ -282,6 +282,7 @@ class PatientController extends Controller
      */
     public function edit(Patient $patient)
     {
+        $patient->load('relatives');
         // Cargar todos los catálogos necesarios
         $countries = Country::where('is_active', true)->orderBy('name')->get();
         
@@ -309,6 +310,25 @@ class PatientController extends Controller
         $selectedAllergyIds    = $patient->allergies()->pluck('allergies.id')->toArray();
         $selectedDisabilityIds = $patient->disabilities()->pluck('disabilities.id')->toArray();
 
+        // Familiares existentes en formato JSON para pre-cargar el wizard
+        $existingRelatives = $patient->relatives->map(function ($r) {
+            return [
+                'id'                   => $r->id,
+                'first_name'           => $r->first_name,
+                'second_name'          => $r->second_name,
+                'third_name'           => $r->third_name,
+                'first_last_name'      => $r->first_last_name,
+                'second_last_name'     => $r->second_last_name,
+                'married_last_name'    => $r->married_last_name,
+                'dpi'                  => $r->dpi,
+                'relationship_type_id' => $r->relationship_type_id,
+                'name'                 => trim(implode(' ', array_filter([
+                    $r->first_name, $r->second_name, $r->third_name,
+                    $r->first_last_name, $r->second_last_name,
+                ]))),
+            ];
+        })->values()->toArray();
+
         return view('modules.patient.edit', compact(
             'patient',
             'countries',
@@ -322,7 +342,8 @@ class PatientController extends Controller
             'allergies',
             'disabilities',
             'selectedAllergyIds',
-            'selectedDisabilityIds'
+            'selectedDisabilityIds',
+            'existingRelatives'
         ));
     }
 
@@ -340,12 +361,30 @@ class PatientController extends Controller
 
         $patient->update($validated);
 
+        // Sincronizar familiares: eliminar los anteriores y recrear
+        $patient->relatives()->delete();
+        if ($request->has('relatives') && is_array($request->input('relatives'))) {
+            foreach ($request->input('relatives') as $relativeData) {
+                if (empty($relativeData['first_name']) || empty($relativeData['first_last_name'])) continue;
+                $patient->relatives()->create([
+                    'relationship_type_id' => $relativeData['relationship_type_id'],
+                    'first_name'           => $relativeData['first_name'],
+                    'second_name'          => $relativeData['second_name'] ?? null,
+                    'third_name'           => $relativeData['third_name'] ?? null,
+                    'first_last_name'      => $relativeData['first_last_name'],
+                    'second_last_name'     => $relativeData['second_last_name'] ?? null,
+                    'married_last_name'    => $relativeData['married_last_name'] ?? null,
+                    'dpi'                  => $relativeData['dpi'] ?? null,
+                ]);
+            }
+        }
+
         // Sincronizar alergias y discapacidades (many-to-many)
         $patient->allergies()->sync($request->input('allergies', []));
         $patient->disabilities()->sync($request->input('disabilities', []));
 
         $notification = [
-            'message' => 'Paciente actualizado exitosamente.',
+            'message'    => 'Paciente actualizado exitosamente.',
             'alert-type' => 'info'
         ];
 
