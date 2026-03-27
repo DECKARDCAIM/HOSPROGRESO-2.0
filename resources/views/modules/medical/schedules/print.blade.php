@@ -1,0 +1,3 @@
+<!DOCTYPE html><html lang="es"><head><meta charset="UTF-8"><title>Turnos</title><style>body{font-family:Arial,sans-serif;font-size:12px;}table{width:100%;border-collapse:collapse;}th,td{border:1px solid #ddd;padding:6px 10px;text-align:left;}th{background-color:#f3f3f3;font-weight:bold;}h2{text-align:center;}</style></head>
+<body><h2>Listado de Turnos</h2><table><thead><tr><th>#</th><th>Nombre</th><th>Estado</th><th>Fecha de Creación</th></tr></thead>
+<tbody>@foreach($items as $item)<tr><td>{{ $item->id }}</td><td>{{ $item->name }}</td><td>{{ $item->is_active ? 'Activo' : 'Inactivo' }}</td><td>{{ $item->created_at->format('d/m/Y') }}</td></tr>@endforeach</tbody></table></body></html>
