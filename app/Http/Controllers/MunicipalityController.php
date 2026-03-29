@@ -68,9 +68,9 @@ class MunicipalityController extends Controller
         $activeMunicipalities   = Municipality::where('is_active', true)->count();
         $inactiveMunicipalities = Municipality::where('is_active', false)->count();
         
-        $countries              = Country::orderBy('id')->get();
+        $countries              = Country::where('is_active', true)->orderBy('name')->get();
         
-        $departmentsQuery = Department::query();
+        $departmentsQuery = Department::where('is_active', true);
         if ($request->filled('country_id')) {
             $departmentsQuery->where('country_id', $request->country_id);
         }
@@ -87,11 +87,11 @@ class MunicipalityController extends Controller
      */
     public function create(Request $request)
     {
-        $countries   = Country::all();
+        $countries   = Country::where('is_active', true)->orderBy('name')->get();
         $departments = collect();
 
         if ($request->filled('country_id')) {
-            $departments = Department::where('country_id', $request->country_id)->get();
+            $departments = Department::where('country_id', $request->country_id)->where('is_active', true)->orderBy('name')->get();
         }
 
         return view('modules.ubication.municipalities.create', compact('departments', 'countries'));
@@ -129,8 +129,8 @@ class MunicipalityController extends Controller
      */
     public function edit(Municipality $municipality)
     {
-        $countries   = Country::all();
-        $departments = Department::all();
+        $countries   = Country::where('is_active', true)->orderBy('name')->get();
+        $departments = Department::where('is_active', true)->orderBy('name')->get();
 
         return view('modules.ubication.municipalities.edit', compact('municipality', 'departments', 'countries'));
     }

@@ -4,6 +4,9 @@ namespace App\Http\Controllers;
 
 use App\Models\Release;
 use Illuminate\Http\Request;
+use Illuminate\Http\JsonResponse;
+use Illuminate\Support\Facades\Http;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
 
@@ -14,22 +17,86 @@ class ReleaseController extends Controller
      */
     public function index(Request $request)
     {
-        $query = Release::with('author')->latest();
+        $query = Release::with('author');
 
-        if ($request->has('date')) {
-            $query->whereDate('published_at', $request->date);
+        if ($request->input('record_status', 'active') === 'inactive') {
+            $query->onlyTrashed();
         }
 
-        $releases = $query->paginate(25);
+        if ($request->filled('date_from') || $request->filled('date_to')) {
+            if ($request->filled('date_from')) {
+                $query->whereDate('published_at', '>=', $request->date_from);
+            }
+            if ($request->filled('date_to')) {
+                $query->whereDate('published_at', '<=', $request->date_to);
+            }
+        } else {
+            $query->whereDate('published_at', now()->toDateString());
+        }
 
-        // For the calendar: get counts of releases per day for the current month
-        $calendarData = Release::selectRaw('DATE(published_at) as date, COUNT(*) as count')
-            ->where('status', 'published')
-            ->groupBy('date')
+        if ($request->filled('search')) {
+            $query->where(function ($q) use ($request) {
+                $q->where('title', 'like', '%' . $request->search . '%')
+                    ->orWhere('content', 'like', '%' . $request->search . '%');
+            });
+        }
+
+        if ($request->filled('type')) {
+            $query->where('type', $request->type);
+        }
+
+        if ($request->filled('status') && in_array($request->status, ['draft', 'published', 'archived'])) {
+            $query->where('status', $request->status);
+        }
+
+        $query->orderBy('published_at', 'desc');
+
+        $allFilteredIds = $query->pluck('id')->toArray();
+        $perPage = $request->input('per_page', 5);
+        $releases = $query->paginate($perPage);
+
+        // Metrics for the cards
+        $allTotal = Release::count();
+        $allPublished = Release::published()->count();
+        $allDrafts = Release::where('status', 'draft')->count();
+        $allThisMonth = Release::whereMonth('created_at', now()->month)->count();
+
+        $activeFilters = 0;
+        if ($request->filled('status')) {
+            $activeFilters++;
+        }
+        if ($request->filled('type')) {
+            $activeFilters++;
+        }
+        if ($request->filled('date_from') || $request->filled('date_to')) {
+            $activeFilters++;
+        }
+
+        // For the calendar: get counts and titles of releases per day
+        $calendarData = Release::published()
+            ->select('id', 'title', 'published_at')
             ->get()
-            ->pluck('count', 'date');
+            ->groupBy(function ($item) {
+                return $item->published_at->format('Y-m-d');
+            })
+            ->map(function ($dayReleases) {
+                return [
+                    'count' => $dayReleases->count(),
+                    'titles' => $dayReleases->take(3)->pluck('title')->toArray(),
+                    'has_more' => $dayReleases->count() > 3
+                ];
+            });
 
-        return view('modules.administration.release.index', compact('releases', 'calendarData'));
+        return view('modules.administration.release.index', compact(
+            'releases', 
+            'calendarData', 
+            'allTotal', 
+            'allPublished', 
+            'allDrafts', 
+            'allThisMonth',
+            'activeFilters',
+            'allFilteredIds'
+        ));
     }
 
     /**
@@ -51,7 +118,9 @@ class ReleaseController extends Controller
             'status' => 'required|in:draft,published,archived',
             'type' => 'required|in:actualizacion,comunicado',
             'published_at' => 'nullable|date',
-            'document' => 'nullable|file|mimes:pdf,doc,docx,jpg,jpeg,png|max:10240',
+            'background_image' => 'nullable|image|mimes:jpeg,png,jpg,webp|max:5120',
+            'documents' => 'nullable|array',
+            'documents.*' => 'file|mimes:pdf,doc,docx,jpg,jpeg,png|max:51200',
         ]);
 
         $data = [
@@ -63,11 +132,18 @@ class ReleaseController extends Controller
             'published_at' => $request->published_at ? \Carbon\Carbon::parse($request->published_at) : ( $request->status == 'published' ? now() : null ),
         ];
 
-        if ($request->hasFile('document')) {
-            $file = $request->file('document');
-            $fileName = Str::slug($request->title) . '-' . time() . '.' . $file->getClientOriginalExtension();
-            $path = $file->storeAs('releases', $fileName, 'public');
-            $data['document_path'] = $path;
+        if ($request->hasFile('documents')) {
+            $paths = [];
+            foreach ($request->file('documents') as $file) {
+                $fileName = Str::slug($request->title) . '-' . time() . '-' . uniqid() . '.' . $file->getClientOriginalExtension();
+                $paths[] = $file->storeAs('releases', $fileName, 'public');
+            }
+            $data['document_path'] = $paths;
+        }
+
+        if ($request->hasFile('background_image')) {
+            $bgName = 'bg-' . time() . '-' . uniqid() . '.' . $request->file('background_image')->getClientOriginalExtension();
+            $data['background_image'] = $request->file('background_image')->storeAs('releases/backgrounds', $bgName, 'public');
         }
 
         Release::create($data);
@@ -78,8 +154,9 @@ class ReleaseController extends Controller
     /**
      * Display the specified resource.
      */
-    public function show(Release $release)
+    public function show($id)
     {
+        $release = Release::withTrashed()->findOrFail($id);
         return view('modules.administration.release.show', compact('release'));
     }
 
@@ -102,7 +179,9 @@ class ReleaseController extends Controller
             'status' => 'required|in:draft,published,archived',
             'type' => 'required|in:actualizacion,comunicado',
             'published_at' => 'nullable|date',
-            'document' => 'nullable|file|mimes:pdf,doc,docx,jpg,jpeg,png|max:10240',
+            'background_image' => 'nullable|image|mimes:jpeg,png,jpg,webp|max:5120',
+            'documents' => 'nullable|array',
+            'documents.*' => 'file|mimes:pdf,doc,docx,jpg,jpeg,png|max:51200',
         ]);
 
         $data = [
@@ -113,15 +192,28 @@ class ReleaseController extends Controller
             'published_at' => $request->published_at ? \Carbon\Carbon::parse($request->published_at) : ( ($request->status == 'published' && !$release->published_at) ? now() : $release->published_at ),
         ];
 
-        if ($request->hasFile('document')) {
-            // Delete old file
-            if ($release->document_path) {
-                Storage::disk('public')->delete($release->document_path);
+        if ($request->hasFile('documents')) {
+            // Delete old files if they exist
+            if ($release->document_path && is_array($release->document_path)) {
+                foreach ($release->document_path as $oldPath) {
+                    Storage::disk('public')->delete($oldPath);
+                }
             }
-            $file = $request->file('document');
-            $fileName = Str::slug($request->title) . '-' . time() . '.' . $file->getClientOriginalExtension();
-            $path = $file->storeAs('releases', $fileName, 'public');
-            $data['document_path'] = $path;
+            
+            $paths = [];
+            foreach ($request->file('documents') as $file) {
+                $fileName = Str::slug($request->title) . '-' . time() . '-' . uniqid() . '.' . $file->getClientOriginalExtension();
+                $paths[] = $file->storeAs('releases', $fileName, 'public');
+            }
+            $data['document_path'] = $paths;
+        }
+
+        if ($request->hasFile('background_image')) {
+            if ($release->background_image) {
+                Storage::disk('public')->delete($release->background_image);
+            }
+            $bgName = 'bg-' . time() . '-' . uniqid() . '.' . $request->file('background_image')->getClientOriginalExtension();
+            $data['background_image'] = $request->file('background_image')->storeAs('releases/backgrounds', $bgName, 'public');
         }
 
         $release->update($data);
@@ -183,26 +275,115 @@ class ReleaseController extends Controller
         $since = $sinceParam ? \Carbon\Carbon::parse($sinceParam) : now()->subMinutes(1);
 
         $unread = Release::published()
-            ->with('author')
             ->where('published_at', '>', $since)
+            ->where('published_at', '<=', now())
             ->whereDoesntHave('readByUsers', function ($query) use ($user) {
                 $query->where('user_id', $user->id);
             })
-            ->latest('published_at')
-            ->get();
+            ->count();
+
+        $notifications = [];
+        if ($unread > 0) {
+            $notifications[] = [
+                'id' => 'unread-notif',
+                'title' => 'Nuevos Comunicados',
+                'message' => 'Tienes mensajes nuevos sin leer en tu bandeja. Por favor, revísalos.',
+                'type' => 'info',
+                'author_name' => 'Sistema',
+                'author_avatar' => asset('img/logo.png'),
+                'time_ago' => 'Justo ahora',
+                'published_at' => now()->toDateTimeString()
+            ];
+        }
 
         return response()->json([
-            'notifications' => $unread->map(function($notif) {
-                return [
-                    'id' => $notif->id,
-                    'title' => $notif->title,
-                    'message' => strip_tags($notif->content),
-                    'type' => $notif->type === 'actualizacion' ? 'info' : 'success',
-                    'author' => $notif->author ? $notif->author->first_name : 'Sistema',
-                    'published_at' => $notif->published_at->toDateTimeString()
-                ];
-            }),
+            'notifications' => $notifications,
             'server_time' => now()->toDateTimeString()
         ]);
+    }
+
+    /**
+     * Generar contenido usando ISAAC (IA del sistema).
+     */
+    public function generateAiContent(Request $request): JsonResponse
+    {
+        $validated = $request->validate([
+            'prompt' => 'required|string|max:1000'
+        ]);
+
+        $user = auth()->user();
+        $userName = $user ? trim("{$user->first_name} {$user->first_last_name}") : 'Usuario';
+
+        $baseUrl = rtrim(config('services.ollama.url'), '/');
+        $model = config('services.ollama.model');
+
+        $systemPrompt = <<<EOT
+        Eres ISAAC, la Inteligencia Artificial del sistema HOSPROGRESO.
+        Estás hablando con tu usuario autenticado actual: {$userName}.
+        Tu tarea en este momento es actuar como un redactor experto para el sistema. 
+        Debes ayudar al usuario a redactar el contenido de un Comunicado Oficial o Actualización.
+        
+        IMPORTANTE: Tu respuesta estructurada debe ser estrictamente un objeto JSON válido, sin ningún texto adicional antes o después. 
+        El JSON debe tener exactamente esta estructura:
+        {
+            "title": "El título generado para el comunicado",
+            "html": "El cuerpo del comunicado en formato HTML (<h1>, <p>, <ul>, etc.)"
+        }
+        Asegúrate de no incluir las etiquetas <html>, <body> o <style> en la clave "html".
+        EOT;
+
+        try {
+            $response = Http::timeout(90)->post("{$baseUrl}/api/chat", [
+                'model' => $model,
+                'messages' => [
+                    ['role' => 'system', 'content' => $systemPrompt],
+                    ['role' => 'user', 'content' => "Por favor, redacta el comunicado basándote en lo siguiente:\n" . $validated['prompt']]
+                ],
+                'stream' => false,
+                'options' => ['temperature' => 0.4] 
+            ]);
+
+            if ($response->successful()) {
+                $rawContent = $response->json('message.content', 'Error al generar contenido.');
+                
+                // Limpiar posibles bloques markdown "```json" y "```"
+                $rawContent = preg_replace('/^```json/i', '', $rawContent);
+                $rawContent = preg_replace('/^```/i', '', $rawContent);
+                $rawContent = preg_replace('/```$/i', '', $rawContent);
+                $rawContent = trim($rawContent);
+                
+                $dataDecoded = json_decode($rawContent, true);
+                
+                if (json_last_error() === JSON_ERROR_NONE && isset($dataDecoded['html']) && isset($dataDecoded['title'])) {
+                    return response()->json([
+                        'success' => true, 
+                        'title' => $dataDecoded['title'],
+                        'html' => $dataDecoded['html']
+                    ]);
+                } else {
+                    // Fallback si no retornó JSON válido
+                    return response()->json([
+                        'success' => true,
+                        'title' => 'Comunicado Generado por ISAAC',
+                        'html' => $rawContent
+                    ]);
+                }
+            }
+
+            Log::error("Error de Ollama API al generar comunicado: {$response->body()}");
+            
+            return response()->json([
+                'success' => false,
+                'message' => "Lo siento {$userName}, no pude generar el contenido. Código: {$response->status()}"
+            ], 500);
+
+        } catch (\Exception $e) {
+            Log::error("Excepción al conectar con Ollama en generador de comunicados: {$e->getMessage()}");
+            
+            return response()->json([
+                'success' => false,
+                'message' => 'Error de conexión con ISAAC. Verifica que el servicio esté activo.'
+            ], 500);
+        }
     }
 }

@@ -117,10 +117,12 @@ Route::middleware(['auth', 'PreventBackHistory'])->group(function () {
         Route::resource('users', UserController::class);
         Route::post('/users/{id}/restore', [UserController::class, 'restore'])->name('users.restore');
         
-        Route::resource('releases', ReleaseController::class);
+        Route::post('/releases/generate-ai', [ReleaseController::class, 'generateAiContent'])->name('releases.generate-ai');
         Route::post('/releases/{id}/mark-as-read', [ReleaseController::class, 'markAsRead'])->name('releases.mark-as-read');
         Route::post('/releases/mark-all-as-read', [ReleaseController::class, 'markAllAsRead'])->name('releases.mark-all-as-read');
         Route::get('/releases/unread-notifications', [ReleaseController::class, 'getUnread'])->name('releases.get-unread');
+        
+        Route::resource('releases', ReleaseController::class);
     });
 
     // ==========================================

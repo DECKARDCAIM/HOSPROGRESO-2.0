@@ -56,11 +56,6 @@ class LoginController extends Controller
         }
 
         $user->update(['estado' => 'disponible']);
-
-        session()->flash('notification', [
-            'message'    => 'Bienvenido ' . $user->first_name . ' ' . $user->first_last_name . ', has iniciado sesión correctamente.',
-            'alert-type' => 'success'
-        ]);
     }
 
     /**

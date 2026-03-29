@@ -419,12 +419,15 @@
                                                     class="avatar-initials">{{ strtoupper(substr($patient->first_name ?? ($patient->mother_first_name ?? 'P'), 0, 1)) }}</span>
                                             </div>
                                             <div class="ms-3 flex-grow-1">
-                                                <span
-                                                    class="d-block h5 text-inherit mb-0">{{ $patient->full_name ?:
-                                                        'Sin
-                                                                                                                                                    nombre' }}</span>
-                                                <span
-                                                    class="d-block fs-5 text-body">{{ $patient->dpi ?: 'Sin DPI' }}</span>
+                                                <span class="d-block h5 text-inherit mb-0">
+                                                    {{ $patient->only_names ?: 'Sin nombre' }}
+                                                </span>
+                                                <span class="d-block h5 text-inherit mb-0">
+                                                    {{ $patient->only_last_names ?: '' }}
+                                                </span>
+                                                <span class="d-block fs-6 text-muted">
+                                                    {{ $patient->dpi ?: 'Sin DPI' }}
+                                                </span>
                                             </div>
                                         </a>
                                     </td>

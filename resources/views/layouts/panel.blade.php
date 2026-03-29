@@ -10,8 +10,8 @@
     <title>@yield('title')</title>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="{{ asset('vendor/bootstrap-icons/font/bootstrap-icons.css') }}">
-    <link rel="preload" href="{{ asset('css/theme.min.css') }}" data-hs-appearance="default" as="style">
-    <link rel="preload" href="{{ asset('css/theme-dark.min.css') }}" data-hs-appearance="dark" as="style">
+    <link rel="prefetch" href="{{ asset('css/theme.min.css') }}" data-hs-appearance="default" as="style">
+    <link rel="prefetch" href="{{ asset('css/theme-dark.min.css') }}" data-hs-appearance="dark" as="style">
     <link rel="preload" href="{{ asset('js/theme.min.js') }}" as="script">
     <link rel="preload" href="{{ asset('vendor/jquery/dist/jquery.min.js') }}" as="script">
     @yield('styles')

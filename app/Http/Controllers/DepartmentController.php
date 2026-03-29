@@ -55,7 +55,7 @@ class DepartmentController extends Controller
         $totalDepartments    = Department::count();
         $activeDepartments   = Department::where('is_active', true)->count();
         $inactiveDepartments = Department::where('is_active', false)->count();
-        $countries           = Country::orderBy('id')->get();
+        $countries           = Country::where('is_active', true)->orderBy('name')->get();
 
         return view('modules.ubication.departments.index', compact(
             'departments', 'allFilteredIds', 'countries', 'totalDepartments', 'activeDepartments', 'inactiveDepartments'
@@ -68,7 +68,7 @@ class DepartmentController extends Controller
      */
     public function create()
     {
-        $countries = Country::all(); // Carga todos los países desde la tabla `countries`
+        $countries = Country::where('is_active', true)->orderBy('name')->get();
         return view('modules.ubication.departments.create', compact('countries'));
     }
 
@@ -102,7 +102,7 @@ class DepartmentController extends Controller
      */
     public function edit(Department $department)
     {
-        $countries = Country::all(); // Carga todos los países desde la tabla `countries`
+        $countries = Country::where('is_active', true)->orderBy('name')->get();
         return view('modules.ubication.departments.edit', compact('department', 'countries'));
     }
 

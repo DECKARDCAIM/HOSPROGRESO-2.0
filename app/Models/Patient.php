@@ -150,6 +150,42 @@ class Patient extends Model
         return trim(implode(' ', $names) . ' ' . implode(' ', $lastNames) . $marriedLastName);
     }
 
+    public function getOnlyNamesAttribute()
+    {
+        if (!$this->first_name && $this->mother_full_name) {
+            return "Hijo de {$this->mother_first_name} {$this->mother_second_name} {$this->mother_third_name}";
+        }
+
+        $names = array_filter([
+            $this->first_name,
+            $this->second_name,
+            $this->third_name,
+        ]);
+
+        return trim(implode(' ', $names));
+    }
+
+    public function getOnlyLastNamesAttribute()
+    {
+        if (!$this->first_name && $this->mother_full_name) {
+            $lastNames = array_filter([
+                $this->mother_first_last_name,
+                $this->mother_second_last_name,
+            ]);
+            $married = $this->mother_married_last_name ? " de {$this->mother_married_last_name}" : '';
+            return trim(implode(' ', $lastNames) . $married);
+        }
+
+        $lastNames = array_filter([
+            $this->first_last_name,
+            $this->second_last_name,
+        ]);
+
+        $marriedLastName = $this->married_last_name ? " de {$this->married_last_name}" : '';
+
+        return trim(implode(' ', $lastNames) . $marriedLastName);
+    }
+
     public function getMotherFullNameAttribute()
     {
         if (!$this->mother_first_name) {

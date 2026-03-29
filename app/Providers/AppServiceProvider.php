@@ -19,6 +19,7 @@ class AppServiceProvider extends ServiceProvider
      */
     public function boot(): void
     {
+        \Illuminate\Support\Carbon::setLocale('es');
         \Illuminate\Pagination\Paginator::useBootstrapFive();
 
         \Illuminate\Support\Facades\View::composer('*', function ($view) {

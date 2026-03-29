@@ -17,11 +17,13 @@ class Release extends Model
         'status',
         'type',
         'document_path',
+        'background_image',
         'published_at',
     ];
 
     protected $casts = [
         'published_at' => 'datetime',
+        'document_path' => 'array',
     ];
 
     public function author()
