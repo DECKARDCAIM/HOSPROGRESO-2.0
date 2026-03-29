@@ -42,7 +42,7 @@ class User extends Authenticatable
         'specialty_id',
         'address',
         'birth_date',
-        'gender',
+        'gender_id',
         'estado',
         'theme_preference',
         'country_id',
@@ -84,6 +84,11 @@ class User extends Authenticatable
     public function schedule()
     {
         return $this->belongsTo(Schedule::class);
+    }
+
+    public function gender()
+    {
+        return $this->belongsTo(Gender::class);
     }
 
     public function specialty()

@@ -61,8 +61,8 @@ class UserController extends Controller
             $query->where('is_active', true);
         }
 
-        if ($request->filled('gender')) {
-            $query->where('gender', $request->gender);
+        if ($request->filled('gender_id')) {
+            $query->where('gender_id', $request->gender_id);
         }
 
         if ($request->filled('country_id')) {
@@ -94,6 +94,7 @@ class UserController extends Controller
         $countries = Country::orderBy('name')->get();
         $departments = Department::orderBy('name')->get();
         $municipalities = Municipality::orderBy('name')->get();
+        $genders = \App\Models\Gender::where('is_active', true)->orderBy('name')->get();
 
         // Contadores
         $totalUsers = \App\Models\User::count();
@@ -102,7 +103,7 @@ class UserController extends Controller
 
         return view('modules.administration.user.index', compact(
             'users', 'totalUsers', 'activeUsers', 'inactiveUsers',
-            'roles', 'workDepartments', 'specialties', 'countries', 'departments', 'municipalities'
+            'roles', 'workDepartments', 'specialties', 'countries', 'departments', 'municipalities', 'genders'
         ));
     }
 
@@ -233,9 +234,10 @@ class UserController extends Controller
         $specialties     = Specialty::where('is_active', true)->orderBy('name')->get();
         $unityExecutions = \App\Models\UnityExecution::orderBy('name')->get();
         $workDepartments = \App\Models\WorkDepartment::orderBy('name')->get();
+        $genders         = \App\Models\Gender::where('is_active', true)->orderBy('name')->get();
 
         return view('modules.administration.user.create', compact(
-            'roles', 'schedules', 'countries', 'specialties', 'unityExecutions', 'workDepartments'
+            'roles', 'schedules', 'countries', 'specialties', 'unityExecutions', 'workDepartments', 'genders'
         ));
     }
 
@@ -247,6 +249,7 @@ class UserController extends Controller
             'email' => 'required|string|email|max:255|unique:users',
             'password' => 'required|string|min:8',
             'role_id' => 'nullable|exists:roles,id',
+            'gender_id' => 'nullable|exists:genders,id',
         ]);
 
         try {
@@ -266,7 +269,7 @@ class UserController extends Controller
                 'marital_status' => $request->marital_status,
                 'phone' => $request->phone,
                 'birth_date' => $request->birth_date,
-                'gender' => $request->gender,
+                'gender_id' => $request->gender_id,
                 'role_id' => $request->role_id,
                 'specialty_id' => $request->specialty_id,
                 'schedule_id' => $request->schedule_id,
@@ -310,6 +313,7 @@ class UserController extends Controller
         $specialties     = Specialty::where('is_active', true)->orderBy('name')->get();
         $unityExecutions = \App\Models\UnityExecution::orderBy('name')->get();
         $workDepartments = \App\Models\WorkDepartment::orderBy('name')->get();
+        $genders         = \App\Models\Gender::where('is_active', true)->orderBy('name')->get();
 
         // Cargar departamentos según el país del usuario (igual que PatientController)
         $departments = $user->country_id
@@ -323,7 +327,7 @@ class UserController extends Controller
 
         return view('modules.administration.user.edit', compact(
             'user', 'roles', 'schedules', 'countries', 'departments', 'municipalities',
-            'specialties', 'unityExecutions', 'workDepartments'
+            'specialties', 'unityExecutions', 'workDepartments', 'genders'
         ));
     }
 
@@ -337,6 +341,7 @@ class UserController extends Controller
             'email' => 'required|string|email|max:255|unique:users,email,' . $user->id,
             'password' => 'nullable|string|min:8',
             'role_id' => 'nullable|exists:roles,id',
+            'gender_id' => 'nullable|exists:genders,id',
         ]);
 
         try {
@@ -355,7 +360,7 @@ class UserController extends Controller
                 'marital_status' => $request->marital_status,
                 'phone' => $request->phone,
                 'birth_date' => $request->birth_date,
-                'gender' => $request->gender,
+                'gender_id' => $request->gender_id,
                 'role_id' => $request->role_id,
                 'specialty_id' => $request->specialty_id,
                 'schedule_id' => $request->schedule_id,

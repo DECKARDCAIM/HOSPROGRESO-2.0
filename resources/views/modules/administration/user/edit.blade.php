@@ -223,21 +223,17 @@
                                         <div class="col-md-4 mb-2">
                                             <label for="genderLabel" class="form-label">Género</label>
                                             <div class="tom-select-custom">
-                                                <select class="js-select form-select" name="gender" id="genderLabel"
+                                                <select class="js-select form-select" name="gender_id" id="genderLabel"
                                                     autocomplete="off"
                                                     data-hs-tom-select-options='{
                                                       "placeholder": "Seleccione..."
                                                     }'>
                                                     <option value="">Seleccione</option>
-                                                    <option value="M"
-                                                        {{ old('gender', $user->gender) == 'M' ? 'selected' : '' }}>
-                                                        Masculino</option>
-                                                    <option value="F"
-                                                        {{ old('gender', $user->gender) == 'F' ? 'selected' : '' }}>
-                                                        Femenino</option>
-                                                    <option value="O"
-                                                        {{ old('gender', $user->gender) == 'O' ? 'selected' : '' }}>Otro
-                                                    </option>
+                                                    @foreach ($genders ?? [] as $gender)
+                                                        <option value="{{ $gender->id }}"
+                                                            {{ old('gender_id', $user->gender_id) == $gender->id ? 'selected' : '' }}>
+                                                            {{ $gender->name }}</option>
+                                                    @endforeach
                                                 </select>
                                             </div>
                                         </div>

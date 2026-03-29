@@ -1,5 +1,8 @@
 @extends('layouts.panel')
 @section('title', ' Editar Perfil')
+@section('styles')
+    <link rel="stylesheet" href="{{ asset('vendor/tom-select/dist/css/tom-select.bootstrap5.css') }}">
+@endsection
 
 @section('content')
     <main id="content" role="main" class="main">
@@ -243,17 +246,19 @@
 
                                             <div class="col-md-4">
                                                 <label class="form-label" for="gender">Género</label>
-                                                <select class="form-control" id="gender" name="gender">
-                                                    <option value=""
-                                                        {{ old('gender', $user->gender) == '' ? 'selected' : '' }}>
-                                                        Seleccione</option>
-                                                    <option value="masculino"
-                                                        {{ old('gender', $user->gender) == 'masculino' ? 'selected' : '' }}>
-                                                        Masculino</option>
-                                                    <option value="femenino"
-                                                        {{ old('gender', $user->gender) == 'femenino' ? 'selected' : '' }}>
-                                                        Femenino</option>
-                                                </select>
+                                                <div class="tom-select-custom">
+                                                    <select class="js-select form-select" id="gender" name="gender_id"
+                                                        data-hs-tom-select-options='{
+                                                          "placeholder": "Seleccione..."
+                                                        }'>
+                                                        <option value="">Seleccione</option>
+                                                        @foreach ($genders ?? [] as $gender)
+                                                            <option value="{{ $gender->id }}"
+                                                                {{ old('gender_id', $user->gender_id) == $gender->id ? 'selected' : '' }}>
+                                                                {{ $gender->name }}</option>
+                                                        @endforeach
+                                                    </select>
+                                                </div>
                                             </div>
 
                                             <div class="col-md-4">
@@ -353,6 +358,7 @@
     <script src="{{ asset('vendor/hs-nav-scroller/dist/hs-nav-scroller.min.js') }}"></script>
     <script src="{{ asset('vendor/hs-sticky-block/dist/hs-sticky-block.min.js') }}"></script>
     <script src="{{ asset('vendor/hs-file-attach/dist/hs-file-attach.min.js') }}"></script>
+    <script src="{{ asset('vendor/tom-select/dist/js/tom-select.complete.min.js') }}"></script>
     <script>
         document.addEventListener('DOMContentLoaded', function() {
 
@@ -388,6 +394,11 @@
                         reader.readAsDataURL(file);
                     }
                 });
+            }
+
+            // 3. INITIALIZATION OF TOM SELECT
+            if (typeof HSCore !== 'undefined' && HSCore.components.HSTomSelect) {
+                HSCore.components.HSTomSelect.init('.js-select');
             }
 
         });

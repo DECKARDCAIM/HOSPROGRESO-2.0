@@ -137,8 +137,7 @@
                                         strtotime($user->birth_date)) }}</li>
                                     @endif
                                     @if ($user->gender)
-                                    <li><i class="bi-gender-ambiguous dropdown-item-icon"></i> Género: {{
-                                        ucfirst($user->gender) }}</li>
+                                    <li><i class="bi-gender-ambiguous dropdown-item-icon"></i> Género: {{ $user->gender->name }}</li>
                                     @endif
                                     @if ($user->marital_status)
                                     <li><i class="bi-heart dropdown-item-icon"></i> Estado civil: {{

@@ -139,9 +139,7 @@
                     <div class="a4-wrapper mb-4">
                         <div class="a4-paper">
                             <div class="ql-container ql-snow">
-                                <div class="ql-editor doc-body">
-                                    {!! $release->content !!}
-                                </div>
+                                <div class="ql-editor doc-body">{!! $release->content !!}</div>
                             </div>
                         </div>
                     </div>

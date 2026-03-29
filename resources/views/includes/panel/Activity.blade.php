@@ -77,14 +77,24 @@
     const sendChatSpinner = document.getElementById('sendChatSpinner');
 
     @php
-    $user = auth() -> user();
-    $fullName = $user ? trim("{$user->first_name} {$user->second_name} {$user->third_name} {$user->first_last_name} {$user->second_last_name} {$user->married_last_name}") : 'Usuario';
-    $isAdmin = ($user && $user -> role_id == 1); // Asumiendo que 1 es Administrador, ajusta si es necesario
-    $avatarUrl = ($user && $user -> profile_photo_path) ? asset('storage/'.$user -> profile_photo_path) : null;
-    $initials = $user ? strtoupper(substr($user -> first_name, 0, 1)) : 'U';
+    $user = auth()->user();
+    $primerNombre = $user->first_name ?? '';
+    $primerApellido = $user->first_last_name ?? '';
+    $nombreMostrar = trim($primerNombre . ' ' . $primerApellido) ?: ($user->email ?? 'Usuario');
+    
+    $isAdmin = ($user && $user->role_id == 1);
+    $avatarUrl = ($user && $user->profile_photo_path) ? asset('storage/' . $user->profile_photo_path) : null;
+    
+    $initials = 'U';
+    if ($user) {
+        $initials = strtoupper(substr($primerNombre, 0, 1));
+        if (!empty($primerApellido)) {
+            $initials .= strtoupper(substr($primerApellido, 0, 1));
+        }
+    }
     @endphp
 
-    const userName = "{{ $fullName }}";
+    const userName = "{{ $nombreMostrar }}";
     const isAdmin = {{ $isAdmin ? 'true' : 'false' }};
   const avatarUrl = "{{ $avatarUrl }}";
   const initials = "{{ $initials }}";

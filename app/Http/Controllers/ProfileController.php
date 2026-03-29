@@ -138,7 +138,8 @@ class ProfileController extends Controller
     public function edit()
     {
         $user = Auth::user();
-        return view('modules.profile.edit', compact('user'));
+        $genders = \App\Models\Gender::where('is_active', true)->orderBy('name')->get();
+        return view('modules.profile.edit', compact('user', 'genders'));
     }
 
     /**
@@ -184,7 +185,7 @@ class ProfileController extends Controller
             'phone' => 'nullable|string|max:15', // phone is string
             'address' => 'nullable|string|max:500', // max 500 para dirección
             'birth_date' => 'nullable|date',
-            'gender' => 'nullable|string|in:masculino,femenino',
+            'gender_id' => 'nullable|exists:genders,id',
             
             // Imágenes
             'profile_photo' => 'nullable|image|mimes:jpeg,png,jpg|max:4096',
@@ -205,7 +206,7 @@ class ProfileController extends Controller
                 'phone' => $request->phone,
                 'address' => $request->address,
                 'birth_date' => $request->birth_date,
-                'gender' => $request->gender,
+                'gender_id' => $request->gender_id,
             ];
 
             // Subir Avatar

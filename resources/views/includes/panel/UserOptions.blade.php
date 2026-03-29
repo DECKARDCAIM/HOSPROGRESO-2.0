@@ -241,12 +241,18 @@
                                                                                 src="{{ asset('storage/' . $rel->author->profile_photo_path) }}"
                                                                                 alt="Avatar">
                                                                         @elseif($rel->author)
-                                                                            <div class="avatar-soft-primary">
+                                                                            @php
+                                                                                $authorInitials = strtoupper(substr($rel->author->first_name, 0, 1));
+                                                                                if (!empty($rel->author->first_last_name)) {
+                                                                                    $authorInitials .= strtoupper(substr($rel->author->first_last_name, 0, 1));
+                                                                                }
+                                                                            @endphp
+                                                                            <div class="avatar-img avatar-soft-primary">
                                                                                 <span
-                                                                                    class="avatar-initials">{{ substr($rel->author->first_name, 0, 1) }}</span>
+                                                                                    class="avatar-initials">{{ $authorInitials }}</span>
                                                                             </div>
                                                                         @else
-                                                                            <div class="avatar-soft-primary">
+                                                                            <div class="avatar-img avatar-soft-primary">
                                                                                 <span class="avatar-initials">U</span>
                                                                             </div>
                                                                         @endif
@@ -306,12 +312,18 @@
                                                                                 src="{{ asset('storage/' . $act->author->profile_photo_path) }}"
                                                                                 alt="Avatar">
                                                                         @elseif($act->author)
-                                                                            <div class="avatar-soft-info">
+                                                                            @php
+                                                                                $authorInitials = strtoupper(substr($act->author->first_name, 0, 1));
+                                                                                if (!empty($act->author->first_last_name)) {
+                                                                                    $authorInitials .= strtoupper(substr($act->author->first_last_name, 0, 1));
+                                                                                }
+                                                                            @endphp
+                                                                            <div class="avatar-img avatar-soft-primary">
                                                                                 <span
-                                                                                    class="avatar-initials">{{ substr($act->author->first_name, 0, 1) }}</span>
+                                                                                    class="avatar-initials">{{ $authorInitials }}</span>
                                                                             </div>
                                                                         @else
-                                                                            <div class="avatar-soft-info">
+                                                                            <div class="avatar-img avatar-soft-primary">
                                                                                 <span class="avatar-initials">U</span>
                                                                             </div>
                                                                         @endif

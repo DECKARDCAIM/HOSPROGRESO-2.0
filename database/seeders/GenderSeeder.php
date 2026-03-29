@@ -13,6 +13,7 @@ class GenderSeeder extends Seeder
         $genders = [
             ['name' => 'Masculino', 'is_active' => true],
             ['name' => 'Femenino', 'is_active' => true],
+            ['name' => 'Otro', 'is_active' => true],
         ];
 
         foreach ($genders as $gender) {

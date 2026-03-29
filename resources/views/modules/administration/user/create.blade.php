@@ -204,15 +204,15 @@
                                         <div class="col-md-4 mb-2">
                                             <label for="genderLabel" class="form-label">Género</label>
                                             <div class="tom-select-custom">
-                                                <select class="js-select form-select" name="gender" id="genderLabel"
+                                                <select class="js-select form-select" name="gender_id" id="genderLabel"
                                                     autocomplete="off"
                                                     data-hs-tom-select-options='{
                                                       "placeholder": "Seleccione..."
                                                     }'>
                                                     <option value="">Seleccione</option>
-                                                    <option value="M">Masculino</option>
-                                                    <option value="F">Femenino</option>
-                                                    <option value="O">Otro</option>
+                                                    @foreach ($genders ?? [] as $gender)
+                                                        <option value="{{ $gender->id }}">{{ $gender->name }}</option>
+                                                    @endforeach
                                                 </select>
                                             </div>
                                         </div>

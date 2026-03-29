@@ -135,20 +135,19 @@
             const ts = select.tomselect;
             if (ts) {
                 ts.clearOptions();
-                ts.addOption({ value: '', text: placeholder });
-                ts.addItem('', true);
+                ts.clear();
                 ts.sync();
                 ts.disable();
-                ts.refreshOptions(false);
             }
         }
 
-        function populateSelect(select, items, placeholder) {
+        function populateSelect(select, items, placeholder, selectedId = null) {
             select.innerHTML = `<option value="">${placeholder}</option>`;
             items.forEach(item => {
                 const opt = document.createElement('option');
                 opt.value = item.id;
                 opt.textContent = item.name;
+                if (selectedId && item.id == selectedId) opt.selected = true;
                 select.appendChild(opt);
             });
             select.disabled = false;
@@ -156,13 +155,14 @@
             const ts = select.tomselect;
             if (ts) {
                 ts.clearOptions();
-                ts.addOptions([{ value: '', text: placeholder }].concat(
-                    items.map(i => ({ value: i.id.toString(), text: i.name }))
-                ));
-                ts.addItem('', true);
+                ts.clear();
                 ts.sync();
+
+                if (selectedId && items.some(item => item.id == selectedId)) {
+                    ts.setValue(selectedId.toString());
+                }
+
                 ts.enable();
-                ts.refreshOptions(false);
             }
         }
 
@@ -178,25 +178,20 @@
             const tsDept = departmentSelect.tomselect;
             if (tsDept) {
                 tsDept.clearOptions();
-                tsDept.addOption({ value: '', text: 'Cargando departamentos...' });
-                tsDept.addItem('', true);
-                tsDept.refreshOptions(false);
+                tsDept.clear();
+                departmentSelect.innerHTML = '<option value="">Cargando departamentos...</option>';
+                tsDept.sync();
             }
 
             // Fetch departments via AJAX
             fetch(`{{ route('patients.get-departments-by-country') }}?country_id=${countryId}`)
                 .then(response => response.json())
                 .then(data => {
-                    populateSelect(departmentSelect, data, 'Selecciona un departamento...');
-                    
-                    // Restore old value if exists
                     const oldDeptId = "{{ old('department_id') }}";
-                    if (oldDeptId && data.some(d => d.id == oldDeptId)) {
-                        departmentSelect.value = oldDeptId;
-                        if (tsDept) {
-                            tsDept.addItem(oldDeptId, true);
-                        }
-                    }
+                    const isInitialLoad = (countryId == "{{ old('country_id') }}");
+                    const targetDeptId = isInitialLoad ? oldDeptId : null;
+
+                    populateSelect(departmentSelect, data, 'Selecciona un departamento...', targetDeptId);
                 })
                 .catch(error => {
                     console.error('Error fetching departments:', error);

@@ -120,7 +120,7 @@
                             if (request()->filled('status') && request('status') !== 'active') {
                                 $activeFilters++;
                             }
-                            if (request()->filled('gender')) {
+                            if (request()->filled('gender_id')) {
                                 $activeFilters++;
                             }
                             if (request()->filled('country_id')) {
@@ -215,14 +215,13 @@
 
                                                 <div class="col-12 mb-3">
                                                     <label class="form-label">Género</label>
-                                                    <select name="gender" class="js-select form-select form-select-sm">
+                                                    <select name="gender_id" class="js-select form-select form-select-sm">
                                                         <option value="">Todos</option>
-                                                        <option value="masculino"
-                                                            {{ request('gender') == 'masculino' ? 'selected' : '' }}>
-                                                            Masculino</option>
-                                                        <option value="femenino"
-                                                            {{ request('gender') == 'femenino' ? 'selected' : '' }}>
-                                                            Femenino</option>
+                                                        @foreach ($genders ?? [] as $gender)
+                                                            <option value="{{ $gender->id }}"
+                                                                {{ request('gender_id') == $gender->id ? 'selected' : '' }}>
+                                                                {{ $gender->name }}</option>
+                                                        @endforeach
                                                     </select>
                                                 </div>
 
