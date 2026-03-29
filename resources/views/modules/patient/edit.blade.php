@@ -1,34 +1,40 @@
 @extends('layouts.panel')
 @section('title', 'Editar Paciente')
 
+@section('styles')
+    <link rel="stylesheet" href="{{ asset('vendor/tom-select/dist/css/tom-select.bootstrap5.css') }}">
+@endsection
+
 @section('content')
     <main id="content" role="main" class="main">
         <div class="content container-fluid">
-<!-- Page Header -->
-        <div class="page-header">
-            <div class="row align-items-end">
-                <div class="col-sm mb-2 mb-sm-0">
-                    <nav aria-label="breadcrumb">
-                        <ol class="breadcrumb breadcrumb-no-gutter">
-                            <li class="breadcrumb-item"><a class="breadcrumb-link" href="{{ route('home') }}">Inicio</a></li>
-                            <li class="breadcrumb-item"><a class="breadcrumb-link" href="{{ route('patients.index') }}">Pacientes</a></li>
-                            <li class="breadcrumb-item active" aria-current="page">Editar</li>
-                        </ol>
-                    </nav>
-                    <h1 class="page-header-title">Editar paciente</h1>
-                </div>
+            <!-- Page Header -->
+            <div class="page-header">
+                <div class="row align-items-end">
+                    <div class="col-sm mb-2 mb-sm-0">
+                        <nav aria-label="breadcrumb">
+                            <ol class="breadcrumb breadcrumb-no-gutter">
+                                <li class="breadcrumb-item"><a class="breadcrumb-link" href="{{ route('home') }}">Inicio</a>
+                                </li>
+                                <li class="breadcrumb-item"><a class="breadcrumb-link"
+                                        href="{{ route('patients.index') }}">Pacientes</a></li>
+                                <li class="breadcrumb-item active" aria-current="page">Editar</li>
+                            </ol>
+                        </nav>
+                        <h1 class="page-header-title">Editar paciente</h1>
+                    </div>
 
-                <div class="col-auto">
-                    <a href="{{ route('patients.index') }}" class="btn btn-primary">
-                        <i class="bi-arrow-left"></i> Regresar
-                    </a>
-                </div>
+                    <div class="col-auto">
+                        <a href="{{ route('patients.index') }}" class="btn btn-primary">
+                            <i class="bi-arrow-left"></i> Regresar
+                        </a>
+                    </div>
 
+                </div>
             </div>
-        </div>
-        <!-- End Page Header -->
-            <form id="editPatientForm" action="{{ route('patients.update', $patient) }}" method="POST" class="js-step-form py-md-5"
-                autocomplete="off"
+            <!-- End Page Header -->
+            <form id="editPatientForm" action="{{ route('patients.update', $patient) }}" method="POST"
+                class="js-step-form py-md-5" autocomplete="off"
                 data-hs-step-form-options='{"progressSelector": "#addUserStepFormProgress","stepsSelector": "#addUserStepFormContent","endSelector": "#addUserFinishBtn","isValidate": false}'>
                 @csrf
                 @method('PUT')
@@ -110,8 +116,8 @@
                                                 <input type="text" class="form-control" name="first_name"
                                                     id="firstNameLabel" placeholder="Primer nombre"
                                                     aria-label="Primer nombre"
-                                                    value="{{ old('first_name', $patient->first_name) }}"
-                                                    autocomplete="off" required>
+                                                    value="{{ old('first_name', $patient->first_name) }}" autocomplete="off"
+                                                    required>
                                                 <input type="text" class="form-control" name="second_name"
                                                     id="secondNameLabel" placeholder="Segundo nombre"
                                                     aria-label="Segundo nombre"
@@ -127,7 +133,8 @@
                                     </div>
 
                                     <div class="row mb-4">
-                                        <label for="firstLastNameLabel" class="col-sm-3 col-form-label form-label">Apellidos
+                                        <label for="firstLastNameLabel"
+                                            class="col-sm-3 col-form-label form-label">Apellidos
                                             <i class="bi-question-circle text-body ms-1" data-bs-toggle="tooltip"
                                                 data-bs-placement="top"
                                                 title="Rellene los apellidos del paciente"></i></label>
@@ -162,8 +169,7 @@
                                                 <div class="col-sm-9">
                                                     <input type="text" class="js-input-mask form-control"
                                                         name="dpi" id="dpiLabel" placeholder="0000 00000 0000"
-                                                        aria-label="DPI"
-                                                        value="{{ old('dpi', $patient->dpi) }}"
+                                                        aria-label="DPI" value="{{ old('dpi', $patient->dpi) }}"
                                                         autocomplete="off"
                                                         data-hs-mask-options='{"mask": "0000 00000 0000"}'>
                                                 </div>
@@ -201,8 +207,7 @@
                                                     <input type="email" class="form-control" name="email"
                                                         id="emailLabel" placeholder="ejemplo@correo.com"
                                                         aria-label="ejemplo@correo.com"
-                                                        value="{{ old('email', $patient->email) }}"
-                                                        autocomplete="off">
+                                                        value="{{ old('email', $patient->email) }}" autocomplete="off">
                                                 </div>
                                             </div>
 
@@ -213,10 +218,8 @@
                                                 <div class="col-sm-9">
                                                     <input type="text" class="js-input-mask form-control"
                                                         name="phone" id="phoneLabel" placeholder="00000000"
-                                                        aria-label="00000000"
-                                                        value="{{ old('phone', $patient->phone) }}"
-                                                        autocomplete="off"
-                                                        data-hs-mask-options='{"mask": "00000000"}'>
+                                                        aria-label="00000000" value="{{ old('phone', $patient->phone) }}"
+                                                        autocomplete="off" data-hs-mask-options='{"mask": "00000000"}'>
                                                 </div>
                                             </div>
                                         </div>
@@ -231,35 +234,50 @@
                                     <div class="row mb-12">
 
                                         <div class="row mb-3">
-
                                             <div class="col-md-6">
                                                 <label for="genderLabel" class="form-label">
                                                     Género
                                                 </label>
-                                                <select class="form-select form-select-sm" name="gender_id"
-                                                    id="genderLabel">
-                                                    <option value="">Seleccione</option>
-                                                    @foreach ($genders as $gender)
-                                                        <option value="{{ $gender->id }}"
-                                                            {{ old('gender_id', $patient->gender_id) == $gender->id ? 'selected' : '' }}>{{ $gender->name }}</option>
-                                                    @endforeach
-                                                </select>
+                                                <!-- Select -->
+                                                <div class="tom-select-custom">
+                                                    <select class="js-select form-select form-select-sm" name="gender_id"
+                                                        id="genderLabel"
+                                                        data-hs-tom-select-options='{
+                                                          "placeholder": "Seleccione género..."
+                                                        }'
+                                                        required>
+                                                        <option value="">Seleccione</option>
+                                                        @foreach ($genders as $gender)
+                                                            <option value="{{ $gender->id }}"
+                                                                {{ old('gender_id', $patient->gender_id) == $gender->id ? 'selected' : '' }}>
+                                                                {{ $gender->name }}</option>
+                                                        @endforeach
+                                                    </select>
+                                                </div>
+                                                <!-- End Select -->
                                             </div>
 
                                             <div class="col-md-6">
                                                 <label for="civilStatusLabel" class="form-label">
                                                     Estado civil
                                                 </label>
-                                                <select class="form-select form-select-sm" name="civil_status_id"
-                                                    id="civilStatusLabel">
-                                                    <option value="">Seleccione</option>
-                                                    @foreach ($civilStatuses as $status)
-                                                        <option value="{{ $status->id }}"
-                                                            {{ old('civil_status_id', $patient->civil_status_id) == $status->id ? 'selected' : '' }}>{{ $status->name }}</option>
-                                                    @endforeach
-                                                </select>
+                                                <!-- Select -->
+                                                <div class="tom-select-custom">
+                                                    <select class="js-select form-select form-select-sm"
+                                                        name="civil_status_id" id="civilStatusLabel"
+                                                        data-hs-tom-select-options='{
+                                                          "placeholder": "Seleccione estado civil..."
+                                                        }'>
+                                                        <option value="">Seleccione</option>
+                                                        @foreach ($civilStatuses as $status)
+                                                            <option value="{{ $status->id }}"
+                                                                {{ old('civil_status_id', $patient->civil_status_id) == $status->id ? 'selected' : '' }}>
+                                                                {{ $status->name }}</option>
+                                                        @endforeach
+                                                    </select>
+                                                </div>
+                                                <!-- End Select -->
                                             </div>
-
                                         </div>
 
                                         <div class="row mb-3">
@@ -268,30 +286,46 @@
                                                 <label for="ethnicityLabel" class="form-label">
                                                     Etnia
                                                 </label>
-                                                <select class="form-select form-select-sm" name="ethnicity_id"
-                                                    id="ethnicityLabel">
-                                                    <option value="">Seleccione</option>
-                                                    @foreach ($ethnicities as $ethnicity)
-                                                        <option value="{{ $ethnicity->id }}"
-                                                            {{ old('ethnicity_id', $patient->ethnicity_id) == $ethnicity->id ? 'selected' : '' }}>{{ $ethnicity->name }}
-                                                        </option>
-                                                    @endforeach
-                                                </select>
+                                                <!-- Select -->
+                                                <div class="tom-select-custom">
+                                                    <select class="js-select form-select form-select-sm"
+                                                        name="ethnicity_id" id="ethnicityLabel"
+                                                        data-hs-tom-select-options='{
+                                                          "placeholder": "Seleccione etnia..."
+                                                        }'>
+                                                        <option value="">Seleccione</option>
+                                                        @foreach ($ethnicities as $ethnicity)
+                                                            <option value="{{ $ethnicity->id }}"
+                                                                {{ old('ethnicity_id', $patient->ethnicity_id) == $ethnicity->id ? 'selected' : '' }}>
+                                                                {{ $ethnicity->name }}
+                                                            </option>
+                                                        @endforeach
+                                                    </select>
+                                                </div>
+                                                <!-- End Select -->
                                             </div>
 
                                             <div class="col-md-6">
                                                 <label for="linguisticCommunityLabel" class="form-label">
                                                     Comunidad lingüística
                                                 </label>
-                                                <select class="form-select form-select-sm" name="linguistic_community_id"
-                                                    id="linguisticCommunityLabel">
-                                                    <option value="">Seleccione</option>
-                                                    @foreach ($linguisticCommunities as $community)
-                                                        <option value="{{ $community->id }}"
-                                                            {{ old('linguistic_community_id', $patient->linguistic_community_id) == $community->id ? 'selected' : '' }}>{{ $community->name }}
-                                                        </option>
-                                                    @endforeach
-                                                </select>
+                                                <!-- Select -->
+                                                <div class="tom-select-custom">
+                                                    <select class="js-select form-select form-select-sm"
+                                                        name="linguistic_community_id" id="linguisticCommunityLabel"
+                                                        data-hs-tom-select-options='{
+                                                          "placeholder": "Seleccione comunidad..."
+                                                        }'>
+                                                        <option value="">Seleccione</option>
+                                                        @foreach ($linguisticCommunities as $community)
+                                                            <option value="{{ $community->id }}"
+                                                                {{ old('linguistic_community_id', $patient->linguistic_community_id) == $community->id ? 'selected' : '' }}>
+                                                                {{ $community->name }}
+                                                            </option>
+                                                        @endforeach
+                                                    </select>
+                                                </div>
+                                                <!-- End Select -->
                                             </div>
 
                                         </div>
@@ -312,16 +346,35 @@
                                                 <label for="educationLabel" class="form-label">
                                                     Escolaridad <span class="form-label-secondary">(Opcional)</span>
                                                 </label>
-                                                <select class="form-select form-select-sm" name="education"
-                                                    id="educationLabel">
-                                                    <option value="">Seleccione</option>
-                                                    <option value="ninguna" {{ old('education', $patient->education) == 'ninguna' ? 'selected' : '' }}>Ninguna</option>
-                                                    <option value="primaria" {{ old('education', $patient->education) == 'primaria' ? 'selected' : '' }}>Primaria</option>
-                                                    <option value="basico" {{ old('education', $patient->education) == 'basico' ? 'selected' : '' }}>Básico</option>
-                                                    <option value="diversificado" {{ old('education', $patient->education) == 'diversificado' ? 'selected' : '' }}>Diversificado</option>
-                                                    <option value="universitario" {{ old('education', $patient->education) == 'universitario' ? 'selected' : '' }}>Universitario</option>
-                                                    <option value="postgrado" {{ old('education', $patient->education) == 'postgrado' ? 'selected' : '' }}>Postgrado</option>
-                                                </select>
+                                                <!-- Select -->
+                                                <div class="tom-select-custom">
+                                                    <select class="js-select form-select form-select-sm" name="education"
+                                                        id="educationLabel"
+                                                        data-hs-tom-select-options='{
+                                                          "placeholder": "Seleccione escolaridad..."
+                                                        }'>
+                                                        <option value="">Seleccione</option>
+                                                        <option value="ninguna"
+                                                            {{ old('education', $patient->education) == 'ninguna' ? 'selected' : '' }}>
+                                                            Ninguna</option>
+                                                        <option value="primaria"
+                                                            {{ old('education', $patient->education) == 'primaria' ? 'selected' : '' }}>
+                                                            Primaria</option>
+                                                        <option value="basico"
+                                                            {{ old('education', $patient->education) == 'basico' ? 'selected' : '' }}>
+                                                            Básico</option>
+                                                        <option value="diversificado"
+                                                            {{ old('education', $patient->education) == 'diversificado' ? 'selected' : '' }}>
+                                                            Diversificado</option>
+                                                        <option value="universitario"
+                                                            {{ old('education', $patient->education) == 'universitario' ? 'selected' : '' }}>
+                                                            Universitario</option>
+                                                        <option value="postgrado"
+                                                            {{ old('education', $patient->education) == 'postgrado' ? 'selected' : '' }}>
+                                                            Postgrado</option>
+                                                    </select>
+                                                </div>
+                                                <!-- End Select -->
                                             </div>
 
                                             <div class="col-md-6">
@@ -351,26 +404,22 @@
                                             Alergias <span class="form-label-secondary">(Opcional)</span>
                                         </label>
                                         <div class="col-sm-9">
-                                            @if($allergies->isEmpty())
-                                                <p class="text-muted small">No hay alergias registradas en el catálogo.</p>
-                                            @else
-                                                <div class="row g-2" id="allergiesCheckboxGroup">
-                                                    @foreach($allergies as $allergy)
-                                                        <div class="col-md-4 col-6">
-                                                            <div class="form-check">
-                                                                <input class="form-check-input allergy-check" type="checkbox"
-                                                                    name="allergies[]" value="{{ $allergy->id }}"
-                                                                    id="allergy_{{ $allergy->id }}"
-                                                                    data-label="{{ $allergy->name }}"
-                                                                    {{ in_array($allergy->id, $selectedAllergyIds) ? 'checked' : '' }}>
-                                                                <label class="form-check-label small" for="allergy_{{ $allergy->id }}">
-                                                                    {{ $allergy->name }}
-                                                                </label>
-                                                            </div>
-                                                        </div>
+                                            <!-- Select (Multi) -->
+                                            <div class="tom-select-custom">
+                                                <select class="js-select form-select" name="allergies[]"
+                                                    id="allergiesLabel" multiple
+                                                    data-hs-tom-select-options='{
+                                                      "placeholder": "Seleccione alergias..."
+                                                    }'>
+                                                    @foreach ($allergies as $allergy)
+                                                        <option value="{{ $allergy->id }}"
+                                                            {{ in_array($allergy->id, $selectedAllergyIds) ? 'selected' : '' }}>
+                                                            {{ $allergy->name }}
+                                                        </option>
                                                     @endforeach
-                                                </div>
-                                            @endif
+                                                </select>
+                                            </div>
+                                            <!-- End Select -->
                                         </div>
                                     </div>
 
@@ -386,26 +435,22 @@
                                             Discapacidades <span class="form-label-secondary">(Opcional)</span>
                                         </label>
                                         <div class="col-sm-9">
-                                            @if($disabilities->isEmpty())
-                                                <p class="text-muted small">No hay discapacidades registradas en el catálogo.</p>
-                                            @else
-                                                <div class="row g-2" id="disabilitiesCheckboxGroup">
-                                                    @foreach($disabilities as $disability)
-                                                        <div class="col-md-4 col-6">
-                                                            <div class="form-check">
-                                                                <input class="form-check-input disability-check" type="checkbox"
-                                                                    name="disabilities[]" value="{{ $disability->id }}"
-                                                                    id="disability_{{ $disability->id }}"
-                                                                    data-label="{{ $disability->name }}"
-                                                                    {{ in_array($disability->id, $selectedDisabilityIds) ? 'checked' : '' }}>
-                                                                <label class="form-check-label small" for="disability_{{ $disability->id }}">
-                                                                    {{ $disability->name }}
-                                                                </label>
-                                                            </div>
-                                                        </div>
+                                            <!-- Select (Multi) -->
+                                            <div class="tom-select-custom">
+                                                <select class="js-select form-select" name="disabilities[]"
+                                                    id="disabilitiesLabel" multiple
+                                                    data-hs-tom-select-options='{
+                                                      "placeholder": "Seleccione discapacidades..."
+                                                    }'>
+                                                    @foreach ($disabilities as $disability)
+                                                        <option value="{{ $disability->id }}"
+                                                            {{ in_array($disability->id, $selectedDisabilityIds) ? 'selected' : '' }}>
+                                                            {{ $disability->name }}
+                                                        </option>
                                                     @endforeach
-                                                </div>
-                                            @endif
+                                                </select>
+                                            </div>
+                                            <!-- End Select -->
                                         </div>
                                     </div>
 
@@ -425,14 +470,20 @@
                                     <div class="row mb-4">
                                         <label for="countryLabel" class="col-sm-3 col-form-label form-label">País</label>
                                         <div class="col-sm-9">
-                                            <select class="form-select" name="country_id" id="countryLabel">
-                                                <option value="">Seleccione un país</option>
-                                                @foreach ($countries as $country)
-                                                    <option value="{{ $country->id }}"
-                                                        {{ old('country_id', $patient->country_id) == $country->id ? 'selected' : '' }}>{{ $country->name }}
-                                                    </option>
-                                                @endforeach
-                                            </select>
+                                            <div class="tom-select-custom">
+                                                <select class="js-select form-select" name="country_id" id="countryLabel"
+                                                    data-hs-tom-select-options='{
+                                                      "placeholder": "Seleccione un país..."
+                                                    }'>
+                                                    <option value="">Seleccione un país</option>
+                                                    @foreach ($countries as $country)
+                                                        <option value="{{ $country->id }}"
+                                                            {{ old('country_id', $patient->country_id) == $country->id ? 'selected' : '' }}>
+                                                            {{ $country->name }}
+                                                        </option>
+                                                    @endforeach
+                                                </select>
+                                            </div>
                                         </div>
                                     </div>
 
@@ -440,14 +491,20 @@
                                         <label for="departmentLabel"
                                             class="col-sm-3 col-form-label form-label">Departamento</label>
                                         <div class="col-sm-9">
-                                            <select class="form-select" name="department_id" id="departmentLabel"
-                                                {{ $departments->isEmpty() ? 'disabled' : '' }}>
-                                                <option value="">Seleccione primero un país</option>
-                                                @foreach ($departments as $dept)
-                                                    <option value="{{ $dept->id }}"
-                                                        {{ old('department_id', $patient->department_id) == $dept->id ? 'selected' : '' }}>{{ $dept->name }}</option>
-                                                @endforeach
-                                            </select>
+                                            <div class="tom-select-custom">
+                                                <select class="js-select form-select" name="department_id"
+                                                    id="departmentLabel" {{ $departments->isEmpty() ? 'disabled' : '' }}
+                                                    data-hs-tom-select-options='{
+                                                      "placeholder": "Seleccione un departamento..."
+                                                    }'>
+                                                    <option value="">Seleccione primero un país</option>
+                                                    @foreach ($departments as $dept)
+                                                        <option value="{{ $dept->id }}"
+                                                            {{ old('department_id', $patient->department_id) == $dept->id ? 'selected' : '' }}>
+                                                            {{ $dept->name }}</option>
+                                                    @endforeach
+                                                </select>
+                                            </div>
                                         </div>
                                     </div>
 
@@ -455,14 +512,21 @@
                                         <label for="municipalityLabel"
                                             class="col-sm-3 col-form-label form-label">Municipio</label>
                                         <div class="col-sm-9">
-                                            <select class="form-select" name="municipality_id" id="municipalityLabel"
-                                                {{ $municipalities->isEmpty() ? 'disabled' : '' }}>
-                                                <option value="">Seleccione primero un departamento</option>
-                                                @foreach ($municipalities as $muni)
-                                                    <option value="{{ $muni->id }}"
-                                                        {{ old('municipality_id', $patient->municipality_id) == $muni->id ? 'selected' : '' }}>{{ $muni->name }}</option>
-                                                @endforeach
-                                            </select>
+                                            <div class="tom-select-custom">
+                                                <select class="js-select form-select" name="municipality_id"
+                                                    id="municipalityLabel"
+                                                    {{ $municipalities->isEmpty() ? 'disabled' : '' }}
+                                                    data-hs-tom-select-options='{
+                                                      "placeholder": "Seleccione un municipio..."
+                                                    }'>
+                                                    <option value="">Seleccione primero un departamento</option>
+                                                    @foreach ($municipalities as $muni)
+                                                        <option value="{{ $muni->id }}"
+                                                            {{ old('municipality_id', $patient->municipality_id) == $muni->id ? 'selected' : '' }}>
+                                                            {{ $muni->name }}</option>
+                                                    @endforeach
+                                                </select>
+                                            </div>
                                         </div>
                                     </div>
 
@@ -472,8 +536,7 @@
                                         <div class="col-sm-9">
                                             <input type="text" class="form-control" name="place" id="placeLabel"
                                                 placeholder="Dirección exacta" aria-label="Dirección exacta"
-                                                value="{{ old('place', $patient->place) }}"
-                                                autocomplete="off">
+                                                value="{{ old('place', $patient->place) }}" autocomplete="off">
                                         </div>
                                     </div>
                                 </div>
@@ -538,37 +601,43 @@
                                                 <div class="col-md-6">
                                                     <label class="form-label form-label-sm">Primer Nombre *</label>
                                                     <input type="text" class="form-control form-control-sm"
-                                                        id="newRelFirstName" placeholder="Primer nombre" autocomplete="off">
+                                                        id="newRelFirstName" placeholder="Primer nombre"
+                                                        autocomplete="off">
                                                 </div>
                                                 <div class="col-md-6">
                                                     <label class="form-label form-label-sm">Segundo Nombre</label>
                                                     <input type="text" class="form-control form-control-sm"
-                                                        id="newRelSecondName" placeholder="Segundo nombre" autocomplete="off">
+                                                        id="newRelSecondName" placeholder="Segundo nombre"
+                                                        autocomplete="off">
                                                 </div>
                                                 <div class="col-md-6">
                                                     <label class="form-label form-label-sm">Primer Apellido
                                                         *</label>
                                                     <input type="text" class="form-control form-control-sm"
-                                                        id="newRelFirstLastName" placeholder="Primer apellido" autocomplete="off">
+                                                        id="newRelFirstLastName" placeholder="Primer apellido"
+                                                        autocomplete="off">
                                                 </div>
                                                 <div class="col-md-6">
                                                     <label class="form-label form-label-sm">Segundo
                                                         Apellido</label>
                                                     <input type="text" class="form-control form-control-sm"
-                                                        id="newRelSecondLastName" placeholder="Segundo apellido" autocomplete="off">
+                                                        id="newRelSecondLastName" placeholder="Segundo apellido"
+                                                        autocomplete="off">
                                                 </div>
                                                 <div class="col-md-6">
                                                     <label class="form-label form-label-sm">Apellido de
                                                         casada</label>
                                                     <input type="text" class="form-control form-control-sm"
-                                                        id="newRelMarriedLastName" placeholder="Apellido de casada" autocomplete="off">
+                                                        id="newRelMarriedLastName" placeholder="Apellido de casada"
+                                                        autocomplete="off">
                                                 </div>
                                                 <div class="col-md-6">
                                                     <label class="form-label form-label-sm">DPI</label>
                                                     <input type="text"
                                                         class="form-control form-control-sm js-input-mask" id="newRelDpi"
                                                         placeholder="0000 00000 0000"
-                                                        data-hs-mask-options='{"mask": "0000 00000 0000"}' autocomplete="off">
+                                                        data-hs-mask-options='{"mask": "0000 00000 0000"}'
+                                                        autocomplete="off">
                                                 </div>
                                                 <div class="col-md-6 d-flex align-items-end">
                                                     <button type="button" class="btn btn-primary btn-sm w-100"
@@ -616,14 +685,16 @@
                                 <!-- Profile Cover -->
                                 <div class="profile-cover">
                                     <div class="profile-cover-img-wrapper">
-                                        <img class="profile-cover-img" src="{{ asset('img/1920x400/img1.jpg') }}" alt="Portada">
+                                        <img class="profile-cover-img" src="{{ asset('img/1920x400/img1.jpg') }}"
+                                            alt="Portada">
                                     </div>
                                 </div>
                                 <!-- End Profile Cover -->
 
                                 <!-- Avatar -->
                                 <label class="avatar avatar-xxl avatar-circle avatar-border-lg profile-cover-avatar">
-                                    <img id="confirmAvatarImg" class="avatar-img" src="{{ asset('img/160x160/img1.jpg') }}" alt="Avatar">
+                                    <img id="confirmAvatarImg" class="avatar-img"
+                                        src="{{ asset('img/160x160/img1.jpg') }}" alt="Avatar">
                                 </label>
                                 <!-- End Avatar -->
 
@@ -636,8 +707,12 @@
                                             <strong>{{ $patient->clinicalRecord->record_number ?? 'Sin expediente' }}</strong>
                                         </dd>
 
-                                        <dt class="col-sm-6 text-sm-end"><hr class="my-2 w-100"></dt>
-                                        <dd class="col-sm-6"><hr class="my-2 w-100"></dd>
+                                        <dt class="col-sm-6 text-sm-end">
+                                            <hr class="my-2 w-100">
+                                        </dt>
+                                        <dd class="col-sm-6">
+                                            <hr class="my-2 w-100">
+                                        </dd>
 
                                         <dt class="col-sm-6 text-sm-end">Primer nombre:</dt>
                                         <dd class="col-sm-6" id="confirm-firstName">—</dd>
@@ -657,8 +732,12 @@
                                         <dt class="col-sm-6 text-sm-end">Apellido de casada:</dt>
                                         <dd class="col-sm-6" id="confirm-marriedLastName">—</dd>
 
-                                        <dt class="col-sm-6 text-sm-end"><hr class="my-2 w-100"></dt>
-                                        <dd class="col-sm-6"><hr class="my-2 w-100"></dd>
+                                        <dt class="col-sm-6 text-sm-end">
+                                            <hr class="my-2 w-100">
+                                        </dt>
+                                        <dd class="col-sm-6">
+                                            <hr class="my-2 w-100">
+                                        </dd>
 
                                         <dt class="col-sm-6 text-sm-end">DPI:</dt>
                                         <dd class="col-sm-6" id="confirm-dpi">—</dd>
@@ -684,8 +763,12 @@
                                         <dt class="col-sm-6 text-sm-end">Ocupación:</dt>
                                         <dd class="col-sm-6" id="confirm-occupation">—</dd>
 
-                                        <dt class="col-sm-6 text-sm-end"><hr class="my-2 w-100"></dt>
-                                        <dd class="col-sm-6"><hr class="my-2 w-100"></dd>
+                                        <dt class="col-sm-6 text-sm-end">
+                                            <hr class="my-2 w-100">
+                                        </dt>
+                                        <dd class="col-sm-6">
+                                            <hr class="my-2 w-100">
+                                        </dd>
 
                                         <dt class="col-sm-6 text-sm-end">Correo electrónico:</dt>
                                         <dd class="col-sm-6" id="confirm-email">—</dd>
@@ -693,8 +776,12 @@
                                         <dt class="col-sm-6 text-sm-end">Teléfono:</dt>
                                         <dd class="col-sm-6" id="confirm-phone">—</dd>
 
-                                        <dt class="col-sm-6 text-sm-end"><hr class="my-2 w-100"></dt>
-                                        <dd class="col-sm-6"><hr class="my-2 w-100"></dd>
+                                        <dt class="col-sm-6 text-sm-end">
+                                            <hr class="my-2 w-100">
+                                        </dt>
+                                        <dd class="col-sm-6">
+                                            <hr class="my-2 w-100">
+                                        </dd>
 
                                         <dt class="col-sm-6 text-sm-end">País:</dt>
                                         <dd class="col-sm-6" id="confirm-country">—</dd>
@@ -708,14 +795,22 @@
                                         <dt class="col-sm-6 text-sm-end">Dirección:</dt>
                                         <dd class="col-sm-6" id="confirm-place">—</dd>
 
-                                        <dt class="col-sm-6 text-sm-end"><hr class="my-2 w-100"></dt>
-                                        <dd class="col-sm-6"><hr class="my-2 w-100"></dd>
+                                        <dt class="col-sm-6 text-sm-end">
+                                            <hr class="my-2 w-100">
+                                        </dt>
+                                        <dd class="col-sm-6">
+                                            <hr class="my-2 w-100">
+                                        </dd>
 
                                         <dt class="col-sm-6 text-sm-end">Alergias:</dt>
                                         <dd class="col-sm-6" id="confirm-allergies">—</dd>
 
-                                        <dt class="col-sm-6 text-sm-end"><hr class="my-2 w-100"></dt>
-                                        <dd class="col-sm-6"><hr class="my-2 w-100"></dd>
+                                        <dt class="col-sm-6 text-sm-end">
+                                            <hr class="my-2 w-100">
+                                        </dt>
+                                        <dd class="col-sm-6">
+                                            <hr class="my-2 w-100">
+                                        </dd>
 
                                         <dt class="col-sm-6 text-sm-end">Discapacidades:</dt>
                                         <dd class="col-sm-6" id="confirm-disabilities">—</dd>
@@ -773,6 +868,9 @@
                 // INITIALIZATION OF FILE ATTACH
                 new HSFileAttach('.js-file-attach')
 
+                // INITIALIZATION OF TOM SELECT
+                HSCore.components.HSTomSelect.init('.js-select')
+
                 // INITIALIZATION OF STEP FORM
                 new HSStepForm('.js-step-form', {
                     onNextStep: function() {
@@ -795,51 +893,61 @@
 
                 // Logic for auto-filling the confirmation step
                 function updateConfirmationStep() {
-                    const getVal = (id) => document.getElementById(id) ? document.getElementById(id).value.trim() : '';
+                    const getVal = (id) => document.getElementById(id) ? document.getElementById(id).value.trim() :
+                        '';
                     const getText = (id) => {
                         const el = document.getElementById(id);
-                        return el && el.options && el.selectedIndex >= 0 && el.value !== "" ? el.options[el.selectedIndex].text : '';
+                        if (!el) return '';
+                        // If it's a TomSelect instance
+                        if (el.tomselect) {
+                            const items = el.tomselect.getValue();
+                            if (Array.isArray(items)) {
+                                return items.map(val => {
+                                    const opt = el.tomselect.options[val];
+                                    return opt ? opt.text : val;
+                                }).join(', ');
+                            }
+                            const selected = el.tomselect.getItem(items);
+                            return selected ? selected.textContent.trim() : '';
+                        }
+                        return el.options && el.selectedIndex >= 0 && el.value !== "" ? el.options[el
+                            .selectedIndex].text : '';
                     };
                     const setEl = (id, val) => {
                         const el = document.getElementById(id);
                         if (!el) return;
-                        if (val) {
+                        if (val && val !== "") {
                             el.textContent = val;
                             el.classList.remove('text-muted', 'fst-italic');
                         } else {
-                            el.innerHTML = '<em class="text-muted">Sin especificar</em>';
+                            el.innerHTML = '<em class="text-muted small">Sin especificar</em>';
                         }
                     };
 
-                    setEl('confirm-firstName',           getVal('firstNameLabel'));
-                    setEl('confirm-secondName',          getVal('secondNameLabel'));
-                    setEl('confirm-thirdName',           getVal('thirdNameLabel'));
-                    setEl('confirm-firstLastName',       getVal('firstLastNameLabel'));
-                    setEl('confirm-secondLastName',      getVal('secondLastNameLabel'));
-                    setEl('confirm-marriedLastName',     getVal('marriedLastNameLabel'));
-                    setEl('confirm-dpi',                 getVal('dpiLabel'));
-                    setEl('confirm-birthDate',           getVal('birthDateLabel'));
-                    setEl('confirm-gender',              getText('genderLabel'));
-                    setEl('confirm-civilStatus',         getText('civilStatusLabel'));
-                    setEl('confirm-ethnicity',           getText('ethnicityLabel'));
+                    setEl('confirm-firstName', getVal('firstNameLabel'));
+                    setEl('confirm-secondName', getVal('secondNameLabel'));
+                    setEl('confirm-thirdName', getVal('thirdNameLabel'));
+                    setEl('confirm-firstLastName', getVal('firstLastNameLabel'));
+                    setEl('confirm-secondLastName', getVal('secondLastNameLabel'));
+                    setEl('confirm-marriedLastName', getVal('marriedLastNameLabel'));
+                    setEl('confirm-dpi', getVal('dpiLabel'));
+                    setEl('confirm-birthDate', getVal('birthDateLabel'));
+                    setEl('confirm-gender', getText('genderLabel'));
+                    setEl('confirm-civilStatus', getText('civilStatusLabel'));
+                    setEl('confirm-ethnicity', getText('ethnicityLabel'));
                     setEl('confirm-linguisticCommunity', getText('linguisticCommunityLabel'));
-                    setEl('confirm-education',           getText('educationLabel'));
-                    setEl('confirm-occupation',          getVal('occupationLabel'));
-                    setEl('confirm-email',               getVal('emailLabel'));
-                    setEl('confirm-phone',               getVal('phoneLabel'));
-                    setEl('confirm-country',             getText('countryLabel'));
-                    setEl('confirm-department',          getText('departmentLabel'));
-                    setEl('confirm-municipality',        getText('municipalityLabel'));
-                    setEl('confirm-place',               getVal('placeLabel'));
+                    setEl('confirm-education', getText('educationLabel'));
+                    setEl('confirm-occupation', getVal('occupationLabel'));
+                    setEl('confirm-email', getVal('emailLabel'));
+                    setEl('confirm-phone', getVal('phoneLabel'));
+                    setEl('confirm-country', getText('countryLabel'));
+                    setEl('confirm-department', getText('departmentLabel'));
+                    setEl('confirm-municipality', getText('municipalityLabel'));
+                    setEl('confirm-place', getVal('placeLabel'));
 
-                    // Alergias & discapacidades
-                    const getCheckedLabels = (selector) => {
-                        const labels = [];
-                        document.querySelectorAll(selector + ':checked').forEach(cb => labels.push(cb.dataset.label));
-                        return labels.join(', ');
-                    };
-                    setEl('confirm-allergies',   getCheckedLabels('.allergy-check'));
-                    setEl('confirm-disabilities', getCheckedLabels('.disability-check'));
+                    // Alergias & discapacidades (Now handled by getText since they are TomSelects)
+                    setEl('confirm-allergies', getText('allergiesLabel'));
+                    setEl('confirm-disabilities', getText('disabilitiesLabel'));
                 }
 
                 // Run immediately so pre-filled values show on confirm step
@@ -889,15 +997,18 @@
                                             `<div class="list-group-item text-muted small py-2"><i class="bi-info-circle me-1"></i>No se encontraron resultados. Prueba «Crear nuevo».</div>`;
                                     } else {
                                         data.forEach(rel => {
-                                            const item = document.createElement('button');
+                                            const item = document.createElement(
+                                                'button');
                                             item.type = 'button';
-                                            item.className = 'list-group-item list-group-item-action py-2';
+                                            item.className =
+                                                'list-group-item list-group-item-action py-2';
                                             item.innerHTML =
                                                 `<strong>${rel.name}</strong>${rel.married_last_name ? ` (de ${rel.married_last_name})` : ''}${rel.dpi ? ` <span class="text-muted small">· DPI: ${rel.dpi}</span>` : ''}`;
                                             item.addEventListener('click', () => {
                                                 addSelectedRelative(rel);
                                                 searchInput.value = '';
-                                                searchResults.style.display = 'none';
+                                                searchResults.style.display =
+                                                    'none';
                                             });
                                             searchResults.appendChild(item);
                                         });
@@ -939,10 +1050,12 @@
                         second_name: document.getElementById('newRelSecondName').value.trim(),
                         first_last_name: firstLastName,
                         second_last_name: document.getElementById('newRelSecondLastName').value.trim(),
-                        married_last_name: document.getElementById('newRelMarriedLastName').value.trim(),
+                        married_last_name: document.getElementById('newRelMarriedLastName').value
+                            .trim(),
                         dpi: document.getElementById('newRelDpi').value.trim(),
                         name: [firstName, document.getElementById('newRelSecondName').value.trim(),
-                            firstLastName, document.getElementById('newRelSecondLastName').value.trim()
+                            firstLastName, document.getElementById('newRelSecondLastName').value
+                            .trim()
                         ].filter(Boolean).join(' ')
                     };
                     addSelectedRelative(relData);
@@ -1014,22 +1127,60 @@
                 const departmentSelect = document.getElementById('departmentLabel');
                 const municipalitySelect = document.getElementById('municipalityLabel');
 
+                function syncTS(select) {
+                    const ts = select.tomselect;
+                    if (ts) {
+                        ts.sync();
+                        ts.refreshOptions(false);
+                    }
+                }
+
                 function resetSelect(select, placeholder) {
                     select.innerHTML = `<option value="">${placeholder}</option>`;
                     select.disabled = true;
                     select.value = '';
+
+                    const ts = select.tomselect;
+                    if (ts) {
+                        ts.clearOptions();
+                        ts.addOption({
+                            value: '',
+                            text: placeholder
+                        });
+                        ts.addItem('', true);
+                        ts.sync();
+                        ts.disable();
+                        ts.refreshOptions(false);
+                    }
                 }
 
-                function populateSelect(select, items, placeholder, selectedId = null) {
+                function populateSelect(select, items, placeholder) {
                     select.innerHTML = `<option value="">${placeholder}</option>`;
                     items.forEach(item => {
                         const opt = document.createElement('option');
                         opt.value = item.id;
                         opt.textContent = item.name;
-                        if (selectedId && item.id == selectedId) opt.selected = true;
                         select.appendChild(opt);
                     });
                     select.disabled = false;
+
+                    const ts = select.tomselect;
+                    if (ts) {
+                        ts.clearOptions();
+                        ts.addOptions([{
+                            value: '',
+                            text: placeholder
+                        }].concat(
+                            items.map(i => ({
+                                value: i.id,
+                                text: i.name
+                            }))
+                        ));
+                        ts.addItem('', true);
+                        ts.sync();
+                        ts.enable();
+                        ts.refreshOptions(false);
+                    }
                 }
 
                 if (countrySelect) {
@@ -1037,17 +1188,25 @@
                         const countryId = this.value;
                         resetSelect(departmentSelect, 'Seleccione primero un país');
                         resetSelect(municipalitySelect, 'Seleccione primero un departamento');
+
                         if (!countryId) return;
+
                         departmentSelect.innerHTML = '<option value="">Cargando...</option>';
+                        syncTS(departmentSelect);
+
                         fetch(`{{ route('patients.get-departments-by-country') }}?country_id=${countryId}`, {
-                                headers: { 'X-Requested-With': 'XMLHttpRequest', 'Accept': 'application/json' }
+                                headers: {
+                                    'X-Requested-With': 'XMLHttpRequest',
+                                    'Accept': 'application/json'
+                                }
                             })
                             .then(r => r.json())
                             .then(data => {
                                 if (data.length === 0) {
                                     resetSelect(departmentSelect, 'Sin departamentos disponibles');
                                 } else {
-                                    populateSelect(departmentSelect, data, 'Seleccione un departamento');
+                                    populateSelect(departmentSelect, data,
+                                        'Seleccione un departamento');
                                 }
                             })
                             .catch(() => resetSelect(departmentSelect, 'Error al cargar'));
@@ -1058,10 +1217,17 @@
                     departmentSelect.addEventListener('change', function() {
                         const deptId = this.value;
                         resetSelect(municipalitySelect, 'Seleccione primero un departamento');
+
                         if (!deptId) return;
+
                         municipalitySelect.innerHTML = '<option value="">Cargando...</option>';
+                        syncTS(municipalitySelect);
+
                         fetch(`{{ route('patients.get-municipalities-by-department') }}?department_id=${deptId}`, {
-                                headers: { 'X-Requested-With': 'XMLHttpRequest', 'Accept': 'application/json' }
+                                headers: {
+                                    'X-Requested-With': 'XMLHttpRequest',
+                                    'Accept': 'application/json'
+                                }
                             })
                             .then(r => r.json())
                             .then(data => {

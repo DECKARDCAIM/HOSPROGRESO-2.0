@@ -1,6 +1,11 @@
 @extends('layouts.panel')
 @section('title', 'Crear Paciente')
 
+@section('styles')
+    <link rel="stylesheet" href="{{ asset('vendor/tom-select/dist/css/tom-select.bootstrap5.css') }}">
+@endsection
+
+
 @section('content')
     <main id="content" role="main" class="main">
         <div class="content container-fluid">
@@ -218,26 +223,32 @@
                                                 <label for="genderLabel" class="form-label">
                                                     Género
                                                 </label>
-                                                <select class="form-select form-select-sm" name="gender_id"
-                                                    id="genderLabel">
-                                                    <option value="">Seleccione</option>
-                                                    @foreach ($genders as $gender)
-                                                        <option value="{{ $gender->id }}">{{ $gender->name }}</option>
-                                                    @endforeach
-                                                </select>
+                                                <div class="tom-select-custom">
+                                                    <select class="js-select form-select form-select-sm" name="gender_id"
+                                                        id="genderLabel"
+                                                        data-hs-tom-select-options='{ "placeholder": "Seleccione género..." }'>
+                                                        <option value="">Seleccione</option>
+                                                        @foreach ($genders as $gender)
+                                                            <option value="{{ $gender->id }}">{{ $gender->name }}</option>
+                                                        @endforeach
+                                                    </select>
+                                                </div>
                                             </div>
 
                                             <div class="col-md-6">
                                                 <label for="civilStatusLabel" class="form-label">
                                                     Estado civil
                                                 </label>
-                                                <select class="form-select form-select-sm" name="civil_status_id"
-                                                    id="civilStatusLabel">
-                                                    <option value="">Seleccione</option>
-                                                    @foreach ($civilStatuses as $status)
-                                                        <option value="{{ $status->id }}">{{ $status->name }}</option>
-                                                    @endforeach
-                                                </select>
+                                                <div class="tom-select-custom">
+                                                    <select class="js-select form-select form-select-sm" name="civil_status_id"
+                                                        id="civilStatusLabel"
+                                                        data-hs-tom-select-options='{ "placeholder": "Seleccione estado civil..." }'>
+                                                        <option value="">Seleccione</option>
+                                                        @foreach ($civilStatuses as $status)
+                                                            <option value="{{ $status->id }}">{{ $status->name }}</option>
+                                                        @endforeach
+                                                    </select>
+                                                </div>
                                             </div>
 
                                         </div>
@@ -248,28 +259,34 @@
                                                 <label for="ethnicityLabel" class="form-label">
                                                     Etnia
                                                 </label>
-                                                <select class="form-select form-select-sm" name="ethnicity_id"
-                                                    id="ethnicityLabel">
-                                                    <option value="">Seleccione</option>
-                                                    @foreach ($ethnicities as $ethnicity)
-                                                        <option value="{{ $ethnicity->id }}">{{ $ethnicity->name }}
-                                                        </option>
-                                                    @endforeach
-                                                </select>
+                                                <div class="tom-select-custom">
+                                                    <select class="js-select form-select form-select-sm" name="ethnicity_id"
+                                                        id="ethnicityLabel"
+                                                        data-hs-tom-select-options='{ "placeholder": "Seleccione etnia..." }'>
+                                                        <option value="">Seleccione</option>
+                                                        @foreach ($ethnicities as $ethnicity)
+                                                            <option value="{{ $ethnicity->id }}">{{ $ethnicity->name }}
+                                                            </option>
+                                                        @endforeach
+                                                    </select>
+                                                </div>
                                             </div>
 
                                             <div class="col-md-6">
                                                 <label for="linguisticCommunityLabel" class="form-label">
                                                     Comunidad lingüística
                                                 </label>
-                                                <select class="form-select form-select-sm" name="linguistic_community_id"
-                                                    id="linguisticCommunityLabel">
-                                                    <option value="">Seleccione</option>
-                                                    @foreach ($linguisticCommunities as $community)
-                                                        <option value="{{ $community->id }}">{{ $community->name }}
-                                                        </option>
-                                                    @endforeach
-                                                </select>
+                                                <div class="tom-select-custom">
+                                                    <select class="js-select form-select form-select-sm" name="linguistic_community_id"
+                                                        id="linguisticCommunityLabel"
+                                                        data-hs-tom-select-options='{ "placeholder": "Seleccione comunidad..." }'>
+                                                        <option value="">Seleccione</option>
+                                                        @foreach ($linguisticCommunities as $community)
+                                                            <option value="{{ $community->id }}">{{ $community->name }}
+                                                            </option>
+                                                        @endforeach
+                                                    </select>
+                                                </div>
                                             </div>
 
                                         </div>
@@ -290,16 +307,19 @@
                                                 <label for="educationLabel" class="form-label">
                                                     Escolaridad <span class="form-label-secondary">(Opcional)</span>
                                                 </label>
-                                                <select class="form-select form-select-sm" name="education"
-                                                    id="educationLabel">
-                                                    <option value="">Seleccione</option>
-                                                    <option value="ninguna">Ninguna</option>
-                                                    <option value="primaria">Primaria</option>
-                                                    <option value="basico">Básico</option>
-                                                    <option value="diversificado">Diversificado</option>
-                                                    <option value="universitario">Universitario</option>
-                                                    <option value="postgrado">Postgrado</option>
-                                                </select>
+                                                <div class="tom-select-custom">
+                                                    <select class="js-select form-select form-select-sm" name="education"
+                                                        id="educationLabel"
+                                                        data-hs-tom-select-options='{ "placeholder": "Seleccione escolaridad..." }'>
+                                                        <option value="">Seleccione</option>
+                                                        <option value="ninguna">Ninguna</option>
+                                                        <option value="primaria">Primaria</option>
+                                                        <option value="basico">Básico</option>
+                                                        <option value="diversificado">Diversificado</option>
+                                                        <option value="universitario">Universitario</option>
+                                                        <option value="postgrado">Postgrado</option>
+                                                    </select>
+                                                </div>
                                             </div>
 
                                             <div class="col-md-6">
@@ -330,20 +350,17 @@
                                             @if($allergies->isEmpty())
                                                 <p class="text-muted small">No hay alergias registradas en el catálogo.</p>
                                             @else
-                                                <div class="row g-2" id="allergiesCheckboxGroup">
-                                                    @foreach($allergies as $allergy)
-                                                        <div class="col-md-4 col-6">
-                                                            <div class="form-check">
-                                                                <input class="form-check-input allergy-check" type="checkbox"
-                                                                    name="allergies[]" value="{{ $allergy->id }}"
-                                                                    id="allergy_{{ $allergy->id }}"
-                                                                    data-label="{{ $allergy->name }}">
-                                                                <label class="form-check-label small" for="allergy_{{ $allergy->id }}">
-                                                                    {{ $allergy->name }}
-                                                                </label>
-                                                            </div>
-                                                        </div>
-                                                    @endforeach
+                                                <div class="tom-select-custom tom-select-custom-with-tags">
+                                                    <select class="js-select form-select" name="allergies[]"
+                                                        id="allergiesSelect" multiple
+                                                        data-hs-tom-select-options='{
+                                                            "placeholder": "Seleccione alergias..."
+                                                        }'>
+                                                        @foreach ($allergies as $allergy)
+                                                            <option value="{{ $allergy->id }}">{{ $allergy->name }}
+                                                            </option>
+                                                        @endforeach
+                                                    </select>
                                                 </div>
                                             @endif
                                         </div>
@@ -364,20 +381,18 @@
                                             @if($disabilities->isEmpty())
                                                 <p class="text-muted small">No hay discapacidades registradas en el catálogo.</p>
                                             @else
-                                                <div class="row g-2" id="disabilitiesCheckboxGroup">
-                                                    @foreach($disabilities as $disability)
-                                                        <div class="col-md-4 col-6">
-                                                            <div class="form-check">
-                                                                <input class="form-check-input disability-check" type="checkbox"
-                                                                    name="disabilities[]" value="{{ $disability->id }}"
-                                                                    id="disability_{{ $disability->id }}"
-                                                                    data-label="{{ $disability->name }}">
-                                                                <label class="form-check-label small" for="disability_{{ $disability->id }}">
-                                                                    {{ $disability->name }}
-                                                                </label>
-                                                            </div>
-                                                        </div>
-                                                    @endforeach
+                                                <div class="tom-select-custom tom-select-custom-with-tags">
+                                                    <select class="js-select form-select" name="disabilities[]"
+                                                        id="disabilitiesSelect" multiple
+                                                        data-hs-tom-select-options='{
+                                                            "placeholder": "Seleccione discapacidades..."
+                                                        }'>
+                                                        @foreach ($disabilities as $disability)
+                                                            <option value="{{ $disability->id }}">
+                                                                {{ $disability->name }}
+                                                            </option>
+                                                        @endforeach
+                                                    </select>
                                                 </div>
                                             @endif
                                         </div>
@@ -399,37 +414,47 @@
                                     <div class="row mb-4">
                                         <label for="countryLabel" class="col-sm-3 col-form-label form-label">País</label>
                                         <div class="col-sm-9">
-                                            <select class="form-select" name="country_id" id="countryLabel">
-                                                <option value="">Seleccione un país</option>
-                                                @foreach ($countries as $country)
-                                                    <option value="{{ $country->id }}">{{ $country->name }}
-                                                    </option>
-                                                @endforeach
-                                            </select>
+                                                <div class="tom-select-custom">
+                                                    <select class="js-select form-select" name="country_id"
+                                                        id="countryLabel"
+                                                        data-hs-tom-select-options='{ "placeholder": "Seleccione un país" }'>
+                                                        <option value="">Seleccione un país</option>
+                                                        @foreach ($countries as $country)
+                                                            <option value="{{ $country->id }}">{{ $country->name }}
+                                                            </option>
+                                                        @endforeach
+                                                    </select>
+                                                </div>
+                                            </div>
                                         </div>
-                                    </div>
 
-                                    <div class="row mb-4">
-                                        <label for="departmentLabel"
-                                            class="col-sm-3 col-form-label form-label">Departamento</label>
-                                        <div class="col-sm-9">
-                                            <select class="form-select" name="department_id" id="departmentLabel"
-                                                disabled>
-                                                <option value="">Seleccione primero un país</option>
-                                            </select>
+                                        <div class="row mb-4">
+                                            <label for="departmentLabel"
+                                                class="col-sm-3 col-form-label form-label">Departamento</label>
+                                            <div class="col-sm-9">
+                                                <div class="tom-select-custom">
+                                                    <select class="js-select form-select" name="department_id"
+                                                        id="departmentLabel" disabled
+                                                        data-hs-tom-select-options='{ "placeholder": "Seleccione primero un país" }'>
+                                                        <option value="">Seleccione primero un país</option>
+                                                    </select>
+                                                </div>
+                                            </div>
                                         </div>
-                                    </div>
 
-                                    <div class="row mb-4">
-                                        <label for="municipalityLabel"
-                                            class="col-sm-3 col-form-label form-label">Municipio</label>
-                                        <div class="col-sm-9">
-                                            <select class="form-select" name="municipality_id" id="municipalityLabel"
-                                                disabled>
-                                                <option value="">Seleccione primero un departamento</option>
-                                            </select>
+                                        <div class="row mb-4">
+                                            <label for="municipalityLabel"
+                                                class="col-sm-3 col-form-label form-label">Municipio</label>
+                                            <div class="col-sm-9">
+                                                <div class="tom-select-custom">
+                                                    <select class="js-select form-select" name="municipality_id"
+                                                        id="municipalityLabel" disabled
+                                                        data-hs-tom-select-options='{ "placeholder": "Seleccione primero un departamento" }'>
+                                                        <option value="">Seleccione primero un departamento</option>
+                                                    </select>
+                                                </div>
+                                            </div>
                                         </div>
-                                    </div>
 
                                     <div class="row mb-4">
                                         <label for="placeLabel" class="col-sm-3 col-form-label form-label">
@@ -740,6 +765,9 @@
     <script>
         (function() {
             window.onload = function() {
+                // INITIALIZATION OF SELECT
+                // =======================================================
+                HSCore.components.HSTomSelect.init('.js-select')
 
 
                 // INITIALIZATION OF NAVBAR VERTICAL ASIDE
@@ -826,13 +854,13 @@
                     setEl('confirm-place', getVal('placeLabel'));
 
                     // Alergias & discapacidades
-                    const getCheckedLabels = (selector) => {
-                        const labels = [];
-                        document.querySelectorAll(selector + ':checked').forEach(cb => labels.push(cb.dataset.label));
-                        return labels.join(', ');
+                    const getMultiSelectLabels = (id) => {
+                        const el = document.getElementById(id);
+                        if (!el || !el.options) return '';
+                        return Array.from(el.selectedOptions).map(opt => opt.text).join(', ');
                     };
-                    setEl('confirm-allergies',   getCheckedLabels('.allergy-check'));
-                    setEl('confirm-disabilities', getCheckedLabels('.disability-check'));
+                    setEl('confirm-allergies', getMultiSelectLabels('allergiesSelect'));
+                    setEl('confirm-disabilities', getMultiSelectLabels('disabilitiesSelect'));
                 }
 
 
@@ -1020,10 +1048,26 @@
                 const departmentSelect = document.getElementById('departmentLabel');
                 const municipalitySelect = document.getElementById('municipalityLabel');
 
+                function syncTS(select) {
+                    if (select.tomselect) {
+                        select.tomselect.sync();
+                    }
+                }
+
                 function resetSelect(select, placeholder) {
                     select.innerHTML = `<option value="">${placeholder}</option>`;
                     select.disabled = true;
                     select.value = '';
+
+                    const ts = select.tomselect;
+                    if (ts) {
+                        ts.clearOptions();
+                        ts.addOption({value: '', text: placeholder});
+                        ts.addItem('', true); // true to skip onChange
+                        ts.sync();
+                        ts.disable();
+                        ts.refreshOptions(false);
+                    }
                 }
 
                 function populateSelect(select, items, placeholder) {
@@ -1035,6 +1079,18 @@
                         select.appendChild(opt);
                     });
                     select.disabled = false;
+
+                    const ts = select.tomselect;
+                    if (ts) {
+                        ts.clearOptions();
+                        ts.addOptions([{value: '', text: placeholder}].concat(
+                            items.map(i => ({value: i.id, text: i.name}))
+                        ));
+                        ts.addItem('', true);
+                        ts.sync();
+                        ts.enable();
+                        ts.refreshOptions(false);
+                    }
                 }
 
                 if (countrySelect) {
@@ -1048,6 +1104,7 @@
                         if (!countryId) return;
 
                         departmentSelect.innerHTML = '<option value="">Cargando...</option>';
+                        syncTS(departmentSelect);
 
                         fetch(`{{ route('patients.get-departments-by-country') }}?country_id=${countryId}`, {
                                 headers: {
@@ -1078,6 +1135,7 @@
                         if (!deptId) return;
 
                         municipalitySelect.innerHTML = '<option value="">Cargando...</option>';
+                        syncTS(municipalitySelect);
 
                         fetch(`{{ route('patients.get-municipalities-by-department') }}?department_id=${deptId}`, {
                                 headers: {
