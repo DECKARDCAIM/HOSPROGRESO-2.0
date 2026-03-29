@@ -1,6 +1,10 @@
 @extends('layouts.panel')
 @section('title', 'Crear Municipio')
 
+@section('styles')
+    <link rel="stylesheet" href="{{ asset('vendor/tom-select/dist/css/tom-select.bootstrap5.css') }}">
+@endsection
+
 @section('content')
 <main id="content" role="main" class="main">
     <div class="content container-fluid">
@@ -45,15 +49,20 @@
                             <!-- Form Group -->
                             <div class="mb-4">
                                 <label for="countrySelect" class="form-label">País</label>
-                                <select class="form-select @error('country_id') is-invalid @enderror" 
-                                        name="country_id" id="countrySelect" required>
-                                    <option value="" selected disabled>Selecciona un país...</option>
-                                    @foreach($countries as $country)
-                                        <option value="{{ $country->id }}" {{ old('country_id') == $country->id ? 'selected' : '' }}>
-                                            {{ $country->name }}
-                                        </option>
-                                    @endforeach
-                                </select>
+                                <div class="tom-select-custom">
+                                    <select class="js-select form-select @error('country_id') is-invalid @enderror" 
+                                            name="country_id" id="countrySelect" required
+                                            data-hs-tom-select-options='{
+                                                "placeholder": "Seleccione un país..."
+                                            }'>
+                                        <option value="" selected disabled>Selecciona un país...</option>
+                                        @foreach($countries as $country)
+                                            <option value="{{ $country->id }}" {{ old('country_id') == $country->id ? 'selected' : '' }}>
+                                                {{ $country->name }}
+                                            </option>
+                                        @endforeach
+                                    </select>
+                                </div>
                                 @error('country_id')
                                     <div class="invalid-feedback d-block">{{ $message }}</div>
                                 @enderror
@@ -63,11 +72,15 @@
                             <!-- Form Group -->
                             <div class="mb-4">
                                 <label for="departmentSelect" class="form-label">Departamento</label>
-                                <select class="form-select @error('department_id') is-invalid @enderror" 
-                                        name="department_id" id="departmentSelect" required>
-                                    <option value="" selected disabled>Selecciona un departamento...</option>
-                                    {{-- Se cargará vía AJAX --}}
-                                </select>
+                                <div class="tom-select-custom">
+                                    <select class="js-select form-select @error('department_id') is-invalid @enderror" 
+                                            name="department_id" id="departmentSelect" required disabled
+                                            data-hs-tom-select-options='{
+                                                "placeholder": "Seleccione primero un país..."
+                                            }'>
+                                        <option value="" selected disabled>Selecciona primero un país...</option>
+                                    </select>
+                                </div>
                                 @error('department_id')
                                     <div class="invalid-feedback d-block">{{ $message }}</div>
                                 @enderror
@@ -104,43 +117,90 @@
 @endsection
 
 @push('scripts')
+<script src="{{ asset('vendor/tom-select/dist/js/tom-select.complete.min.js') }}"></script>
 <script>
     document.addEventListener('DOMContentLoaded', function () {
+        // INITIALIZATION OF TOM SELECT
+        HSCore.components.HSTomSelect.init('.js-select')
+
         const countrySelect = document.getElementById('countrySelect');
         const departmentSelect = document.getElementById('departmentSelect');
         const form = document.getElementById('municipalityForm');
+
+        function resetSelect(select, placeholder) {
+            select.innerHTML = `<option value="">${placeholder}</option>`;
+            select.disabled = true;
+            select.value = '';
+
+            const ts = select.tomselect;
+            if (ts) {
+                ts.clearOptions();
+                ts.addOption({ value: '', text: placeholder });
+                ts.addItem('', true);
+                ts.sync();
+                ts.disable();
+                ts.refreshOptions(false);
+            }
+        }
+
+        function populateSelect(select, items, placeholder) {
+            select.innerHTML = `<option value="">${placeholder}</option>`;
+            items.forEach(item => {
+                const opt = document.createElement('option');
+                opt.value = item.id;
+                opt.textContent = item.name;
+                select.appendChild(opt);
+            });
+            select.disabled = false;
+
+            const ts = select.tomselect;
+            if (ts) {
+                ts.clearOptions();
+                ts.addOptions([{ value: '', text: placeholder }].concat(
+                    items.map(i => ({ value: i.id.toString(), text: i.name }))
+                ));
+                ts.addItem('', true);
+                ts.sync();
+                ts.enable();
+                ts.refreshOptions(false);
+            }
+        }
 
         // Logic for dependent selects
         countrySelect.addEventListener('change', function() {
             const countryId = this.value;
             
-            // Clear department select
-            departmentSelect.innerHTML = '<option value="" selected disabled>Cargando departamentos...</option>';
-            
             if (!countryId) {
-                departmentSelect.innerHTML = '<option value="" selected disabled>Selecciona un departamento...</option>';
+                resetSelect(departmentSelect, 'Selecciona un país...');
                 return;
+            }
+
+            const tsDept = departmentSelect.tomselect;
+            if (tsDept) {
+                tsDept.clearOptions();
+                tsDept.addOption({ value: '', text: 'Cargando departamentos...' });
+                tsDept.addItem('', true);
+                tsDept.refreshOptions(false);
             }
 
             // Fetch departments via AJAX
             fetch(`{{ route('patients.get-departments-by-country') }}?country_id=${countryId}`)
                 .then(response => response.json())
                 .then(data => {
-                    departmentSelect.innerHTML = '<option value="" selected disabled>Selecciona un departamento...</option>';
-                    data.forEach(dept => {
-                        const option = document.createElement('option');
-                        option.value = dept.id;
-                        option.textContent = dept.name;
-                        // Keep old value if exists (for validation errors)
-                        if (dept.id == "{{ old('department_id') }}") {
-                            option.selected = true;
+                    populateSelect(departmentSelect, data, 'Selecciona un departamento...');
+                    
+                    // Restore old value if exists
+                    const oldDeptId = "{{ old('department_id') }}";
+                    if (oldDeptId && data.some(d => d.id == oldDeptId)) {
+                        departmentSelect.value = oldDeptId;
+                        if (tsDept) {
+                            tsDept.addItem(oldDeptId, true);
                         }
-                        departmentSelect.appendChild(option);
-                    });
+                    }
                 })
                 .catch(error => {
                     console.error('Error fetching departments:', error);
-                    departmentSelect.innerHTML = '<option value="" selected disabled>Error al cargar</option>';
+                    resetSelect(departmentSelect, 'Error al cargar');
                     window.showToast('Error', 'No se pudieron cargar los departamentos.', 'error');
                 });
         });
@@ -171,3 +231,4 @@
     });
 </script>
 @endpush
+

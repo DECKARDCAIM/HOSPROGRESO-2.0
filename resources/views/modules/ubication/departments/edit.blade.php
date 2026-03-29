@@ -1,6 +1,10 @@
 @extends('layouts.panel')
 @section('title', 'Editar Departamento')
 
+@section('styles')
+    <link rel="stylesheet" href="{{ asset('vendor/tom-select/dist/css/tom-select.bootstrap5.css') }}">
+@endsection
+
 @section('content')
 <main id="content" role="main" class="main">
     <div class="content container-fluid">
@@ -46,15 +50,20 @@
                             <!-- Form Group -->
                             <div class="mb-4">
                                 <label for="countrySelect" class="form-label">País</label>
-                                <select class="form-select @error('country_id') is-invalid @enderror" 
-                                        name="country_id" id="countrySelect" required>
-                                    <option value="" disabled>Selecciona un país...</option>
-                                    @foreach($countries as $country)
-                                        <option value="{{ $country->id }}" {{ old('country_id', $department->country_id) == $country->id ? 'selected' : '' }}>
-                                            {{ $country->name }}
-                                        </option>
-                                    @endforeach
-                                </select>
+                                <div class="tom-select-custom">
+                                    <select class="js-select form-select @error('country_id') is-invalid @enderror" 
+                                            name="country_id" id="countrySelect" required
+                                            data-hs-tom-select-options='{
+                                                "placeholder": "Seleccione un país..."
+                                            }'>
+                                        <option value="" disabled>Selecciona un país...</option>
+                                        @foreach($countries as $country)
+                                            <option value="{{ $country->id }}" {{ old('country_id', $department->country_id) == $country->id ? 'selected' : '' }}>
+                                                {{ $country->name }}
+                                            </option>
+                                        @endforeach
+                                    </select>
+                                </div>
                                 @error('country_id')
                                     <div class="invalid-feedback d-block">{{ $message }}</div>
                                 @enderror
@@ -91,8 +100,12 @@
 @endsection
 
 @push('scripts')
+<script src="{{ asset('vendor/tom-select/dist/js/tom-select.complete.min.js') }}"></script>
 <script>
     document.addEventListener('DOMContentLoaded', function () {
+        // INITIALIZATION OF TOM SELECT
+        HSCore.components.HSTomSelect.init('.js-select')
+
         const form = document.querySelector('#departmentForm');
         
         form.addEventListener('submit', function (event) {
@@ -115,3 +128,4 @@
     });
 </script>
 @endpush
+
