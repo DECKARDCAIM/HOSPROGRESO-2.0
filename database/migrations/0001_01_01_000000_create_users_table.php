@@ -42,7 +42,7 @@ return new class extends Migration
 
             $table->text('address')->nullable();
             $table->date('birth_date')->nullable();
-            $table->string('gender')->nullable();
+            $table->foreignId('gender_id')->nullable()->constrained('genders')->onDelete('set null');
 
             $table->enum('estado', ['disponible', 'ocupado', 'ausente', 'privado', 'desconectado'])->default('disponible');
             $table->string('theme_preference')->nullable()->default('auto');

@@ -14,10 +14,12 @@ return new class extends Migration
         Schema::create('releases', function (Blueprint $table) {
             $table->id();
             $table->string('title');
-            $table->text('content');
+            $table->longText('content');
             $table->foreignId('author_id')->constrained('users')->onDelete('cascade');
             $table->enum('status', ['draft', 'published', 'archived'])->default('published');
-            $table->string('type')->default('comunicado'); // To allow different types if needed
+            $table->enum('type', ['actualizacion', 'comunicado'])->default('comunicado');
+            $table->text('document_path')->nullable();
+            $table->string('background_image')->nullable();
             $table->timestamp('published_at')->nullable();
             $table->softDeletes();
             $table->timestamps();

@@ -54,7 +54,7 @@ class DatabaseSeeder extends Seeder
             'phone' => null,
             'address' => null,
             'birth_date' => null,
-            'gender' => null,
+            'gender_id' => null,
             'estado' => 'disponible',
             'theme_preference' => 'auto',
         ]);
@@ -79,7 +79,7 @@ class DatabaseSeeder extends Seeder
             'phone' => null,
             'address' => null,
             'birth_date' => null,
-            'gender' => null,
+            'gender_id' => null,
             'estado' => 'disponible',
             'theme_preference' => 'auto',
         ]);
