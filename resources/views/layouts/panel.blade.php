@@ -3,6 +3,8 @@
 
 <head>
     <meta charset="utf-8">
+    <meta id="theme-color-meta" name="theme-color" content="#ffffff">
+    @include('includes.loading-screen')
     <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
     <meta name="csrf-token" content="{{ csrf_token() }}">
     <link rel="icon" type="image/png" href="{{ asset('img/logo.png') }}">
@@ -29,8 +31,6 @@
             opacity: 0 !important;
         }
     </style>
-
-    @include('includes.loading-screen')
 
     <script>
         window.hs_config = {
@@ -286,6 +286,30 @@
     @include ('includes.notification-toast')
 
     @stack('scripts')
+    <script>
+        // Función para cambiar el color del header
+        function updateMetaThemeColor() {
+            const metaThemeColor = document.getElementById('theme-color-meta');
+            if (!metaThemeColor || typeof HSThemeAppearance === 'undefined') return;
+
+            // Obtiene el tema activo ('default' o 'dark')
+            const currentTheme = HSThemeAppearance.getAppearance();
+
+            if (currentTheme === 'dark') {
+                // Color para el tema oscuro (puedes ajustarlo si tu fondo es distinto)
+                metaThemeColor.setAttribute('content', '#1e2022');
+            } else {
+                // Color para el tema claro
+                metaThemeColor.setAttribute('content', '#ffffff');
+            }
+        }
+
+        // 1. Ejecutar al cargar la página
+        updateMetaThemeColor();
+
+        // 2. Escuchar cada vez que el usuario cambia el tema en el menú
+        window.addEventListener('on-hs-appearance-change', updateMetaThemeColor);
+    </script>
 </body>
 
 </html>

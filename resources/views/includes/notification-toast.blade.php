@@ -4,74 +4,48 @@
 
     <script>
         document.addEventListener('DOMContentLoaded', function() {
-            // --- GLOBAL TOAST FUNCTION (Simplified and Solid) ---
+            // --- 1. TU FUNCIÓN DE TOAST INTACTA ---
             window.showToast = function(title, message, type = 'info', sticky = false) {
                 const container = document.querySelector('.toast-container');
                 if (!container) return;
 
-                // Reproducir sonido de alerta
-                const alertAudio = new Audio('{{ asset("sound/alerta-toast.mp3") }}');
+                const alertAudio = new Audio('{{ asset('sound/alerta-toast.mp3') }}');
                 alertAudio.volume = 0.8;
                 alertAudio.play().catch(e => console.log('Audio play prevented', e));
 
                 const toastId = 'toast-' + Math.random().toString(36).substr(2, 9);
-                const systemLogo = '{{ asset("img/logo.png") }}';
-                
-                const finalMessage = title && title !== 'Sistema' && title !== 'Atención' && title !== 'Error' && title !== 'Éxito' && title !== 'Información' && title !== 'HOSPROGRESO'
-                    ? `<strong>${title}</strong><br>${message}` 
-                    : message;
+                const systemLogo = '{{ asset('img/logo.png') }}';
+
+                const finalMessage = title && !['Sistema', 'Atención', 'Error', 'Éxito', 'Información',
+                        'HOSPROGRESO'
+                    ].includes(title) ?
+                    `<strong>${title}</strong><br>${message}` :
+                    message;
 
                 const toastHTML = `
-                <!-- Toast -->
-                <div id="${toastId}" class="toast toast-show fade show" role="alert" aria-live="assertive" aria-atomic="true" style="backdrop-filter: none !important; -webkit-backdrop-filter: none !important; box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.15);">
+                <div id="${toastId}" class="toast toast-show fade show border-0 shadow-lg" role="alert" aria-live="assertive" aria-atomic="true">
                   <div class="toast-header">
-                    <div class="d-flex align-items-center flex-grow-1">
-                      <div class="flex-shrink-0">
-                        <img class="avatar avatar-sm avatar-circle" src="${systemLogo}" alt="HOSPROGRESO">
-                      </div>
-                      <div class="flex-grow-1 ms-3">
-                        <h5 class="mb-0">HOSPROGRESO</h5>
-                        <small class="ms-auto">Justo ahora</small>
-                      </div>
-                      <div class="text-end">
-                        <button type="button" class="btn-close" data-bs-dismiss="toast" aria-label="Close"></button>
-                      </div>
-                    </div>
+                    <img class="avatar avatar-sm avatar-circle me-3" src="${systemLogo}" alt="HOSPROGRESO" width="24" height="24">
+                    <strong class="me-auto text-dark">HOSPROGRESO</strong>
+                    <button type="button" class="btn-close" data-bs-dismiss="toast"></button>
                   </div>
-                  <div class="toast-body">
-                    ${finalMessage}
-                  </div>
-                </div>
-                <!-- End Toast -->
-                `;
+                  <div class="toast-body text-dark">${finalMessage}</div>
+                </div>`;
 
                 container.insertAdjacentHTML('beforeend', toastHTML);
                 const toastEl = document.getElementById(toastId);
-
                 const bsToast = new bootstrap.Toast(toastEl, {
                     delay: 8000,
                     autohide: !sticky
                 });
                 bsToast.show();
 
-                toastEl.addEventListener('hidden.bs.toast', () => {
-                    toastEl.remove();
-                });
+                toastEl.addEventListener('hidden.bs.toast', () => toastEl.remove());
             };
 
-
-
-            // --- USER VARIABLES FOR SYSTEM TOASTS ---
-            const currentUserName = "{{ Auth::check() ? trim(Auth::user()->first_name . ' ' . Auth::user()->first_last_name) : 'Sistema' }}";
-            const currentUserAvatar = "{{ Auth::check() && Auth::user()->avatar ? Storage::url(Auth::user()->avatar) : asset('img/logo.png') }}";
-
-            // --- AUTOMATIC NOTIFICATIONS (Session & Errors) ---
+            // --- 2. NOTIFICACIONES DE SESIÓN Y ERRORES ---
             @if (session('notification'))
-                @php
-                    $notif = session('notification');
-                    $title = 'Información';
-                @endphp
-                window.showToast('{{ $title }}', '{{ $notif['message'] }}', 'info', false);
+                window.showToast('Información', '{{ session('notification')['message'] }}', 'info', false);
             @endif
 
             @if ($errors->any())
@@ -80,37 +54,33 @@
                 @endforeach
             @endif
 
-            // --- REAL-TIME POLLING FOR NOTIFICATIONS ---
-            let lastNotificationCheck = sessionStorage.getItem('lastNotificationCheck') || "{{ now()->toDateTimeString() }}";
+            // --- 3. LA MAGIA DE WEBSOCKETS (CON ESPERA INTELIGENTE) ---
+            function iniciarWebSockets() {
+                // Verificamos si Vite ya terminó de cargar window.Echo
+                if (typeof window.Echo !== 'undefined') {
+                    console.log("Conectando a WebSockets...");
 
-            function pollNotifications() {
-                $.get("{{ route('releases.get-unread') }}", {
-                    since: lastNotificationCheck
-                }, function(data) {
-                    if (data.notifications && data.notifications.length > 0) {
-                        // Solo mostramos la primera notificación recibida para evitar spam
-                        const notif = data.notifications[0];
-                        window.showToast(notif.title, notif.message, notif.type, true);
+                    window.Echo.channel('anuncios')
+                        // 🔥 NOTA EL PUNTO AL INICIO: '.ReleaseCreated'
+                        .listen('.ReleaseCreated', (e) => {
+                            console.log("¡Anuncio recibido en tiempo real!", e);
 
-                        if (window.refreshNotificationDropdown) {
-                            window.refreshNotificationDropdown();
-                        }
-                    }
+                            // Mostrar el Toast visual
+                            window.showToast(e.title, e.message, e.type, true);
 
-                    if (data.server_time) {
-                        lastNotificationCheck = data.server_time;
-                        sessionStorage.setItem('lastNotificationCheck', lastNotificationCheck);
-                    }
-                }).fail(function(xhr, status, error) {
-                    console.error("Notification poll failed:", error);
-                });
+                            // Actualizar la campanita
+                            if (typeof window.refreshNotificationDropdown === 'function') {
+                                window.refreshNotificationDropdown();
+                            }
+                        });
+                } else {
+                    // Si no está listo, vuelve a intentar en medio segundo (500ms)
+                    setTimeout(iniciarWebSockets, 500);
+                }
             }
 
-            // Poll inicial después de 3 segundos
-            setTimeout(pollNotifications, 3000);
-
-            // Iniciar polling regular cada 60 segundos
-            setInterval(pollNotifications, 60000);
+            // Arrancamos el buscador de Echo
+            iniciarWebSockets();
         });
     </script>
 @endauth

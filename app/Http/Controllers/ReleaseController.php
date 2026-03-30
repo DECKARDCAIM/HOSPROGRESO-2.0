@@ -2,9 +2,11 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\Release;
-use Illuminate\Http\Request;
+use App\Events\ReleaseCreated;
+use App\Models\Release; // 🔥 1. IMPORTAMOS TU NUEVO EVENTO AQUÍ
+use Carbon\Carbon;
 use Illuminate\Http\JsonResponse;
+use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Storage;
@@ -36,8 +38,8 @@ class ReleaseController extends Controller
 
         if ($request->filled('search')) {
             $query->where(function ($q) use ($request) {
-                $q->where('title', 'like', '%' . $request->search . '%')
-                    ->orWhere('content', 'like', '%' . $request->search . '%');
+                $q->where('title', 'like', '%'.$request->search.'%')
+                    ->orWhere('content', 'like', '%'.$request->search.'%');
             });
         }
 
@@ -83,16 +85,16 @@ class ReleaseController extends Controller
                 return [
                     'count' => $dayReleases->count(),
                     'titles' => $dayReleases->take(3)->pluck('title')->toArray(),
-                    'has_more' => $dayReleases->count() > 3
+                    'has_more' => $dayReleases->count() > 3,
                 ];
             });
 
         return view('modules.administration.release.index', compact(
-            'releases', 
-            'calendarData', 
-            'allTotal', 
-            'allPublished', 
-            'allDrafts', 
+            'releases',
+            'calendarData',
+            'allTotal',
+            'allPublished',
+            'allDrafts',
             'allThisMonth',
             'activeFilters',
             'allFilteredIds'
@@ -129,24 +131,35 @@ class ReleaseController extends Controller
             'status' => $request->status,
             'type' => $request->type,
             'author_id' => auth()->id(),
-            'published_at' => $request->published_at ? \Carbon\Carbon::parse($request->published_at) : ( $request->status == 'published' ? now() : null ),
+            'published_at' => $request->published_at ? Carbon::parse($request->published_at) : ($request->status == 'published' ? now() : null),
         ];
 
         if ($request->hasFile('documents')) {
             $paths = [];
             foreach ($request->file('documents') as $file) {
-                $fileName = Str::slug($request->title) . '-' . time() . '-' . uniqid() . '.' . $file->getClientOriginalExtension();
+                $fileName = Str::slug($request->title).'-'.time().'-'.uniqid().'.'.$file->getClientOriginalExtension();
                 $paths[] = $file->storeAs('releases', $fileName, 'public');
             }
             $data['document_path'] = $paths;
         }
 
         if ($request->hasFile('background_image')) {
-            $bgName = 'bg-' . time() . '-' . uniqid() . '.' . $request->file('background_image')->getClientOriginalExtension();
+            $bgName = 'bg-'.time().'-'.uniqid().'.'.$request->file('background_image')->getClientOriginalExtension();
             $data['background_image'] = $request->file('background_image')->storeAs('releases/backgrounds', $bgName, 'public');
         }
 
-        Release::create($data);
+        // Guardamos en Base de Datos
+        $release = Release::create($data);
+
+        // 🔥 2. AVISAMOS A TODOS LOS NAVEGADORES CONECTADOS 🔥
+        // Solo enviamos la notificación si el comunicado se guardó como "Publicado" (no tiene sentido notificar borradores)
+        if ($release->status === 'published') {
+            // El texto que le aparecerá al usuario en el Toast
+            $mensajeToast = 'Se ha publicado un nuevo comunicado: '.$release->title;
+
+            // Disparamos el evento a Reverb/WebSockets
+            broadcast(new ReleaseCreated('Nuevo Comunicado', $mensajeToast, 'info'));
+        }
 
         return redirect()->route('releases.index')->with('success', 'Comunicado creado exitosamente.');
     }
@@ -157,6 +170,7 @@ class ReleaseController extends Controller
     public function show($id)
     {
         $release = Release::withTrashed()->findOrFail($id);
+
         return view('modules.administration.release.show', compact('release'));
     }
 
@@ -189,7 +203,7 @@ class ReleaseController extends Controller
             'content' => $request->content,
             'status' => $request->status,
             'type' => $request->type,
-            'published_at' => $request->published_at ? \Carbon\Carbon::parse($request->published_at) : ( ($request->status == 'published' && !$release->published_at) ? now() : $release->published_at ),
+            'published_at' => $request->published_at ? Carbon::parse($request->published_at) : (($request->status == 'published' && ! $release->published_at) ? now() : $release->published_at),
         ];
 
         if ($request->hasFile('documents')) {
@@ -199,10 +213,10 @@ class ReleaseController extends Controller
                     Storage::disk('public')->delete($oldPath);
                 }
             }
-            
+
             $paths = [];
             foreach ($request->file('documents') as $file) {
-                $fileName = Str::slug($request->title) . '-' . time() . '-' . uniqid() . '.' . $file->getClientOriginalExtension();
+                $fileName = Str::slug($request->title).'-'.time().'-'.uniqid().'.'.$file->getClientOriginalExtension();
                 $paths[] = $file->storeAs('releases', $fileName, 'public');
             }
             $data['document_path'] = $paths;
@@ -212,11 +226,17 @@ class ReleaseController extends Controller
             if ($release->background_image) {
                 Storage::disk('public')->delete($release->background_image);
             }
-            $bgName = 'bg-' . time() . '-' . uniqid() . '.' . $request->file('background_image')->getClientOriginalExtension();
+            $bgName = 'bg-'.time().'-'.uniqid().'.'.$request->file('background_image')->getClientOriginalExtension();
             $data['background_image'] = $request->file('background_image')->storeAs('releases/backgrounds', $bgName, 'public');
         }
 
+        $wasDraft = $release->status === 'draft';
         $release->update($data);
+
+        // 🔥 3. OPCIONAL: Notificar si pasó de Borrador a Publicado 🔥
+        if ($wasDraft && $release->status === 'published') {
+            broadcast(new ReleaseCreated('Nuevo Comunicado', 'Se ha publicado un nuevo comunicado: '.$release->title, 'info'));
+        }
 
         return redirect()->route('releases.index')->with('success', 'Comunicado actualizado exitosamente.');
     }
@@ -227,6 +247,7 @@ class ReleaseController extends Controller
     public function destroy(Release $release)
     {
         $release->delete();
+
         return redirect()->route('releases.index')->with('success', 'Comunicado eliminado exitosamente.');
     }
 
@@ -237,7 +258,7 @@ class ReleaseController extends Controller
     {
         $user = auth()->user();
         $user->readReleases()->syncWithoutDetaching([
-            $id => ['read_at' => now()]
+            $id => ['read_at' => now()],
         ]);
 
         return response()->json(['success' => true]);
@@ -258,7 +279,7 @@ class ReleaseController extends Controller
 
         foreach ($unreadReleases as $release) {
             $user->readReleases()->syncWithoutDetaching([
-                $release->id => ['read_at' => now()]
+                $release->id => ['read_at' => now()],
             ]);
         }
 
@@ -270,9 +291,11 @@ class ReleaseController extends Controller
      */
     public function getUnread(Request $request)
     {
+        // Esta función ya no la necesitas para "escuchar" nuevos anuncios en tiempo real,
+        // pero puedes dejarla si la usas para cargar la campanita la primera vez que entras a la página.
         $user = auth()->user();
         $sinceParam = $request->input('since');
-        $since = $sinceParam ? \Carbon\Carbon::parse($sinceParam) : now()->subMinutes(1);
+        $since = $sinceParam ? Carbon::parse($sinceParam) : now()->subMinutes(1);
 
         $unread = Release::published()
             ->where('published_at', '>', $since)
@@ -292,13 +315,13 @@ class ReleaseController extends Controller
                 'author_name' => 'Sistema',
                 'author_avatar' => asset('img/logo.png'),
                 'time_ago' => 'Justo ahora',
-                'published_at' => now()->toDateTimeString()
+                'published_at' => now()->toDateTimeString(),
             ];
         }
 
         return response()->json([
             'notifications' => $notifications,
-            'server_time' => now()->toDateTimeString()
+            'server_time' => now()->toDateTimeString(),
         ]);
     }
 
@@ -307,8 +330,9 @@ class ReleaseController extends Controller
      */
     public function generateAiContent(Request $request): JsonResponse
     {
+        // ... (Tu código de ISAAC se mantiene idéntico, no hace falta tocarlo)
         $validated = $request->validate([
-            'prompt' => 'required|string|max:1000'
+            'prompt' => 'required|string|max:1000',
         ]);
 
         $user = auth()->user();
@@ -337,52 +361,52 @@ class ReleaseController extends Controller
                 'model' => $model,
                 'messages' => [
                     ['role' => 'system', 'content' => $systemPrompt],
-                    ['role' => 'user', 'content' => "Por favor, redacta el comunicado basándote en lo siguiente:\n" . $validated['prompt']]
+                    ['role' => 'user', 'content' => "Por favor, redacta el comunicado basándote en lo siguiente:\n".$validated['prompt']],
                 ],
                 'stream' => false,
-                'options' => ['temperature' => 0.4] 
+                'options' => ['temperature' => 0.4],
             ]);
 
             if ($response->successful()) {
                 $rawContent = $response->json('message.content', 'Error al generar contenido.');
-                
+
                 // Limpiar posibles bloques markdown "```json" y "```"
                 $rawContent = preg_replace('/^```json/i', '', $rawContent);
                 $rawContent = preg_replace('/^```/i', '', $rawContent);
                 $rawContent = preg_replace('/```$/i', '', $rawContent);
                 $rawContent = trim($rawContent);
-                
+
                 $dataDecoded = json_decode($rawContent, true);
-                
+
                 if (json_last_error() === JSON_ERROR_NONE && isset($dataDecoded['html']) && isset($dataDecoded['title'])) {
                     return response()->json([
-                        'success' => true, 
+                        'success' => true,
                         'title' => $dataDecoded['title'],
-                        'html' => $dataDecoded['html']
+                        'html' => $dataDecoded['html'],
                     ]);
                 } else {
                     // Fallback si no retornó JSON válido
                     return response()->json([
                         'success' => true,
                         'title' => 'Comunicado Generado por ISAAC',
-                        'html' => $rawContent
+                        'html' => $rawContent,
                     ]);
                 }
             }
 
             Log::error("Error de Ollama API al generar comunicado: {$response->body()}");
-            
+
             return response()->json([
                 'success' => false,
-                'message' => "Lo siento {$userName}, no pude generar el contenido. Código: {$response->status()}"
+                'message' => "Lo siento {$userName}, no pude generar el contenido. Código: {$response->status()}",
             ], 500);
 
         } catch (\Exception $e) {
             Log::error("Excepción al conectar con Ollama en generador de comunicados: {$e->getMessage()}");
-            
+
             return response()->json([
                 'success' => false,
-                'message' => 'Error de conexión con ISAAC. Verifica que el servicio esté activo.'
+                'message' => 'Error de conexión con ISAAC. Verifica que el servicio esté activo.',
             ], 500);
         }
     }

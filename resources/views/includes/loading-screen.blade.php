@@ -1,145 +1,209 @@
-<div id="global-sync-loader"
-    class="position-fixed top-0 start-0 w-100 h-100 d-flex flex-column align-items-center justify-content-center"
-    style="background-color: #0B1B3D; z-index: 99999; display: flex !important; opacity: 1; transition: opacity 0.5s ease; pointer-events: auto;">
+{{--
+╔═══════════════════════════════════════════════════════════════════╗
+║  GLOBAL PAGE LOADER — Diseño Anterior + Nueva Lógica (Protegida)  ║
+║  Incluir en layouts/app.blade.php DENTRO del <head>               ║
+╚═══════════════════════════════════════════════════════════════════╝
+--}}
+<style>
+    /* Estilos base del contenedor para la transición suave */
+    #gpl {
+        position: fixed;
+        inset: 0;
+        z-index: 99999;
+        background: #0B1B3D;
+        /* El fondo de tu diseño anterior */
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        pointer-events: auto;
+    }
+
+    #gpl.gpl-out {
+        transition: opacity .55s cubic-bezier(.4, 0, .2, 1);
+        opacity: 0;
+        pointer-events: none;
+    }
+</style>
+
+<div id="gpl">
     <div class="text-center">
         <img src="{{ asset('img/Logotipo-white.svg') }}" alt="Logo" class="img-fluid mb-4" style="max-width: 300px;">
         <div class="mt-4">
-            <div class="spinner-border text-white" role="status" style="width: 2.5rem; height: 2.5rem;">
+            <div class="spinner-border text-white" role="status"
+                style="width: 2.5rem; height: 2.5rem; border-width: 0.2rem;">
                 <span class="visually-hidden">Cargando...</span>
             </div>
-            <p id="global-sync-text" class="text-white mt-3 fs-3 fw-light">Iniciando...</p>
+            <p id="gpl-txt" class="text-white mt-3 fs-4 fw-light tracking-wide">Iniciando...</p>
         </div>
-        <div class="progress mt-4 mx-auto" style="height: 6px; width: 250px; background-color: rgba(255,255,255,0.1);">
-            <div class="progress-bar bg-white" id="global-sync-progress-bar" role="progressbar"
-                style="width: 0%; transition: width 0.3s ease;"></div>
+        <div class="progress mt-4 mx-auto overflow-hidden"
+            style="height: 4px; width: 250px; background-color: rgba(255,255,255,0.1); border-radius: 10px;">
+            <div class="progress-bar bg-white" id="gpl-bar" role="progressbar" style="width: 0%;"></div>
         </div>
     </div>
 </div>
 
 <script>
     (function() {
-        const loader = document.getElementById('global-sync-loader');
-        const progressBar = document.getElementById('global-sync-progress-bar');
-        const syncText = document.getElementById('global-sync-text');
+        'use strict';
 
-        let totalResources = 0;
-        let loadedResources = 0;
+        var overlay = document.getElementById('gpl');
+        var bar = document.getElementById('gpl-bar');
+        var txt = document.getElementById('gpl-txt');
 
-        // Función que calcula el progreso matemáticamente
-        window.updateRealProgress = function() {
-            loadedResources++;
-            let percentage = Math.floor((loadedResources / totalResources) * 100);
-            if (percentage > 100) percentage = 100;
+        var pct = 0;
+        var loaded = 0;
+        var total = 0;
+        var syncDone = false;
+        var hiding = false;
 
-            if (progressBar) progressBar.style.width = percentage + '%';
-
-            // Textos dinámicos basados en el avance REAL, no en tiempo
-            if (syncText) {
-                if (percentage < 30) syncText.textContent = "Sincronizando archivos del sistema...";
-                else if (percentage < 70) syncText.textContent = "Optimizando bases de datos y caché...";
-                else if (percentage < 100) syncText.textContent = "Cargando interfaz...";
-                else syncText.textContent = "¡Sincronizado!";
+        var MSGS = [{
+                at: 0,
+                text: 'Iniciando...'
+            },
+            {
+                at: 15,
+                text: 'Sincronizando archivos del sistema...'
+            },
+            {
+                at: 50,
+                text: 'Optimizando base de datos y caché...'
+            },
+            {
+                at: 82,
+                text: 'Cargando interfaz...'
+            },
+            {
+                at: 100,
+                text: '\u00a1Sincronizado!'
             }
+        ];
 
-            // Si ya cargó todo, ocultamos
-            if (loadedResources >= totalResources) {
-                window.hideGlobalLoader();
+        function msgFor(p) {
+            var out = MSGS[0].text;
+            for (var i = 0; i < MSGS.length; i++) {
+                if (p >= MSGS[i].at) out = MSGS[i].text;
             }
-        };
+            return out;
+        }
 
-        window.startRealLoader = function() {
-            if (!loader) return;
-            loader.style.opacity = '1';
-            loader.style.display = 'flex';
-            loader.style.pointerEvents = 'auto';
+        function setBar(p, ms) {
+            p = Math.min(100, Math.max(0, Math.round(p)));
+            pct = p;
+            if (bar) {
+                bar.style.transition = ms > 0 ? 'width ' + ms + 'ms cubic-bezier(.4,0,.2,1)' : 'none';
+                bar.style.width = p + '%';
+            }
+            if (txt) txt.textContent = msgFor(p);
+        }
+
+        function hide() {
+            if (!overlay || hiding) return;
+            hiding = true;
+            setBar(100, 380);
+            setTimeout(function() {
+                overlay.classList.add('gpl-out');
+                document.body.style.overflow = '';
+                overlay.addEventListener('transitionend', function onEnd() {
+                    overlay.removeEventListener('transitionend', onEnd);
+                    overlay.style.display = 'none';
+                });
+            }, 1000);
+        }
+
+        function watchAssets() {
             document.body.style.overflow = 'hidden';
+            var nodes = document.querySelectorAll('img, script[src], link[rel="stylesheet"], link[rel="preload"]');
+            total = nodes.length;
+            loaded = 0;
 
-            // 1. Buscar todos los archivos que toman tiempo en descargar
-            const elements = document.querySelectorAll(
-                'img, script[src], link[rel="stylesheet"], link[rel="preload"]');
-            totalResources = elements.length;
-            loadedResources = 0;
-
-            if (totalResources === 0) {
-                window.updateRealProgress(); // Si no hay nada, terminar de inmediato
+            if (total === 0) {
+                syncDone = true;
+                hide();
                 return;
             }
 
-            // 2. Escuchar cuándo termina de descargar cada archivo
-            elements.forEach(el => {
-                // Las imágenes a veces ya están en caché y completas instantáneamente
-                if (el.tagName.toLowerCase() === 'img' && el.complete) {
-                    window.updateRealProgress();
+            var startPct = pct;
+
+            function onAsset() {
+                loaded++;
+                var next = startPct + ((loaded / total) * (98 - startPct));
+                setBar(next, 260);
+                if (loaded >= total) {
+                    syncDone = true;
+                    hide();
+                }
+            }
+
+            nodes.forEach(function(el) {
+                if (el.tagName === 'IMG' && el.complete) {
+                    onAsset();
                 } else {
-                    // Contamos tanto 'load' (éxito) como 'error' para que el loader no se quede trabado si un archivo falla
-                    el.addEventListener('load', window.updateRealProgress);
-                    el.addEventListener('error', window.updateRealProgress);
+                    el.addEventListener('load', onAsset, {
+                        once: true
+                    });
+                    el.addEventListener('error', onAsset, {
+                        once: true
+                    });
                 }
             });
+        }
+
+        window.showPageLoader = function(label) {
+            if (!overlay) return;
+            hiding = false;
+            overlay.style.display = 'flex';
+            overlay.classList.remove('gpl-out');
+            overlay.style.opacity = '1';
+            overlay.style.pointerEvents = 'auto';
+            document.body.style.overflow = 'hidden';
+            setBar(0, 0);
+            if (txt) txt.textContent = label || 'Cargando...';
+
+            // Simulación de carga visual
+            setTimeout(function() {
+                setBar(45, 550);
+            }, 60);
+            setTimeout(function() {
+                setBar(68, 900);
+            }, 650);
         };
 
-        window.hideGlobalLoader = function() {
-            if (!loader) return;
-            setTimeout(() => {
-                loader.style.transition = 'opacity 0.6s ease-out';
-                loader.style.opacity = '0';
-                loader.style.pointerEvents = 'none';
-                document.body.style.overflow = '';
-                setTimeout(() => {
-                    if (loader.style.opacity === '0') loader.style.display = 'none';
-                }, 700);
-            }, 300); // Pequeño respiro visual al llegar al 100%
-        };
+        window.hidePageLoader = hide;
 
-        // Arrancamos el escáner de recursos reales
-        document.addEventListener('DOMContentLoaded', window.startRealLoader);
+        document.addEventListener('click', function(e) {
+            var link = e.target.closest('a[href]');
+            if (!link) return;
+            var href = link.getAttribute('href') || '';
+            var target = link.getAttribute('target') || '';
+            if (!href || href.startsWith('#') || href.startsWith('javascript:') || href.startsWith(
+                    'mailto:') || href.startsWith('tel:') || target === '_blank' || e.ctrlKey || e
+                .metaKey || e.shiftKey || link.closest('form')) return;
 
-        // Fallback de seguridad: El evento 'load' de window se dispara cuando TODO absolutamente todo está listo.
-        // Forzamos el 100% aquí por si algún evento se nos escapó.
-        window.addEventListener('load', () => {
-            loadedResources = totalResources;
-            window.updateRealProgress();
+            window.showPageLoader('Cargando...');
         });
 
-        // Función para mostrar el loader manualmente con un texto personalizado
-        window.showManualLoader = function(text = "Cargando...") {
-            if (!loader) return;
-            loader.style.transition = 'none';
-            loader.style.opacity = '1';
-            loader.style.display = 'flex';
-            loader.style.pointerEvents = 'auto';
-            if (progressBar) progressBar.style.width = '100%';
-            if (syncText) syncText.textContent = text;
-            document.body.style.overflow = 'hidden';
-        };
+        // 🛡️ LÓGICA PROTEGIDA: Se agregó "checkValidity()" para evitar cuelgues si el formulario está incompleto
+        document.addEventListener('submit', function(e) {
+            if (e.target.getAttribute('target') === '_blank' || !e.target.checkValidity()) return;
+            window.showPageLoader('Procesando...');
+        });
 
-        // Intercepción de enlaces para navegación entre páginas
-        document.addEventListener('click', function(e) {
-            const link = e.target.closest('a');
-            if (link && link.getAttribute('href') && !link.getAttribute('href').startsWith('#') &&
-                !link.getAttribute('href').startsWith('javascript:') && link.getAttribute('target') !==
-                '_blank' &&
-                !e.ctrlKey && !e.metaKey && !e.shiftKey) {
+        window.addEventListener('pageshow', function(e) {
+            if (e.persisted) hide();
+        });
 
-                // Evitamos mostrar el loader si es el botón de cerrar sesión (que ya tiene su propio onsubmit)
-                if (link.closest('form')) return;
+        if (document.readyState === 'loading') {
+            document.addEventListener('DOMContentLoaded', watchAssets);
+        } else {
+            watchAssets();
+        }
 
-                window.showManualLoader("Cargando...");
+        window.addEventListener('load', function() {
+            if (!syncDone) {
+                syncDone = true;
+                hide();
             }
         });
 
-        // Intercepción global de formularios para mostrar el loader al enviar
-        document.addEventListener('submit', function(e) {
-            const form = e.target;
-            // No mostramos loader si el formulario tiene un target o si es una búsqueda rápida (opcional)
-            if (form.getAttribute('target') === '_blank') return;
-
-            // Si es el formulario de login o logout, o cualquier POST principal
-            window.showManualLoader("Procesando...");
-        });
-
-        window.addEventListener('pageshow', function(event) {
-            if (event.persisted) window.hideGlobalLoader();
-        });
-    })();
+    }());
 </script>

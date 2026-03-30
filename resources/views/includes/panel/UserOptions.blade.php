@@ -1,7 +1,7 @@
 <header id="header"
     class="navbar navbar-expand-lg navbar-fixed navbar-height navbar-container navbar-bordered bg-white">
     <div class="navbar-nav-wrap">
-        <a class="navbar-brand" href="/" aria-label="Front">
+        <a class="navbar-brand" href="{{ route('home') }}" aria-label="Front">
             <img class="navbar-brand-logo" src="{{ asset('img/Logotipo.svg') }}" alt="Logo"
                 data-hs-theme-appearance="default">
             <img class="navbar-brand-logo" src="{{ asset('img/Logotipo-white.svg') }}" alt="Logo"
@@ -242,17 +242,36 @@
                                                                                 alt="Avatar">
                                                                         @elseif($rel->author)
                                                                             @php
-                                                                                $authorInitials = strtoupper(substr($rel->author->first_name, 0, 1));
-                                                                                if (!empty($rel->author->first_last_name)) {
-                                                                                    $authorInitials .= strtoupper(substr($rel->author->first_last_name, 0, 1));
+                                                                                $authorInitials = strtoupper(
+                                                                                    substr(
+                                                                                        $rel->author->first_name,
+                                                                                        0,
+                                                                                        1,
+                                                                                    ),
+                                                                                );
+                                                                                if (
+                                                                                    !empty(
+                                                                                        $rel->author->first_last_name
+                                                                                    )
+                                                                                ) {
+                                                                                    $authorInitials .= strtoupper(
+                                                                                        substr(
+                                                                                            $rel->author
+                                                                                                ->first_last_name,
+                                                                                            0,
+                                                                                            1,
+                                                                                        ),
+                                                                                    );
                                                                                 }
                                                                             @endphp
-                                                                            <div class="avatar-img avatar-soft-primary">
+                                                                            <div
+                                                                                class="avatar-img avatar-soft-primary">
                                                                                 <span
                                                                                     class="avatar-initials">{{ $authorInitials }}</span>
                                                                             </div>
                                                                         @else
-                                                                            <div class="avatar-img avatar-soft-primary">
+                                                                            <div
+                                                                                class="avatar-img avatar-soft-primary">
                                                                                 <span class="avatar-initials">U</span>
                                                                             </div>
                                                                         @endif
@@ -313,17 +332,36 @@
                                                                                 alt="Avatar">
                                                                         @elseif($act->author)
                                                                             @php
-                                                                                $authorInitials = strtoupper(substr($act->author->first_name, 0, 1));
-                                                                                if (!empty($act->author->first_last_name)) {
-                                                                                    $authorInitials .= strtoupper(substr($act->author->first_last_name, 0, 1));
+                                                                                $authorInitials = strtoupper(
+                                                                                    substr(
+                                                                                        $act->author->first_name,
+                                                                                        0,
+                                                                                        1,
+                                                                                    ),
+                                                                                );
+                                                                                if (
+                                                                                    !empty(
+                                                                                        $act->author->first_last_name
+                                                                                    )
+                                                                                ) {
+                                                                                    $authorInitials .= strtoupper(
+                                                                                        substr(
+                                                                                            $act->author
+                                                                                                ->first_last_name,
+                                                                                            0,
+                                                                                            1,
+                                                                                        ),
+                                                                                    );
                                                                                 }
                                                                             @endphp
-                                                                            <div class="avatar-img avatar-soft-primary">
+                                                                            <div
+                                                                                class="avatar-img avatar-soft-primary">
                                                                                 <span
                                                                                     class="avatar-initials">{{ $authorInitials }}</span>
                                                                             </div>
                                                                         @else
-                                                                            <div class="avatar-img avatar-soft-primary">
+                                                                            <div
+                                                                                class="avatar-img avatar-soft-primary">
                                                                                 <span class="avatar-initials">U</span>
                                                                             </div>
                                                                         @endif
