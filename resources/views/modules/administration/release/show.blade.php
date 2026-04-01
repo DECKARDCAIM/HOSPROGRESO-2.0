@@ -2,7 +2,6 @@
 @section('title', $release->title)
 
 @section('styles')
-    <link rel="stylesheet" href="{{ asset('vendor/quill/dist/quill.snow.css') }}">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <style>

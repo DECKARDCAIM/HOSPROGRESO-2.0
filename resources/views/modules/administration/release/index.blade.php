@@ -343,7 +343,6 @@
 @endsection
 
 @push('scripts')
-    <script src="{{ asset('vendor/tom-select/dist/js/tom-select.complete.min.js') }}"></script>
     @php
         // Extraemos los datos para pasarlos a JavaScript de forma segura
         $calendarEvents = \App\Models\Release::select('id', 'title', 'status', 'published_at', 'created_at')

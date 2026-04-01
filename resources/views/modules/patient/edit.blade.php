@@ -2,7 +2,6 @@
 @section('title', 'Editar Paciente')
 
 @section('styles')
-    <link rel="stylesheet" href="{{ asset('vendor/tom-select/dist/css/tom-select.bootstrap5.css') }}">
 @endsection
 
 @section('content')
@@ -845,11 +844,7 @@
 @endsection
 
 @push('scripts')
-    <script src="{{ asset('vendor/hs-file-attach/dist/hs-file-attach.min.js') }}"></script>
-    <script src="{{ asset('vendor/hs-step-form/dist/hs-step-form.min.js') }}"></script>
     <script src="{{ asset('vendor/hs-add-field/dist/hs-add-field.min.js') }}"></script>
-    <script src="{{ asset('vendor/imask/dist/imask.min.js') }}"></script>
-    <script src="{{ asset('vendor/tom-select/dist/js/tom-select.complete.min.js') }}"></script>
 
     <!-- JS Plugins Init. -->
     <script>

@@ -480,25 +480,6 @@
 @endsection
 
 @push('scripts')
-    <script src="{{ asset('vendor/hs-toggle-password/dist/js/hs-toggle-password.js') }}"></script>
-    <script src="{{ asset('vendor/hs-file-attach/dist/hs-file-attach.min.js') }}"></script>
-    <script src="{{ asset('vendor/hs-nav-scroller/dist/hs-nav-scroller.min.js') }}"></script>
-    <script src="{{ asset('vendor/hs-step-form/dist/hs-step-form.min.js') }}"></script>
-    <script src="{{ asset('vendor/hs-counter/dist/hs-counter.min.js') }}"></script>
-    <script src="{{ asset('vendor/appear/dist/appear.min.js') }}"></script>
-    <script src="{{ asset('vendor/imask/dist/imask.min.js') }}"></script>
-    <script src="{{ asset('vendor/tom-select/dist/js/tom-select.complete.min.js') }}"></script>
-    <script src="{{ asset('vendor/datatables/media/js/jquery.dataTables.min.js') }}"></script>
-    <script src="{{ asset('vendor/datatables.net.extensions/select/select.min.js') }}"></script>
-    <script src="{{ asset('vendor/datatables.net-buttons/js/dataTables.buttons.min.js') }}"></script>
-    <script src="{{ asset('vendor/datatables.net-buttons/js/buttons.flash.min.js') }}"></script>
-    <script src="{{ asset('vendor/jszip/dist/jszip.min.js') }}"></script>
-    <script src="{{ asset('vendor/pdfmake/build/pdfmake.min.js') }}"></script>
-    <script src="{{ asset('vendor/pdfmake/build/vfs_fonts.js') }}"></script>
-    <script src="{{ asset('vendor/datatables.net-buttons/js/buttons.html5.min.js') }}"></script>
-    <script src="{{ asset('vendor/datatables.net-buttons/js/buttons.print.min.js') }}"></script>
-    <script src="{{ asset('vendor/datatables.net-buttons/js/buttons.colVis.min.js') }}"></script>
-
     <script>
         $(document).ready(function() {
             $('#filter_country_id').on('change', function() {

@@ -139,19 +139,6 @@
 </main>
 @endsection
 @push('scripts')
-<script src="{{ asset('vendor/hs-counter/dist/hs-counter.min.js') }}"></script>
-<script src="{{ asset('vendor/appear/dist/appear.min.js') }}"></script>
-<script src="{{ asset('vendor/tom-select/dist/js/tom-select.complete.min.js') }}"></script>
-<script src="{{ asset('vendor/datatables/media/js/jquery.dataTables.min.js') }}"></script>
-<script src="{{ asset('vendor/datatables.net.extensions/select/select.min.js') }}"></script>
-<script src="{{ asset('vendor/datatables.net-buttons/js/dataTables.buttons.min.js') }}"></script>
-<script src="{{ asset('vendor/datatables.net-buttons/js/buttons.flash.min.js') }}"></script>
-<script src="{{ asset('vendor/jszip/dist/jszip.min.js') }}"></script>
-<script src="{{ asset('vendor/pdfmake/build/pdfmake.min.js') }}"></script>
-<script src="{{ asset('vendor/pdfmake/build/vfs_fonts.js') }}"></script>
-<script src="{{ asset('vendor/datatables.net-buttons/js/buttons.html5.min.js') }}"></script>
-<script src="{{ asset('vendor/datatables.net-buttons/js/buttons.print.min.js') }}"></script>
-<script src="{{ asset('vendor/datatables.net-buttons/js/buttons.colVis.min.js') }}"></script>
 <script>
 document.addEventListener('DOMContentLoaded',function(){
     const storageKey='selectedSpecialties';let selectedIds=JSON.parse(sessionStorage.getItem(storageKey)||'[]');

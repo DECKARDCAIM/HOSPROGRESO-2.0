@@ -302,7 +302,5 @@
         });
     });
 </script>
-<script src="{{ asset('vendor/hs-nav-scroller/dist/hs-nav-scroller.min.js') }}"></script>
 <script src="{{ asset('vendor/hs-sticky-block/dist/hs-sticky-block.min.js') }}"></script>
-<script src="{{ asset('vendor/hs-file-attach/dist/hs-file-attach.min.js') }}"></script>
 @endpush

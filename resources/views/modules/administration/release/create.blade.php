@@ -2,8 +2,6 @@
 @section('title', 'Crear Comunicado')
 
 @section('styles')
-    <link rel="stylesheet" href="{{ asset('vendor/quill/dist/quill.snow.css') }}">
-    <link rel="stylesheet" href="{{ asset('vendor/flatpickr/dist/flatpickr.min.css') }}">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link
@@ -297,7 +295,6 @@
 @endsection
 
 @push('scripts')
-    <script src="{{ asset('vendor/quill/dist/quill.min.js') }}"></script>
 
     <script>
         document.addEventListener('DOMContentLoaded', function() {

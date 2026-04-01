@@ -2,7 +2,6 @@
 @section('title', 'Editar Municipio')
 
 @section('styles')
-    <link rel="stylesheet" href="{{ asset('vendor/tom-select/dist/css/tom-select.bootstrap5.css') }}">
 @endsection
 
 @section('content')
@@ -125,7 +124,6 @@
 @endsection
 
 @push('scripts')
-    <script src="{{ asset('vendor/tom-select/dist/js/tom-select.complete.min.js') }}"></script>
     <script>
         document.addEventListener('DOMContentLoaded', function() {
             // INITIALIZATION OF TOM SELECT
