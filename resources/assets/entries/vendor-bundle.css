@@ -1,0 +1,10 @@
+/**
+ * Vendor CSS Bundle Entry Point
+ * Replaces Gulp's vendorBundleCSS task
+ * Imports the same 4 vendor stylesheets
+ */
+
+@import '../vendor/bootstrap-icons/font/bootstrap-icons.css';
+@import '../vendor/tom-select/dist/css/tom-select.bootstrap5.css';
+@import '../vendor/quill/dist/quill.snow.css';
+@import '../vendor/flatpickr/dist/flatpickr.min.css';
