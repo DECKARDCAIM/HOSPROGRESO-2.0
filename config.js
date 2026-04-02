@@ -147,7 +147,7 @@ module.exports = {
 
   directoryNames: {
     src: "./resources/assets",
-    dist: "./public",
+    dist: "./public/dist",
     build: "./public/build"
   },
 
