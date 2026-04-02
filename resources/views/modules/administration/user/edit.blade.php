@@ -528,7 +528,7 @@
                                 <!-- Profile Cover -->
                                 <div class="profile-cover">
                                     <div class="profile-cover-img-wrapper">
-                                        <img class="profile-cover-img" src="{{ asset('img/1920x400/img1.jpg') }}"
+                                        <img class="profile-cover-img" src="{{ asset('dist/img/1920x400/img1.jpg') }}"
                                             alt="Portada">
                                     </div>
                                 </div>
@@ -634,11 +634,11 @@
                             @if (session('success'))
                                 <div id="successMessageContent">
                                     <div class="text-center">
-                                        <img class="img-fluid mb-3" src="{{ asset('svg/illustrations/oc-hi-five.svg') }}"
+                                        <img class="img-fluid mb-3" src="{{ asset('dist/svg/illustrations/oc-hi-five.svg') }}"
                                             alt="Image Description" data-hs-theme-appearance="default"
                                             style="max-width: 15rem;">
                                         <img class="img-fluid mb-3"
-                                            src="{{ asset('svg/illustrations-light/oc-hi-five.svg') }}"
+                                            src="{{ asset('dist/svg/illustrations-light/oc-hi-five.svg') }}"
                                             alt="Image Description" data-hs-theme-appearance="dark"
                                             style="max-width: 15rem;">
                                         <div class="mb-4">

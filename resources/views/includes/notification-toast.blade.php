@@ -9,7 +9,7 @@ document.addEventListener('DOMContentLoaded',function(){
         alertAudio.volume=0.8;
         alertAudio.play().catch(e=>console.log('Audio error',e));
         const toastId='toast-'+Math.random().toString(36).substr(2, 9);
-        const systemLogo='{{ asset('img/logo.png') }}';
+        const systemLogo='{{ asset('dist/img/logo.png') }}';
         const finalMessage=title&&!['Sistema','Atención','Error','Éxito','Información','HOSPROGRESO'].includes(title)?`<strong>${title}</strong><br>${message}`:message;
         const toastHTML=`<div id="${toastId}" class="toast toast-show fade show border-0 shadow-lg" role="alert" aria-live="assertive" aria-atomic="true">
             <div class="toast-header">

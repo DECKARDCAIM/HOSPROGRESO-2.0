@@ -603,7 +603,7 @@
                                 <!-- Profile Cover -->
                                 <div class="profile-cover">
                                     <div class="profile-cover-img-wrapper">
-                                        <img class="profile-cover-img" src="{{ asset('img/1920x400/img1.jpg') }}"
+                                        <img class="profile-cover-img" src="{{ asset('dist/img/1920x400/img1.jpg') }}"
                                             alt="Portada">
                                     </div>
                                 </div>
@@ -612,7 +612,7 @@
                                 <!-- Avatar -->
                                 <label class="avatar avatar-xxl avatar-circle avatar-border-lg profile-cover-avatar">
                                     <img id="confirmAvatarImg" class="avatar-img"
-                                        src="{{ asset('img/160x160/img1.jpg') }}" alt="Avatar">
+                                        src="{{ asset('dist/img/160x160/img1.jpg') }}" alt="Avatar">
                                 </label>
                                 <!-- End Avatar -->
 
@@ -754,8 +754,6 @@
 @endsection
 
 @push('scripts')
-    <script src="{{ asset('vendor/hs-add-field/dist/hs-add-field.min.js') }}"></script>
-
     <!-- JS Plugins Init. -->
     <script>
         (function() {

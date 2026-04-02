@@ -1,10 +1,10 @@
 <header id="header" class="navbar navbar-expand-lg navbar-fixed navbar-height navbar-container navbar-bordered bg-white">
     <div class="navbar-nav-wrap">
         <a class="navbar-brand" href="{{ route('home') }}" aria-label="Front">
-            <img class="navbar-brand-logo" src="{{ asset('img/Logotipo.svg') }}" alt="Logo" data-hs-theme-appearance="default">
-            <img class="navbar-brand-logo" src="{{ asset('img/Logotipo-white.svg') }}" alt="Logo" data-hs-theme-appearance="dark">
-            <img class="navbar-brand-logo-mini" src="{{ asset('img/Logotipo.svg') }}" alt="Logo" data-hs-theme-appearance="default">
-            <img class="navbar-brand-logo-mini" src="{{ asset('img/Logotipo-white.svg') }}" alt="Logo" data-hs-theme-appearance="dark">
+            <img class="navbar-brand-logo" src="{{ asset('dist/img/Logotipo.svg') }}" alt="Logo" data-hs-theme-appearance="default">
+            <img class="navbar-brand-logo" src="{{ asset('dist/img/Logotipo-white.svg') }}" alt="Logo" data-hs-theme-appearance="dark">
+            <img class="navbar-brand-logo-mini" src="{{ asset('dist/img/Logotipo.svg') }}" alt="Logo" data-hs-theme-appearance="default">
+            <img class="navbar-brand-logo-mini" src="{{ asset('dist/img/Logotipo-white.svg') }}" alt="Logo" data-hs-theme-appearance="dark">
         </a>
         <div class="navbar-nav-wrap-content-start">
             <button type="button" class="js-navbar-vertical-aside-toggle-invoker navbar-aside-toggler">

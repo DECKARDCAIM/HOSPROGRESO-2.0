@@ -50,7 +50,7 @@
                 <a class="dropdown-item" href="/">
                     <div class="d-flex align-items-center">
                         <div class="flex-shrink-0">
-                            <img class="avatar avatar-xs avatar-circle" src="{{ asset('img/160x160/img10.jpg') }}" alt="Image Description">
+                            <img class="avatar avatar-xs avatar-circle" src="{{ asset('dist/img/160x160/img10.jpg') }}" alt="Image Description">
                         </div>
                         <div class="flex-grow-1 text-truncate ms-2">
                             <span>Amanda Harvey <i class="tio-verified text-primary" data-toggle="tooltip" data-placement="top" title="Top endorsed"></i></span>
@@ -60,7 +60,7 @@
                 <a class="dropdown-item" href="/">
                     <div class="d-flex align-items-center">
                         <div class="flex-shrink-0">
-                            <img class="avatar avatar-xs avatar-circle" src="{{ asset('img/160x160/img3.jpg') }}" alt="Image Description">
+                            <img class="avatar avatar-xs avatar-circle" src="{{ asset('dist/img/160x160/img3.jpg') }}" alt="Image Description">
                         </div>
                         <div class="flex-grow-1 text-truncate ms-2">
                             <span>David Harrison</span>

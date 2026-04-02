@@ -354,7 +354,6 @@
 @endsection
 
 @push('scripts')
-    <script src="{{ asset('vendor/hs-sticky-block/dist/hs-sticky-block.min.js') }}"></script>
     <script>
         document.addEventListener('DOMContentLoaded', function() {
 

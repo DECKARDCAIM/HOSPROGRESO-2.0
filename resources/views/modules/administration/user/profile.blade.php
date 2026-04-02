@@ -227,10 +227,10 @@
                             <div class="card-body text-center">
                                 <div class="mb-4">
                                     <img class="avatar avatar-xl avatar-4x3"
-                                        src="{{ asset('svg/illustrations/oc-unlock.svg') }}" alt="Image Description"
+                                        src="{{ asset('dist/svg/illustrations/oc-unlock.svg') }}" alt="Image Description"
                                         data-hs-theme-appearance="default">
                                     <img class="avatar avatar-xl avatar-4x3"
-                                        src="{{ asset('svg/illustrations-light/oc-unlock.svg') }}"
+                                        src="{{ asset('dist/svg/illustrations-light/oc-unlock.svg') }}"
                                         alt="Image Description" data-hs-theme-appearance="dark">
                                 </div>
 
@@ -269,10 +269,10 @@
                                 </div>
                             </div>
                             <div class="card-body card-body-height">
-                                <img class="avatar avatar-xxl mb-3" src="{{ asset('svg/illustrations/oc-error.svg') }}"
+                                <img class="avatar avatar-xxl mb-3" src="{{ asset('dist/svg/illustrations/oc-error.svg') }}"
                                     alt="Image Description" data-hs-theme-appearance="default">
                                 <img class="avatar avatar-xxl mb-3"
-                                    src="{{ asset('svg/illustrations-light/oc-error.svg') }}" alt="Image Description"
+                                    src="{{ asset('dist/svg/illustrations-light/oc-error.svg') }}" alt="Image Description"
                                     data-hs-theme-appearance="dark">
                                 <p class="card-text">No hay actividades para mostrar</p>
                                 <a class="btn btn-white btn-sm" href="./#">Iniciar Actividades</a>
@@ -302,5 +302,4 @@
         });
     });
 </script>
-<script src="{{ asset('vendor/hs-sticky-block/dist/hs-sticky-block.min.js') }}"></script>
 @endpush

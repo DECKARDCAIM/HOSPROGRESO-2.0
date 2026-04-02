@@ -95,7 +95,7 @@
                                                 <label class="avatar avatar-xl avatar-circle avatar-uploader me-5"
                                                     for="avatarUploader">
                                                     <img id="avatarImg" class="avatar-img"
-                                                        src="{{ asset('img/160x160/img1.jpg') }}" alt="Avatar">
+                                                        src="{{ asset('dist/img/160x160/img1.jpg') }}" alt="Avatar">
                                                     <input type="file" name="profile_photo"
                                                         class="js-file-attach avatar-uploader-input" id="avatarUploader"
                                                         autocomplete="off"
@@ -104,7 +104,7 @@
                                                             "mode": "image",
                                                             "targetAttr": "src",
                                                             "resetTarget": ".js-file-attach-reset-img",
-                                                            "resetImg": "{{ asset('img/160x160/img1.jpg') }}",
+                                                            "resetImg": "{{ asset('dist/img/160x160/img1.jpg') }}",
                                                             "allowTypes": [".png", ".jpeg", ".jpg"]
                                                         }'>
                                                     <span class="avatar-uploader-trigger">
@@ -474,7 +474,7 @@
                                 <!-- Profile Cover -->
                                 <div class="profile-cover">
                                     <div class="profile-cover-img-wrapper">
-                                        <img class="profile-cover-img" src="{{ asset('img/1920x400/img1.jpg') }}"
+                                        <img class="profile-cover-img" src="{{ asset('dist/img/1920x400/img1.jpg') }}"
                                             alt="Portada">
                                     </div>
                                 </div>
@@ -485,7 +485,7 @@
                                     for="avatarUploaderConfirm" data-bs-toggle="tooltip" data-bs-placement="right"
                                     title="Foto de perfil">
                                     <img id="confirmAvatarImg" class="avatar-img"
-                                        src="{{ asset('img/160x160/img1.jpg') }}" alt="Avatar">
+                                        src="{{ asset('dist/img/160x160/img1.jpg') }}" alt="Avatar">
                                     <span class="avatar-uploader-trigger">
                                         <i class="bi-pencil avatar-uploader-icon shadow-sm"></i>
                                     </span>
@@ -590,7 +590,7 @@
                                             alt="Image Description" data-hs-theme-appearance="default"
                                             style="max-width: 15rem;">
                                         <img class="img-fluid mb-3"
-                                            src="{{ asset('svg/illustrations-light/oc-hi-five.svg') }}"
+                                            src="{{ asset('dist/svg/illustrations-light/oc-hi-five.svg') }}"
                                             alt="Image Description" data-hs-theme-appearance="dark"
                                             style="max-width: 15rem;">
                                         <div class="mb-4">

@@ -5,13 +5,13 @@
     <meta id="theme-color-meta" name="theme-color" content="#ffffff">
     <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
     <meta name="csrf-token" content="{{ csrf_token() }}">
-    <link rel="icon" type="image/png" href="{{ asset('img/logo.png') }}">
-    <link rel="apple-touch-icon" href="{{ asset('img/logo.png') }}">
+    <link rel="icon" type="image/png" href="{{ asset('dist/img/logo.png') }}">
+    <link rel="apple-touch-icon" href="{{ asset('dist/img/logo.png') }}">
     <title>@yield('title')</title>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="{{ asset('css/vendor.min.css') }}">
-    <link rel="preload" href="{{ asset('css/theme.min.css') }}" data-hs-appearance="default" as="style">
-    <link rel="prefetch" href="{{ asset('css/theme-dark.min.css') }}" data-hs-appearance="dark" as="style">
+    <link rel="stylesheet" href="{{ asset('dist/css/vendor.min.css') }}">
+    <link rel="preload" href="{{ asset('dist/css/theme.min.css') }}" data-hs-appearance="default" as="style">
+    <link rel="prefetch" href="{{ asset('dist/css/theme-dark.min.css') }}" data-hs-appearance="dark" as="style">
     @yield('styles')
     <style data-hs-appearance-onload-styles>
         * {
@@ -26,18 +26,18 @@
             opacity: 0 !important;
         }
     </style>
-    <script src="{{ asset('js/hs-config.js') }}"></script>
+    <script src="{{ asset('dist/js/hs-config.js') }}"></script>
     @include('includes.loading-screen')
 </head>
 <body class="has-navbar-vertical-aside navbar-vertical-aside-show-xl footer-offset">
-    <script src="{{ asset('js/hs.theme-appearance.js') }}"></script>
-    <script src="{{ asset('vendor/hs-navbar-vertical-aside/dist/hs-navbar-vertical-aside-mini-cache.js') }}"></script>
+    <script src="{{ asset('dist/js/hs.theme-appearance.js') }}"></script>
+    <script src="{{ asset('dist/vendor/hs-navbar-vertical-aside/dist/hs-navbar-vertical-aside-mini-cache.js') }}"></script>
     @include('includes.panel.UserOptions')
     @include('includes.panel.menu')
     @yield('content')
     @include('includes.panel.IsaacChat')
-    <script src="{{ asset('js/vendor.min.js') }}"></script>
-    <script src="{{ asset('js/theme.min.js') }}"></script>
+    <script src="{{ asset('dist/js/vendor.min.js') }}"></script>
+    <script src="{{ asset('dist/js/theme.min.js') }}"></script>
     @include ('includes.notification-toast')
     @stack('scripts')
 </body>

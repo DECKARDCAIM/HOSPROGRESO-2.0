@@ -8,14 +8,14 @@
         /* ─── Custom Fonts ─── */
         @font-face {
             font-family: 'Altivo';
-            src: url('{{ asset('Fonts/35170.otf') }}') format('opentype');
+            src: url('{{ asset('dist/Fonts/35170.otf') }}') format('opentype');
             font-weight: 400;
             font-style: normal;
         }
 
         @font-face {
             font-family: 'Altivo';
-            src: url('{{ asset('Fonts/35174.otf') }}') format('opentype');
+            src: url('{{ asset('dist/Fonts/35174.otf') }}') format('opentype');
             font-weight: 700;
             font-style: normal;
         }
@@ -34,7 +34,7 @@
             border: 1px solid #e2e8f0;
             background-image:
                 linear-gradient(to bottom, transparent 1052px, #cbd5e1 1052px, #cbd5e1 1056px),
-                url('{{ asset('doc/Oficio-Institucional.jpg') }}');
+                url('{{ asset('dist/doc/Oficio-Institucional.jpg') }}');
             background-size: 100% 1056px;
             background-position: top center;
             background-repeat: repeat-y;
@@ -47,7 +47,7 @@
                 background-size: 100% 1056px;
                 background-image:
                     linear-gradient(to bottom, transparent 1052px, #cbd5e1 1052px, #cbd5e1 1056px),
-                    url('{{ asset('doc/Oficio-Institucional.jpg') }}');
+                    url('{{ asset('dist/doc/Oficio-Institucional.jpg') }}');
             }
         }
 

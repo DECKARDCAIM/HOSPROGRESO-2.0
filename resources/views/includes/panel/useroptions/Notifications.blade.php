@@ -100,7 +100,7 @@
                                 @empty
                                     <li class="list-group-item">
                                         <div class="text-center p-4">
-                                            <img class="mb-3" src="{{ asset('svg/illustrations/oc-error.svg') }}" alt="Sin mensajes" style="width: 7rem;" data-hs-theme-appearance="default">
+                                            <img class="mb-3" src="{{ asset('dist/svg/illustrations/oc-error.svg') }}" alt="Sin mensajes" style="width: 7rem;" data-hs-theme-appearance="default">
                                             <p class="mb-0">No hay mensajes recientes</p>
                                         </div>
                                     </li>
@@ -168,7 +168,7 @@
                                 @empty
                                     <li class="list-group-item">
                                         <div class="text-center p-4">
-                                            <img class="mb-3" src="{{ asset('svg/illustrations/oc-error.svg') }}" alt="Sin actualizaciones" style="width: 7rem;" data-hs-theme-appearance="default">
+                                            <img class="mb-3" src="{{ asset('dist/svg/illustrations/oc-error.svg') }}" alt="Sin actualizaciones" style="width: 7rem;" data-hs-theme-appearance="default">
                                             <p class="mb-0">No hay actualizaciones recientes</p>
                                         </div>
                                     </li>

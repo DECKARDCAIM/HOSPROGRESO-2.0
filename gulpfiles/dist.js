@@ -230,10 +230,11 @@ function vendorBundleJS() {
             paths.src.vendor.dir + '/hs-nav-scroller/dist/hs-nav-scroller.min.js',
             paths.src.vendor.dir + '/hs-step-form/dist/hs-step-form.min.js',
             paths.src.vendor.dir + '/hs-sticky-block/dist/hs-sticky-block.min.js',
+            paths.src.vendor.dir + '/hs-add-field/dist/hs-add-field.min.js',
             paths.src.vendor.dir + '/imask/dist/imask.min.js',
             paths.src.vendor.dir + '/quill/dist/quill.min.js'
         ], { allowEmpty: true })
-        .pipe(concat('vendor.min.js', { newLine: ';\n' }))
+        .pipe(concat('vendor.min.js', { newLine: ';\nwindow.module = undefined; window.exports = undefined; window.define = undefined;\n' }))
         .pipe(gulp.dest(paths.dist.js.dir));
 }
 

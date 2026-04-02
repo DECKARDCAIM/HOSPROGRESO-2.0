@@ -47,12 +47,12 @@
                         <button type="button" class="btn btn-white btn-sm dropdown-toggle w-100" id="exportDd" data-bs-toggle="dropdown" aria-expanded="false"><i class="bi-download me-2"></i> Exportar</button>
                         <div class="dropdown-menu dropdown-menu-sm-end">
                             <span class="dropdown-header">Opciones</span>
-                            <a id="export-print" class="dropdown-item" href="javascript:;"><img class="avatar avatar-xss avatar-4x3 me-2" src="{{ asset('svg/illustrations/print-icon.svg') }}" alt="Imprimir"> Imprimir</a>
+                            <a id="export-print" class="dropdown-item" href="javascript:;"><img class="avatar avatar-xss avatar-4x3 me-2" src="{{ asset('dist/svg/illustrations/print-icon.svg') }}" alt="Imprimir"> Imprimir</a>
                             <div class="dropdown-divider"></div>
                             <span class="dropdown-header">Opciones de descarga</span>
-                            <a id="export-excel" class="dropdown-item" href="javascript:;"><img class="avatar avatar-xss avatar-4x3 me-2" src="{{ asset('svg/brands/excel-icon.svg') }}" alt="Excel"> Excel</a>
-                            <a id="export-csv" class="dropdown-item" href="javascript:;"><img class="avatar avatar-xss avatar-4x3 me-2" src="{{ asset('svg/components/placeholder-csv-format.svg') }}" alt="CSV"> .CSV</a>
-                            <a id="export-pdf" class="dropdown-item" href="javascript:;"><img class="avatar avatar-xss avatar-4x3 me-2" src="{{ asset('svg/brands/pdf-icon.svg') }}" alt="PDF"> PDF</a>
+                            <a id="export-excel" class="dropdown-item" href="javascript:;"><img class="avatar avatar-xss avatar-4x3 me-2" src="{{ asset('dist/svg/brands/excel-icon.svg') }}" alt="Excel"> Excel</a>
+                            <a id="export-csv" class="dropdown-item" href="javascript:;"><img class="avatar avatar-xss avatar-4x3 me-2" src="{{ asset('dist/svg/components/placeholder-csv-format.svg') }}" alt="CSV"> .CSV</a>
+                            <a id="export-pdf" class="dropdown-item" href="javascript:;"><img class="avatar avatar-xss avatar-4x3 me-2" src="{{ asset('dist/svg/brands/pdf-icon.svg') }}" alt="PDF"> PDF</a>
                         </div>
                     </div>
                     @php $activeFilters = count(array_filter(request()->only(['status']))); @endphp

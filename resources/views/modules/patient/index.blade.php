@@ -141,25 +141,25 @@
                                 <span class="dropdown-header">Opciones</span>
                                 <a id="export-copy" class="dropdown-item" href="javascript:;">
                                     <img class="avatar avatar-xss avatar-4x3 me-2"
-                                        src="{{ asset('svg/illustrations/copy-icon.svg') }}" alt="Copiar"> Copiar
+                                        src="{{ asset('dist/svg/illustrations/copy-icon.svg') }}" alt="Copiar"> Copiar
                                 </a>
                                 <a id="export-print" class="dropdown-item" href="javascript:;">
                                     <img class="avatar avatar-xss avatar-4x3 me-2"
-                                        src="{{ asset('svg/illustrations/print-icon.svg') }}" alt="Imprimir"> Imprimir
+                                        src="{{ asset('dist/svg/illustrations/print-icon.svg') }}" alt="Imprimir"> Imprimir
                                 </a>
                                 <div class="dropdown-divider"></div>
                                 <span class="dropdown-header">Opciones de descarga</span>
                                 <a id="export-excel" class="dropdown-item" href="javascript:;">
                                     <img class="avatar avatar-xss avatar-4x3 me-2"
-                                        src="{{ asset('svg/brands/excel-icon.svg') }}" alt="Excel"> Excel
+                                        src="{{ asset('dist/svg/brands/excel-icon.svg') }}" alt="Excel"> Excel
                                 </a>
                                 <a id="export-csv" class="dropdown-item" href="javascript:;">
                                     <img class="avatar avatar-xss avatar-4x3 me-2"
-                                        src="{{ asset('svg/components/placeholder-csv-format.svg') }}" alt="CSV"> .CSV
+                                        src="{{ asset('dist/svg/components/placeholder-csv-format.svg') }}" alt="CSV"> .CSV
                                 </a>
                                 <a id="export-pdf" class="dropdown-item" href="javascript:;">
                                     <img class="avatar avatar-xss avatar-4x3 me-2"
-                                        src="{{ asset('svg/brands/pdf-icon.svg') }}" alt="PDF"> PDF
+                                        src="{{ asset('dist/svg/brands/pdf-icon.svg') }}" alt="PDF"> PDF
                                 </a>
                             </div>
                         </div>
@@ -481,7 +481,7 @@
                             @empty
                                 <tr>
                                     <td colspan="7" class="text-center py-5">
-                                        <img class="mb-3" src="{{ asset('svg/illustrations/oc-error.svg') }}"
+                                        <img class="mb-3" src="{{ asset('dist/svg/illustrations/oc-error.svg') }}"
                                             alt="Image Description" style="width: 10rem;"
                                             data-hs-theme-appearance="default">
                                         <p class="text-muted mb-0">No hay pacientes registrados</p>

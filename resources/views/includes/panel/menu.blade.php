@@ -2,10 +2,10 @@
     <div class="navbar-vertical-container">
         <div class="navbar-vertical-footer-offset">
             <a class="navbar-brand" href="/" aria-label="Front">
-                <img class="navbar-brand-logo" src="{{ asset('img/Logotipo.svg') }}" alt="Logo" data-hs-theme-appearance="default">
-                <img class="navbar-brand-logo" src="{{ asset('img/Logotipo-white.svg') }}" alt="Logo" data-hs-theme-appearance="dark">
-                <img class="navbar-brand-logo-mini" src="{{ asset('img/Logotipo.svg') }}" alt="Logo" data-hs-theme-appearance="default">
-                <img class="navbar-brand-logo-mini" src="{{ asset('img/Logotipo-white.svg') }}" alt="Logo" data-hs-theme-appearance="dark">
+                <img class="navbar-brand-logo" src="{{ asset('dist/img/Logotipo.svg') }}" alt="Logo" data-hs-theme-appearance="default">
+                <img class="navbar-brand-logo" src="{{ asset('dist/img/Logotipo-white.svg') }}" alt="Logo" data-hs-theme-appearance="dark">
+                <img class="navbar-brand-logo-mini" src="{{ asset('dist/img/Logotipo.svg') }}" alt="Logo" data-hs-theme-appearance="default">
+                <img class="navbar-brand-logo-mini" src="{{ asset('dist/img/Logotipo-white.svg') }}" alt="Logo" data-hs-theme-appearance="dark">
             </a>
             <button type="button" class="js-navbar-vertical-aside-toggle-invoker navbar-aside-toggler">
                 <i class="bi-arrow-bar-left navbar-toggler-short-align" data-bs-template='<div class="tooltip d-none d-md-block" role="tooltip"><div class="arrow"></div><div class="tooltip-inner"></div></div>' data-bs-toggle="tooltip" data-bs-placement="right" title="Collapse"></i>
