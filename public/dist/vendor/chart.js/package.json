@@ -1,8 +1,8 @@
 {
-    "name": "chart.js-helpers",
+    "name": "chart.js-auto",
     "private": true,
-    "description": "helper package",
-    "main": "helpers.js",
-    "module": "helpers.esm.js",
-    "types": "helpers.esm.d.ts"
+    "description": "auto registering package",
+    "main": "auto.js",
+    "module": "auto.esm.js",
+    "types": "auto.esm.d.ts"
 }

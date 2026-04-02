@@ -160,6 +160,10 @@ export default defineConfig({
     },
 
     rollupOptions: {
+      onwarn(warning, warn) {
+        if (warning.code === 'EVAL') return;
+        warn(warning);
+      },
       input: {
         vendor: path.resolve(import.meta.dirname, 'resources/assets/entries/vendor-bundle.js'),
       },
