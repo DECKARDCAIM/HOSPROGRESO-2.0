@@ -85,8 +85,7 @@
                 </div>
             </div>
             <div class="table-responsive datatable-custom position-relative">
-                <table id="datatable" class="table table-lg table-borderless table-thead-bordered table-nowrap table-align-middle card-table"
-                    data-hs-datatables-options='{"columnDefs":[{"targets":[0,3],"orderable":false}],"order":[],"info":{"totalQty":"#datatableWithPaginationInfoTotalQty"},"search":"#datatableSearch","entries":"#datatableEntries","pageLength":{{ request('per_page',25) }},"isResponsive":false,"isShowPaging":false,"pagination":"datatablePagination"}'>
+                <table id="datatable" class="table table-lg table-borderless table-thead-bordered table-nowrap table-align-middle card-table" data-hs-datatables-options='{"columnDefs":[{"targets":[0,3],"orderable":false}],"order":[],"info":{"totalQty":"#datatableWithPaginationInfoTotalQty"},"search":"#datatableSearch","entries":"#datatableEntries","pageLength":{{ request('per_page',25) }},"isResponsive":false,"isShowPaging":false,"pagination":"datatablePagination"}'>
                     <thead class="thead-light"><tr>
                         <th class="table-column-pe-0"><div class="form-check"><input class="form-check-input" type="checkbox" value="" id="datatableCheckAll"><label class="form-check-label" for="datatableCheckAll"></label></div></th>
                         <th class="table-column-ps-0">Especialidad</th><th>Estado</th><th>Acciones</th>

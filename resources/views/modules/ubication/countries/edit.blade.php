@@ -1,10 +1,8 @@
 @extends('layouts.panel')
 @section('title', 'Editar País')
-
 @section('content')
 <main id="content" role="main" class="main">
     <div class="content container-fluid">
-        <!-- Page Header -->
         <div class="page-header">
             <div class="row align-items-end">
                 <div class="col-sm mb-2 mb-sm-0">
@@ -25,59 +23,40 @@
                 </div>
             </div>
         </div>
-        <!-- End Page Header -->
-
         <div class="row justify-content-lg-center">
             <div class="col-lg-9">
-                <!-- Card -->
                 <form action="{{ route('countries.update', $country->id) }}" method="POST" id="countryForm" class="needs-validation" novalidate>
                     @csrf
                     @method('PUT')
-                    
                     <div class="card card-lg mb-3 mb-lg-5">
-                        <!-- Header -->
                         <div class="card-header">
                             <h4 class="card-header-title">Detalles del país</h4>
                         </div>
-                        <!-- End Header -->
-
-                        <!-- Body -->
                         <div class="card-body">
-                            <!-- Form Group -->
                             <div class="mb-4">
                                 <label for="nameLabel" class="form-label">Nombre del país</label>
-
                                 <div class="input-group input-group-merge">
                                     <div class="input-group-prepend input-group-text">
                                         <i class="bi-briefcase"></i>
                                     </div>
-                                    <input type="text" class="form-control @error('name') is-invalid @enderror" 
-                                           name="name" id="nameLabel" placeholder="Ej. Guatemala" 
-                                           value="{{ old('name', $country->name) }}" required minlength="5" autocomplete="off">
+                                    <input type="text" class="form-control @error('name') is-invalid @enderror" name="name" id="nameLabel" placeholder="Ej. Guatemala" value="{{ old('name', $country->name) }}" required minlength="5" autocomplete="off">
                                 </div>
                                 @error('name')
                                     <div class="invalid-feedback d-block">{{ $message }}</div>
                                 @enderror
                             </div>
-                            <!-- End Form Group -->
                         </div>
-                        <!-- End Body -->
-
-                        <!-- Footer -->
                         <div class="card-footer d-flex justify-content-end align-items-center gap-3">
                             <a href="{{ route('countries.index') }}" class="btn btn-white">Cancelar</a>
                             <button type="submit" class="btn btn-primary">Guardar cambios</button>
                         </div>
-                        <!-- End Footer -->
                     </div>
                 </form>
-                <!-- End Card -->
             </div>
         </div>
     </div>
 </main>
 @endsection
-
 @push('scripts')
 <script>
     document.addEventListener('DOMContentLoaded', function () {

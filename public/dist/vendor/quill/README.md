@@ -1,194 +1,105 @@
-# clone
+# EventEmitter3
 
-[![build status](https://secure.travis-ci.org/pvorb/clone.svg)](http://travis-ci.org/pvorb/clone) [![downloads](https://img.shields.io/npm/dt/clone.svg)](http://npm-stat.com/charts.html?package=clone)
+[![Version npm](https://img.shields.io/npm/v/eventemitter3.svg?style=flat-square)](https://www.npmjs.com/package/eventemitter3)[![Build Status](https://img.shields.io/travis/primus/eventemitter3/master.svg?style=flat-square)](https://travis-ci.org/primus/eventemitter3)[![Dependencies](https://img.shields.io/david/primus/eventemitter3.svg?style=flat-square)](https://david-dm.org/primus/eventemitter3)[![Coverage Status](https://img.shields.io/coveralls/primus/eventemitter3/master.svg?style=flat-square)](https://coveralls.io/r/primus/eventemitter3?branch=master)[![IRC channel](https://img.shields.io/badge/IRC-irc.freenode.net%23primus-00a8ff.svg?style=flat-square)](https://webchat.freenode.net/?channels=primus)
 
-offers foolproof _deep cloning_ of objects, arrays, numbers, strings, maps,
-sets, promises, etc. in JavaScript.
+[![Sauce Test Status](https://saucelabs.com/browser-matrix/eventemitter3.svg)](https://saucelabs.com/u/eventemitter3)
 
-**XSS vulnerability detected**
+EventEmitter3 is a high performance EventEmitter. It has been micro-optimized
+for various of code paths making this, one of, if not the fastest EventEmitter
+available for Node.js and browsers. The module is API compatible with the
+EventEmitter that ships by default with Node.js but there are some slight
+differences:
 
+- Domain support has been removed.
+- We do not `throw` an error when you emit an `error` event and nobody is
+  listening.
+- The `newListener` event is removed as the use-cases for this functionality are
+  really just edge cases.
+- No `setMaxListeners` and its pointless memory leak warnings. If you want to
+  add `end` listeners you should be able to do that without modules complaining.
+- No `listenerCount` method. Use `EE.listeners(event).length` instead.
+- Support for custom context for events so there is no need to use `fn.bind`.
+- The `listeners` method can do existence checking instead of returning only
+  arrays.
+- The `removeListener` method removes all matching listeners, not only the
+  first.
+
+It's a drop in replacement for existing EventEmitters, but just faster. Free
+performance, who wouldn't want that? The EventEmitter is written in EcmaScript 3
+so it will work in the oldest browsers and node versions that you need to
+support.
 
 ## Installation
 
-    npm install clone
+```bash
+$ npm install --save eventemitter3        # npm
+$ component install primus/eventemitter3  # Component
+$ bower install eventemitter3             # Bower
+```
 
-(It also works with browserify, ender or standalone. You may want to use the
-option `noParse` in browserify to reduce the resulting file size, since usually
-`Buffer`s are not needed in browsers.)
+## Usage
 
+After installation the only thing you need to do is require the module:
 
-## Example
+```js
+var EventEmitter = require('eventemitter3');
+```
 
-~~~ javascript
-var clone = require('clone');
+And you're ready to create your own EventEmitter instances. For the API
+documentation, please follow the official Node.js documentation:
 
-var a, b;
+http://nodejs.org/api/events.html
 
-a = { foo: { bar: 'baz' } };  // initial value of a
+### Contextual emits
 
-b = clone(a);                 // clone a -> b
-a.foo.bar = 'foo';            // change a
+We've upgraded the API of the `EventEmitter.on`, `EventEmitter.once` and
+`EventEmitter.removeListener` to accept an extra argument which is the `context`
+or `this` value that should be set for the emitted events. This means you no
+longer have the overhead of an event that required `fn.bind` in order to get a
+custom `this` value.
 
-console.log(a);               // show a
-console.log(b);               // show b
-~~~
+```js
+var EE = new EventEmitter()
+  , context = { foo: 'bar' };
 
-This will print:
+function emitted() {
+  console.log(this === context); // true
+}
 
-~~~ javascript
-{ foo: { bar: 'foo' } }
-{ foo: { bar: 'baz' } }
-~~~
+EE.once('event-name', emitted, context);
+EE.on('another-event', emitted, context);
+EE.removeListener('another-event', emitted, context);
+```
 
-**clone** masters cloning simple objects (even with custom prototype), arrays,
-Date objects, and RegExp objects. Everything is cloned recursively, so that you
-can clone dates in arrays in objects, for example.
+### Existence
 
+To check if there is already a listener for a given event you can supply the
+`listeners` method with an extra boolean argument. This will transform the
+output from an array, to a boolean value which indicates if there are listeners
+in place for the given event:
 
-## API
+```js
+var EE = new EventEmitter();
+EE.once('event-name', function () {});
+EE.on('another-event', function () {});
 
-`clone(val, circular, depth)`
+EE.listeners('event-name', true); // returns true
+EE.listeners('unknown-name', true); // returns false
+```
 
-  * `val` -- the value that you want to clone, any type allowed
-  * `circular` -- boolean
+### Tests and benchmarks
 
-    Call `clone` with `circular` set to `false` if you are certain that `obj`
-    contains no circular references. This will give better performance if
-    needed. There is no error if `undefined` or `null` is passed as `obj`.
-  * `depth` -- depth to which the object is to be cloned (optional,
-    defaults to infinity)
-  * `prototype` -- sets the prototype to be used when cloning an object.
-    (optional, defaults to parent prototype).
-  * `includeNonEnumerable` -- set to `true` if the non-enumerable properties
-    should be cloned as well. Non-enumerable properties on the prototype chain
-    will be ignored. (optional, defaults to `false`)
+This module is well tested. You can run:
 
-`clone.clonePrototype(obj)`
+- `npm test` to run the tests under Node.js.
+- `npm run test-browser` to run the tests in real browsers via Sauce Labs.
 
-  * `obj` -- the object that you want to clone
+We also have a set of benchmarks to compare EventEmitter3 with some available
+alternatives. To run the benchmarks run `npm run benchmark`.
 
-Does a prototype clone as
-[described by Oran Looney](http://oranlooney.com/functional-javascript/).
-
-
-## Circular References
-
-~~~ javascript
-var a, b;
-
-a = { hello: 'world' };
-
-a.myself = a;
-b = clone(a);
-
-console.log(b);
-~~~
-
-This will print:
-
-~~~ javascript
-{ hello: "world", myself: [Circular] }
-~~~
-
-So, `b.myself` points to `b`, not `a`. Neat!
-
-
-## Test
-
-    npm test
-
-
-## Changelog
-
-### v2.1.2
-
-#### 2018-03-21
-
-  - Use `Buffer.allocUnsafe()` on Node >= 4.5.0 (contributed by @ChALkeR)
-
-### v2.1.1
-
-#### 2017-03-09
-
-  - Fix build badge in README
-  - Add support for cloning Maps and Sets on Internet Explorer
-
-### v2.1.0
-
-#### 2016-11-22
-
-  - Add support for cloning Errors
-  - Exclude non-enumerable symbol-named object properties from cloning
-  - Add option to include non-enumerable own properties of objects
-
-### v2.0.0
-
-#### 2016-09-28
-
-  - Add support for cloning ES6 Maps, Sets, Promises, and Symbols
-
-### v1.0.3
-
-#### 2017-11-08
-
-  - Close XSS vulnerability in the NPM package, which included the file
-    `test-apart-ctx.html`. This vulnerability was disclosed by Juho Nurminen of
-    2NS - Second Nature Security.
-
-### v1.0.2 (deprecated)
-
-#### 2015-03-25
-
-  - Fix call on getRegExpFlags
-  - Refactor utilities
-  - Refactor test suite
-
-### v1.0.1 (deprecated)
-
-#### 2015-03-04
-
-  - Fix nodeunit version
-  - Directly call getRegExpFlags
-
-### v1.0.0 (deprecated)
-
-#### 2015-02-10
-
-  - Improve browser support
-  - Improve browser testability
-  - Move helper methods to private namespace
-
-## Caveat
-
-Some special objects like a socket or `process.stdout`/`stderr` are known to not
-be cloneable. If you find other objects that cannot be cloned, please [open an
-issue](https://github.com/pvorb/clone/issues/new).
-
-
-## Bugs and Issues
-
-If you encounter any bugs or issues, feel free to [open an issue at
-github](https://github.com/pvorb/clone/issues) or send me an email to
-<paul@vorba.ch>. I also always like to hear from you, if you’re using my code.
+Tests and benchmarks are not included in the npm package. If you want to play
+with them you have to clone the GitHub repository.
 
 ## License
 
-Copyright © 2011-2016 [Paul Vorbach](https://paul.vorba.ch/) and
-[contributors](https://github.com/pvorb/clone/graphs/contributors).
-
-Permission is hereby granted, free of charge, to any person obtaining a copy of
-this software and associated documentation files (the “Software”), to deal in
-the Software without restriction, including without limitation the rights to
-use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies of
-the Software, and to permit persons to whom the Software is furnished to do so,
-subject to the following conditions:
-
-The above copyright notice and this permission notice shall be included in all
-copies or substantial portions of the Software.
-
-THE SOFTWARE IS PROVIDED “AS IS”, WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS
-FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR
-COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER
-IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, OUT OF OR IN CONNECTION WITH THE
-SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
+[MIT](LICENSE)

@@ -128,9 +128,11 @@ Route::middleware(['auth', 'PreventBackHistory'])->group(function () {
     // ==========================================
     // MÓDULO: MÉTRICAS
     // ==========================================
-    Route::prefix('metrics')->group(function () {
-        Route::get('/system', [MetricsController::class, 'system'])->name('metrics.system.index');
-        Route::get('/system/expand/{chart}', [MetricsController::class, 'expandSystem'])->name('metrics.system.expand');
+    Route::prefix('metrics')->name('metrics.')->group(function () {
+        Route::get('/system', [MetricsController::class, 'system'])->name('system.index');
+        Route::get('/system/expand/{chart}', [MetricsController::class, 'expandSystem'])->name('system.expand');
+        Route::post('/system/export/pdf', [MetricsController::class, 'exportPDF'])->name('system.export.pdf');
+        Route::post('/system/export/print', [MetricsController::class, 'print'])->name('system.export.print');
     });
 
     // ==========================================

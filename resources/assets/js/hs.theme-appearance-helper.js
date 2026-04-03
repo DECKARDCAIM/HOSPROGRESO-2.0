@@ -12,6 +12,10 @@
         }
     };
 
+    // Ejecutar inmediatamente al cargar el script (no esperar onload)
+    // HSThemeAppearance ya corrió desde el <body> antes que este script
+    updateMetaThemeColor();
+
     // ───── 2. Inicialización Global ─────
     window.onload = function () {
         // Solo inicializamos si los componentes existen
@@ -31,7 +35,7 @@
             initThemeDropdown();
         }
 
-        // Ejecución inicial del meta color
+        // Re-aplicar por si acaso
         updateMetaThemeColor();
     };
 
@@ -73,6 +77,22 @@
                     const themeValue = $item.getAttribute('data-value');
                     if (themeValue) {
                         HSThemeAppearance.setAppearance(themeValue);
+
+                        // Sincronizar con el servidor (persiste en DB)
+                        const csrfToken = document.querySelector('meta[name="csrf-token"]');
+                        if (csrfToken) {
+                            fetch('/user/update-theme', {
+                                method: 'POST',
+                                headers: {
+                                    'Content-Type': 'application/json',
+                                    'X-CSRF-TOKEN': csrfToken.getAttribute('content'),
+                                    'Accept': 'application/json',
+                                },
+                                body: JSON.stringify({ theme: themeValue }),
+                            }).catch(function (err) {
+                                console.warn('[Theme] No se pudo sincronizar con el servidor:', err);
+                            });
+                        }
                     }
                 });
             }

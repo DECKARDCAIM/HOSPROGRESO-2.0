@@ -1,10 +1,8 @@
 @extends('layouts.panel')
 @section('title', 'Comunicados')
-
 @section('content')
     <main id="content" role="main" class="main">
         <div class="content container-fluid py-4">
-
             <div class="page-header">
                 <div class="row align-items-end">
                     <div class="col-sm mb-2 mb-sm-0">
@@ -24,9 +22,6 @@
                     </div>
                 </div>
             </div>
-
-
-
             <div class="row">
                 <div class="col-sm-6 col-md-3 mb-3 mb-lg-5">
                     <div class="card h-100">
@@ -40,7 +35,6 @@
                         </div>
                     </div>
                 </div>
-
                 <div class="col-sm-6 col-md-3 mb-3 mb-lg-5">
                     <div class="card h-100">
                         <div class="card-body">
@@ -53,7 +47,6 @@
                         </div>
                     </div>
                 </div>
-
                 <div class="col-sm-6 col-md-3 mb-3 mb-lg-5">
                     <div class="card h-100">
                         <div class="card-body">
@@ -66,7 +59,6 @@
                         </div>
                     </div>
                 </div>
-
                 <div class="col-sm-6 col-md-3 mb-3 mb-lg-5">
                     <div class="card h-100">
                         <div class="card-body">
@@ -80,9 +72,7 @@
                     </div>
                 </div>
             </div>
-
             <div class="row">
-
                 <div class="col-lg-8 mb-4 mb-lg-0">
                     <div class="card">
                         <div class="card-header card-header-content-md-between">
@@ -92,12 +82,10 @@
                                         <input type="hidden" name="per_page" value="{{ request('per_page') }}">
                                     @endif
                                     <div class="input-group input-group-merge input-group-flush">
-                                        <button type="submit"
-                                            class="input-group-prepend input-group-text bg-transparent border-0">
+                                        <button type="submit" class="input-group-prepend input-group-text bg-transparent border-0">
                                             <i class="bi-search"></i>
                                         </button>
-                                        <input name="search" type="text" class="form-control"
-                                            placeholder="Buscar comunicados" value="{{ request('search') }}">
+                                        <input name="search" type="text" class="form-control" placeholder="Buscar comunicados" value="{{ request('search') }}">
                                         @if (request('search'))
                                             <a class="input-group-append input-group-text text-muted"
                                                 href="{{ route('releases.index', request()->except('search')) }}">
@@ -107,21 +95,15 @@
                                     </div>
                                 </form>
                             </div>
-
                             <div class="d-grid d-sm-flex justify-content-md-end align-items-sm-center gap-2">
-
                                 <div class="dropdown">
-                                    <button type="button" class="btn btn-white btn-sm w-100" id="releasesFilterDropdown"
-                                        data-bs-toggle="dropdown" data-bs-auto-close="outside" aria-expanded="false">
+                                    <button type="button" class="btn btn-white btn-sm w-100" id="releasesFilterDropdown" data-bs-toggle="dropdown" data-bs-auto-close="outside" aria-expanded="false">
                                         <i class="bi-filter" style="font-style: normal;"> Filtrar </i>
                                         @if ($activeFilters > 0)
-                                            <span
-                                                class="badge bg-soft-dark text-dark rounded-circle ms-1">{{ $activeFilters }}</span>
+                                            <span class="badge bg-soft-dark text-dark rounded-circle ms-1">{{ $activeFilters }}</span>
                                         @endif
                                     </button>
-
-                                    <div class="dropdown-menu dropdown-menu-sm-end dropdown-card card-dropdown-filter-centered"
-                                        style="min-width: 25rem;">
+                                    <div class="dropdown-menu dropdown-menu-sm-end dropdown-card card-dropdown-filter-centered" style="min-width: 25rem;">
                                         <div class="card">
                                             <div class="card-header card-header-content-between">
                                                 <h5 class="card-header-title">Filtrar comunicados</h5>
@@ -129,8 +111,7 @@
                                             <div class="card-body">
                                                 <form action="{{ route('releases.index') }}" method="GET">
                                                     @if (request('search'))
-                                                        <input type="hidden" name="search"
-                                                            value="{{ request('search') }}">
+                                                        <input type="hidden" name="search" value="{{ request('search') }}">
                                                     @endif
                                                     <div class="row">
                                                         <div class="col-12 mb-3">
@@ -143,50 +124,34 @@
                                                         <div class="col-12 mb-3">
                                                             <label class="form-label">Publicación</label>
                                                             <select name="status" class="form-select form-select-sm">
-                                                                <option value=""
-                                                                    {{ !request()->has('status') ? 'selected' : '' }}>Todos
-                                                                </option>
-                                                                <option value="published"
-                                                                    {{ request('status') == 'published' ? 'selected' : '' }}>
-                                                                    Publicados</option>
-                                                                <option value="draft"
-                                                                    {{ request('status') == 'draft' ? 'selected' : '' }}>
-                                                                    Borradores</option>
+                                                                <option value="" {{ !request()->has('status') ? 'selected' : '' }}>Todos</option>
+                                                                <option value="published" {{ request('status') == 'published' ? 'selected' : '' }}>Publicados</option>
+                                                                <option value="draft" {{ request('status') == 'draft' ? 'selected' : '' }}>Borradores</option>
                                                             </select>
                                                         </div>
                                                         <div class="col-12 mb-3">
                                                             <label class="form-label">Tipo</label>
                                                             <select name="type" class="form-select form-select-sm">
                                                                 <option value="">Todos</option>
-                                                                <option value="comunicado"
-                                                                    {{ request('type') == 'comunicado' ? 'selected' : '' }}>
-                                                                    Comunicado</option>
-                                                                <option value="actualizacion"
-                                                                    {{ request('type') == 'actualizacion' ? 'selected' : '' }}>
-                                                                    Actualización</option>
+                                                                <option value="comunicado" {{ request('type') == 'comunicado' ? 'selected' : '' }}>Comunicado</option>
+                                                                <option value="actualizacion" {{ request('type') == 'actualizacion' ? 'selected' : '' }}>Actualización</option>
                                                             </select>
                                                         </div>
                                                         <div class="col-12 mb-3">
                                                             <label class="form-label">Fecha de Publicación</label>
                                                             <div class="row">
                                                                 <div class="col-6">
-                                                                    <input type="date" name="date_from"
-                                                                        class="form-control form-control-sm"
-                                                                        value="{{ request('date_from') }}">
+                                                                    <input type="date" name="date_from" class="form-control form-control-sm" value="{{ request('date_from') }}">
                                                                 </div>
                                                                 <div class="col-6">
-                                                                    <input type="date" name="date_to"
-                                                                        class="form-control form-control-sm"
-                                                                        value="{{ request('date_to') }}">
+                                                                    <input type="date" name="date_to" class="form-control form-control-sm" value="{{ request('date_to') }}">
                                                                 </div>
                                                             </div>
                                                         </div>
                                                     </div>
                                                     <div class="d-grid gap-2">
-                                                        <button type="submit" class="btn btn-primary btn-sm">Aplicar
-                                                            Filtros</button>
-                                                        <a href="{{ route('releases.index') }}"
-                                                            class="btn btn-white btn-sm">Limpiar Filtros</a>
+                                                        <button type="submit" class="btn btn-primary btn-sm">Aplicar Filtros</button>
+                                                        <a href="{{ route('releases.index') }}" class="btn btn-white btn-sm">Limpiar Filtros</a>
                                                     </div>
                                                 </form>
                                             </div>
@@ -195,10 +160,8 @@
                                 </div>
                             </div>
                         </div>
-
                         <div class="table-responsive datatable-custom position-relative">
-                            <table
-                                class="table table-lg table-borderless table-thead-bordered table-nowrap table-align-middle card-table">
+                            <table class="table table-lg table-borderless table-thead-bordered table-nowrap table-align-middle card-table">
                                 <thead class="thead-light">
                                     <tr>
                                         <th>Título</th>
@@ -242,19 +205,13 @@
                                             </td>
                                             <td>
                                                 <div class="d-flex gap-1 justify-content-start">
-                                                    <a class="btn btn-white btn-sm" style="padding: 0.35rem 0.5rem;"
-                                                        href="{{ route('releases.show', $release->id) }}"
-                                                        title="Ver"><i class="bi-eye-fill" style="font-size: 0.85rem;"></i></a>
+                                                    <a class="btn btn-white btn-sm" style="padding: 0.35rem 0.5rem;" href="{{ route('releases.show', $release->id) }}" title="Ver"><i class="bi-eye-fill" style="font-size: 0.85rem;"></i></a>
                                                     @if (!$release->trashed())
-                                                    <a class="btn btn-white btn-sm" style="padding: 0.35rem 0.5rem;"
-                                                        href="{{ route('releases.edit', $release->id) }}"
-                                                        title="Editar"><i class="bi-pencil-fill" style="font-size: 0.85rem;"></i></a>
-                                                    <form action="{{ route('releases.destroy', $release->id) }}"
-                                                        method="POST" class="d-inline">
+                                                    <a class="btn btn-white btn-sm" style="padding: 0.35rem 0.5rem;" href="{{ route('releases.edit', $release->id) }}" title="Editar"><i class="bi-pencil-fill" style="font-size: 0.85rem;"></i></a>
+                                                    <form action="{{ route('releases.destroy', $release->id) }}" method="POST" class="d-inline">
                                                         @csrf
                                                         @method('DELETE')
-                                                        <button type="submit" class="btn btn-white btn-sm" style="padding: 0.35rem 0.5rem;"
-                                                            title="Eliminar"><i class="bi-trash" style="font-size: 0.85rem;"></i></button>
+                                                        <button type="submit" class="btn btn-white btn-sm" style="padding: 0.35rem 0.5rem;" title="Eliminar"><i class="bi-trash" style="font-size: 0.85rem;"></i></button>
                                                     </form>
                                                     @endif
                                                 </div>
@@ -266,8 +223,7 @@
                                                 <div class="p-4">
                                                     <i class="bi-mailbox fs-1 text-muted mb-3 d-block"></i>
                                                     <h5>No hay comunicados todavía</h5>
-                                                    <p class="text-muted">Crea el primero usando el botón "Nuevo
-                                                        comunicado"</p>
+                                                    <p class="text-muted">Crea el primero usando el botón "Nuevo comunicado"</p>
                                                 </div>
                                             </td>
                                         </tr>
@@ -275,17 +231,13 @@
                                 </tbody>
                             </table>
                         </div>
-
                         <div class="card-footer">
                             <div class="row justify-content-center justify-content-sm-between align-items-sm-center">
                                 <div class="col-sm mb-2 mb-sm-0">
                                     <div class="d-flex justify-content-center justify-content-sm-start align-items-center">
                                         <span class="me-2">Mostrando:</span>
                                         <div class="tom-select-custom">
-                                            <select id="datatableEntries"
-                                                class="js-select form-select form-select-borderless w-auto" autocomplete="off"
-                                                data-hs-tom-select-options='{"searchInDropdown": false, "hideSearch": true}'
-                                                onchange="window.location.href = '{{ route('releases.index', request()->except(['per_page', 'page'])) }}' + ( '{{ route('releases.index', request()->except(['per_page', 'page'])) }}'.includes('?') ? '&' : '?' ) + 'per_page=' + this.value">
+                                            <select id="datatableEntries" class="js-select form-select form-select-borderless w-auto" autocomplete="off" data-hs-tom-select-options='{"searchInDropdown": false, "hideSearch": true}' onchange="window.location.href = '{{ route('releases.index', request()->except(['per_page', 'page'])) }}' + ( '{{ route('releases.index', request()->except(['per_page', 'page'])) }}'.includes('?') ? '&' : '?' ) + 'per_page=' + this.value">
                                                 <option value="5" {{ request('per_page', 5) == 5 ? 'selected' : '' }}>5</option>
                                                 <option value="10" {{ request('per_page') == 10 ? 'selected' : '' }}>10</option>
                                                 <option value="25" {{ request('per_page') == 25 ? 'selected' : '' }}>25</option>
@@ -306,7 +258,6 @@
                         </div>
                     </div>
                 </div>
-
                 <div class="col-lg-4">
                     <div class="card h-100 shadow-sm">
                         <div class="card-header border-bottom">
@@ -325,26 +276,20 @@
                                     <i class="bi-chevron-right"></i>
                                 </button>
                             </div>
-
                             <div id="miniCalendarGrid"></div>
-
                             <hr class="my-3">
-
                             <div id="calEventsList" class="list-group list-group-flush list-group-no-gutters">
                                 <div class="text-center text-muted small py-3">Cargando eventos...</div>
                             </div>
                         </div>
                     </div>
                 </div>
-
             </div>
         </div>
     </main>
 @endsection
-
 @push('scripts')
     @php
-        // Extraemos los datos para pasarlos a JavaScript de forma segura
         $calendarEvents = \App\Models\Release::select('id', 'title', 'status', 'published_at', 'created_at')
             ->orderBy('published_at', 'asc')
             ->get()
@@ -359,15 +304,9 @@
                 ];
             });
     @endphp
-
     <script>
         document.addEventListener('DOMContentLoaded', function() {
-            // Datos traídos de Laravel
             const releaseEvents = @json($calendarEvents);
-
-            // ══════════════════════════════════════════
-            // LÓGICA DEL MINI CALENDARIO BOOTSTRAP NATIVO
-            // ══════════════════════════════════════════
             const today = new Date();
             let calYear = today.getFullYear();
             let calMonth = today.getMonth();
@@ -407,15 +346,11 @@
                         `<div style="width: 14.28%;"><small class="text-muted fw-bold text-uppercase" style="font-size: 0.75rem;">${d}</small></div>`;
                 });
                 html += '</div><div class="d-flex flex-wrap text-center g-1">';
-
-                // Días mes anterior
                 for (let i = firstDay - 1; i >= 0; i--) {
                     html += `<div style="width: 14.28%; padding: 2px;">
                                 <div class="p-1 text-muted" style="opacity: 0.4; font-size: 0.85rem;">${daysInPrevMonth - i}</div>
                              </div>`;
                 }
-
-                // Días mes actual
                 for (let d = 1; d <= daysInMonth; d++) {
                     const dateStr = `${year}-${String(month+1).padStart(2,'0')}-${String(d).padStart(2,'0')}`;
                     const isToday = dateStr === todayStr;
@@ -468,8 +403,6 @@
                                 </div>
                              </div>`;
                 }
-
-                // Días mes siguiente
                 const totalCells = firstDay + daysInMonth;
                 const remaining = totalCells % 7 === 0 ? 0 : 7 - (totalCells % 7);
                 for (let i = 1; i <= remaining; i++) {
@@ -537,8 +470,6 @@
             window.calDayClick = function(dateStr) {
                 renderUpcoming(dateStr);
             };
-
-            // Inicializar Calendario
             renderCalendar(calYear, calMonth);
             renderUpcoming(null);
         });

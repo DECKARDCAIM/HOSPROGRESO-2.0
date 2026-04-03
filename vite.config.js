@@ -14,6 +14,25 @@ import { ViteImageOptimizer } from 'vite-plugin-image-optimizer';
 import path from 'path';
 import fs from 'fs';
 
+// ─── Custom Vite Plugin: Fix legacy implicit globals ────────
+// Some vendor libraries assign to undeclared globals (e.g. `appear = function(){}`)
+// which is valid in classic scripts but causes ReferenceError in ESM/IIFE bundles.
+// This plugin prepends a `var` declaration so the assignment is valid in strict scope.
+function fixLegacyGlobalsPlugin() {
+  return {
+    name: 'fix-legacy-globals',
+    transform(code, id) {
+      // Fix appear.js: uses `appear=function(){...}` without declaration
+      if (id.includes('appear') && id.includes('appear.min.js')) {
+        return {
+          code: 'var appear;\n' + code,
+          map: null,
+        };
+      }
+    }
+  };
+}
+
 // ─── Custom Vite Plugin: Bundle Vendor CSS ──────────────────
 // Concatenates the same 4 vendor CSS files that Gulp bundled
 // and writes vendor.min.css to the output directory
@@ -171,7 +190,7 @@ export default defineConfig({
         entryFileNames: 'js/[name].min.js',
         assetFileNames: 'assets/[name][extname]',
         manualChunks: undefined,
-        footer: '\nwindow.module = undefined; window.exports = undefined; window.define = undefined;',
+        footer: '\nwindow.module = undefined; window.exports = undefined; window.define = undefined; if(typeof appear !== "undefined") window.appear = appear;',
         format: 'iife',
         name: 'VendorBundle',
         globals: {},
@@ -188,6 +207,9 @@ export default defineConfig({
   },
 
   plugins: [
+    // ── 0. Fix legacy implicit globals (appear, etc.) ──
+    fixLegacyGlobalsPlugin(),
+
     // ── 1. Copy static assets (img, svg, Fonts, json, sound, video, doc) ──
     viteStaticCopy({
       structured: false,

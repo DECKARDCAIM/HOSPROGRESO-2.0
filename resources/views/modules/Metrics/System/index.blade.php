@@ -1,10 +1,8 @@
 @extends('layouts.panel')
-
+@section('title', 'Métricas del Sistema')
 @section('content')
     <main id="content" role="main" class="main">
-        <!-- Content -->
         <div class="content container-fluid">
-            <!-- Page Header -->
             <div class="page-header">
                 <div class="row align-items-end">
                     <div class="col-sm mb-2 mb-sm-0">
@@ -19,9 +17,6 @@
                     </div>
                 </div>
             </div>
-            <!-- End Page Header -->
-
-            <!-- Gráfica -->
             <div class="row mb-3 mb-lg-5">
                 <div class="col-12">
                     <div class="card">
@@ -29,25 +24,21 @@
                             <h4 class="card-header-title">Gráfica de Ubicaciones</h4>
                             <div class="d-flex gap-2 align-items-center">
                                 <div class="dropdown">
-                                    <button type="button" class="btn btn-white btn-sm dropdown-toggle" id="exportDropdown1"
-                                        data-bs-toggle="dropdown" aria-expanded="false">
+                                    <button type="button" class="btn btn-white btn-sm dropdown-toggle" id="exportDropdown1" data-bs-toggle="dropdown" aria-expanded="false">
                                         <i class="bi-download me-2"></i> Exportar
                                     </button>
                                     <div class="dropdown-menu dropdown-menu-sm-end" aria-labelledby="exportDropdown1">
                                         <span class="dropdown-header">Opciones</span>
                                         <a class="dropdown-item print-chart-btn" href="javascript:;" data-chart-id="chart1">
-                                            <img class="avatar avatar-xss avatar-4x3 me-2"
-                                                src="{{ asset('dist/svg/illustrations/print-icon.svg') }}" alt="Imprimir"> Imprimir
+                                            <img class="avatar avatar-xss avatar-4x3 me-2" src="{{ asset('dist/svg/illustrations/print-icon.svg') }}" alt="Imprimir"> Imprimir
                                         </a>
                                         <div class="dropdown-divider"></div>
                                         <span class="dropdown-header">Opciones de descarga</span>
                                         <a class="dropdown-item export-pdf-btn" href="javascript:;" data-chart-id="chart1">
-                                            <img class="avatar avatar-xss avatar-4x3 me-2"
-                                                src="{{ asset('dist/svg/brands/pdf-icon.svg') }}" alt="PDF"> PDF
+                                            <img class="avatar avatar-xss avatar-4x3 me-2" src="{{ asset('dist/svg/brands/pdf-icon.svg') }}" alt="PDF"> PDF
                                         </a>
                                         <a class="dropdown-item export-svg-btn" href="javascript:;" data-chart-id="chart1">
-                                            <img class="avatar avatar-xss avatar-4x3 me-2"
-                                                src="{{ asset('dist/svg/components/placeholder-csv-format.svg') }}" alt="SVG"> SVG
+                                            <img class="avatar avatar-xss avatar-4x3 me-2" src="{{ asset('dist/svg/components/placeholder-csv-format.svg') }}" alt="SVG"> SVG
                                         </a>
                                     </div>
                                 </div>
@@ -57,27 +48,67 @@
                             </div>
                         </div>
                         <div class="card-body">
-                            <div class="chart-container" style="position: relative; height: 400px;">
-                                <canvas id="chart1"></canvas>
+                            <div class="chartjs-custom" style="height: 20rem;">
+                                <canvas id="chart1" class="js-chart" data-hs-chartjs-options='{
+                                    "type": "bar",
+                                    "options": {
+                                        "scales": {
+                                            "y": {
+                                                "grid": {
+                                                    "color": "#e7eaf3",
+                                                    "drawBorder": false,
+                                                    "zeroLineColor": "#e7eaf3"
+                                                },
+                                                "ticks": {
+                                                    "beginAtZero": true,
+                                                    "color": "#97a4af",
+                                                    "font": {
+                                                        "family": "Inter, sans-serif"
+                                                    },
+                                                    "padding": 10
+                                                }
+                                            },
+                                            "x": {
+                                                "grid": {
+                                                    "display": false,
+                                                    "drawBorder": false
+                                                },
+                                                "ticks": {
+                                                    "color": "#97a4af",
+                                                    "font": {
+                                                        "size": 12,
+                                                        "family": "Inter, sans-serif"
+                                                    },
+                                                    "padding": 5
+                                                },
+                                                "categoryPercentage": 0.5
+                                            }
+                                        },
+                                        "cornerRadius": 2,
+                                        "plugins": {
+                                            "tooltip": {
+                                                "hasIndicator": true,
+                                                "mode": "index",
+                                                "intersect": false
+                                            }
+                                        },
+                                        "hover": {
+                                            "mode": "nearest",
+                                            "intersect": true
+                                        }
+                                    }
+                                }'></canvas>
                             </div>
                         </div>
                     </div>
                 </div>
             </div>
-            <!-- End Gráfica -->
-
         </div>
-        <!-- End Content -->
     </main>
-
-    <!-- Scripts adicionales -->
-    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-zoom@2.0.1/dist/chartjs-plugin-zoom.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/html2canvas@1.4.1/dist/html2canvas.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/jspdf@2.5.1/dist/jspdf.umd.min.js"></script>
     <script>
         document.addEventListener('DOMContentLoaded', function() {
             if (typeof Chart === 'undefined') {
+                console.error("Chart.js no cargó. Verifica la ruta local.");
                 return;
             }
 
@@ -91,95 +122,84 @@
 
             const locationsData = @json($locationsData);
 
-            // Gráfica de barras
-            const ctx1 = document.getElementById('chart1');
-            if (ctx1) {
-                const chart1 = new Chart(ctx1, {
-                    type: 'bar',
-                    data: {
-                        labels: locationsData.map(item => item.type),
-                        datasets: [{
-                                label: 'Activos',
-                                data: locationsData.map(item => item.active),
-                                backgroundColor: 'rgba(55, 125, 255, 0.8)',
-                                borderColor: 'rgba(55, 125, 255, 1)',
-                                borderWidth: 1
-                            },
-                            {
-                                label: 'Desactivados',
-                                data: locationsData.map(item => item.inactive),
-                                backgroundColor: 'rgba(237, 76, 120, 0.8)',
-                                borderColor: 'rgba(237, 76, 120, 1)',
-                                borderWidth: 1
-                            }
-                        ]
-                    },
-                    options: {
-                        responsive: true,
-                        maintainAspectRatio: false,
-                        scales: {
-                            y: {
-                                beginAtZero: true
-                            }
-                        },
-                        plugins: {
-                            legend: {
-                                display: true
-                            }
-                        }
-                    }
-                });
+            const chartLabels = locationsData.map(item => item.type);
+            const activeData = locationsData.map(item => item.active);
+            const inactiveData = locationsData.map(item => item.inactive);
 
-                // Guardar referencia
-                window.charts = window.charts || {};
-                window.charts.chart1 = chart1;
+            HSCore.components.HSChartJS.init(document.querySelector('#chart1'), {
+                data: {
+                    labels: chartLabels,
+                    datasets: [
+                        {
+                            label: 'Activos',
+                            data: activeData,
+                            backgroundColor: '#377dff',
+                            hoverBackgroundColor: '#377dff',
+                            borderColor: '#377dff',
+                            maxBarThickness: 15
+                        },
+                        {
+                            label: 'Desactivados',
+                            data: inactiveData,
+                            backgroundColor: '#ed4c78',
+                            hoverBackgroundColor: '#ed4c78',
+                            borderColor: '#ed4c78',
+                            maxBarThickness: 15
+                        }
+                    ]
+                }
+            });
+
+            window.charts = window.charts || {};
+            window.charts.chart1 = HSCore.components.HSChartJS.getItem('chart1');
+
+            function submitChartExport(url, chartId) {
+                const chart = window.charts[chartId];
+                if (!chart) return;
+
+                const canvas = chart.canvas;
+                const imgData = canvas.toDataURL('image/png');
+
+                const form = document.createElement('form');
+                form.method = 'POST';
+                form.action = url;
+                form.target = '_blank';
+
+                const csrfInput = document.createElement('input');
+                csrfInput.type = 'hidden';
+                csrfInput.name = '_token';
+                csrfInput.value = '{{ csrf_token() }}';
+                form.appendChild(csrfInput);
+
+                const imageInput = document.createElement('input');
+                imageInput.type = 'hidden';
+                imageInput.name = 'chart_image';
+                imageInput.value = imgData;
+                form.appendChild(imageInput);
+
+                const idInput = document.createElement('input');
+                idInput.type = 'hidden';
+                idInput.name = 'chart_id';
+                idInput.value = chartId;
+                form.appendChild(idInput);
+
+                document.body.appendChild(form);
+                form.submit();
+                document.body.removeChild(form);
             }
 
-            // Manejar impresión
             document.querySelectorAll('.print-chart-btn').forEach(btn => {
                 btn.addEventListener('click', function() {
-                    const chartId = this.getAttribute('data-chart-id');
-                    const chart = window.charts[chartId];
-
-                    if (!chart) return;
-
-                    const canvas = chart.canvas;
-                    const url = canvas.toDataURL('image/png');
-                    const printWindow = window.open('', '_blank');
-                    printWindow.document.write(`
-                    <html>
-                      <head><title>Imprimir Gráfica</title></head>
-                      <body style="margin:0;padding:20px;text-align:center;background-color:#ffffff;">
-                        <img src="${url}" style="max-width:100%;height:auto;" onload="window.print(); window.close();" />
-                      </body>
-                    </html>
-                `);
-                    printWindow.document.close();
+                    submitChartExport('{{ route('metrics.system.export.print') }}', this.getAttribute('data-chart-id'));
                 });
             });
 
-            // Manejar exportación PDF
             document.querySelectorAll('.export-pdf-btn').forEach(btn => {
                 btn.addEventListener('click', function() {
-                    const chartId = this.getAttribute('data-chart-id');
-                    const chart = window.charts[chartId];
-
-                    if (!chart) return;
-
-                    const canvas = chart.canvas;
-                    const imgData = canvas.toDataURL('image/png');
-                    const {
-                        jsPDF
-                    } = window.jspdf;
-                    const pdf = new jsPDF('landscape', 'mm', 'a4');
-                    const imgWidth = 297;
-                    const imgHeight = (canvas.height * imgWidth) / canvas.width;
-                    pdf.addImage(imgData, 'PNG', 0, 0, imgWidth, imgHeight);
-                    pdf.save('grafica-' + chartId + '.pdf');
+                    submitChartExport('{{ route('metrics.system.export.pdf') }}', this.getAttribute('data-chart-id'));
                 });
             });
 
-            // Manejar exportación SVG
             document.querySelectorAll('.export-svg-btn').forEach(btn => {
                 btn.addEventListener('click', function() {
                     const chartId = this.getAttribute('data-chart-id');
@@ -210,7 +230,6 @@
                     URL.revokeObjectURL(svgUrl);
                 });
             });
-
         });
     </script>
 @endsection

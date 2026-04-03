@@ -44,3 +44,5 @@ import '../vendor/imask/dist/imask.min.js'
 
 // Quill
 import '../vendor/quill/dist/quill.min.js'
+// Chart.js
+import '../vendor/chart.js/dist/chart.min.js'

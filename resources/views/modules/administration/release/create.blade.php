@@ -1,15 +1,7 @@
 @extends('layouts.panel')
 @section('title', 'Crear Comunicado')
-
 @section('styles')
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link
-        href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,600;0,700;1,600&family=DM+Sans:wght@300;400;500;600&display=swap"
-        rel="stylesheet">
-
     <style>
-        /* ─── Custom Fonts ─── */
         @font-face {
             font-family: 'Altivo';
             src: url('{{ asset('dist/Fonts/35170.otf') }}') format('opentype');
@@ -24,12 +16,10 @@
             font-style: normal;
         }
 
-        /* ─── A4 Paper Settings ─── */
         .a4-wrapper {
             width: 100%;
-            max-width: 816px;
-            margin: 0 auto;
-            overflow-x: auto;
+            display: flex;
+            justify-content: center;
         }
 
         .a4-paper {
@@ -42,9 +32,8 @@
             background-size: 100% 1056px;
             background-position: top center;
             background-repeat: repeat-y;
-            width: 816px !important;
-            min-width: 816px;
-            /* Se elimina min-height fijo aquí, lo controla el JS */
+            width: 100%;
+            max-width: 816px;
         }
 
         @media (max-width: 816px) {
@@ -67,11 +56,9 @@
             z-index: 100;
         }
 
-        /* CORRECCIÓN DE QUILL SCROLL */
         .ql-container.ql-snow {
             border: none !important;
             height: auto !important;
-            /* Permite que el contenedor crezca con la hoja */
         }
 
         .ql-editor {
@@ -84,9 +71,7 @@
             padding-left: 2.5cm !important;
             padding-right: 2.5cm !important;
             overflow-y: hidden !important;
-            /* APAGAMOS EL SCROLL INTERNO DE QUILL */
             height: auto !important;
-            /* Deja que el contenido empuje el div */
             min-height: 1056px;
         }
 
@@ -95,7 +80,6 @@
             font-style: normal !important;
         }
 
-        /* Toggles Custom Styles */
         .type-opt,
         .status-opt {
             cursor: pointer;
@@ -129,46 +113,36 @@
         }
     </style>
 @endsection
-
 @section('content')
     <main id="content" role="main" class="main">
         <div class="content container-fluid py-4">
-
             <div class="page-header">
                 <div class="row align-items-end">
                     <div class="col-sm mb-2 mb-sm-0">
                         <nav aria-label="breadcrumb">
                             <ol class="breadcrumb breadcrumb-no-gutter">
-                                <li class="breadcrumb-item"><a class="breadcrumb-link" href="{{ route('home') }}">Inicio</a>
-                                </li>
-                                <li class="breadcrumb-item"><a class="breadcrumb-link"
-                                        href="{{ route('releases.index') }}">Comunicados</a></li>
+                                <li class="breadcrumb-item"><a class="breadcrumb-link" href="{{ route('home') }}">Inicio</a></li>
+                                <li class="breadcrumb-item"><a class="breadcrumb-link" href="{{ route('releases.index') }}">Comunicados</a></li>
                                 <li class="breadcrumb-item active" aria-current="page">Crear</li>
                             </ol>
                         </nav>
-                        <h1 class="page-header-title">Crear comunicado <span id="typeBadgeDisplay"
-                                class="badge bg-soft-primary text-primary ms-2">Comunicado</span></h1>
+                        <h1 class="page-header-title">Crear comunicado <span id="typeBadgeDisplay" class="badge bg-soft-primary text-primary ms-2">Comunicado</span></h1>
                     </div>
                 </div>
             </div>
-
             <form action="{{ route('releases.store') }}" method="POST" enctype="multipart/form-data" id="releaseForm">
                 @csrf
                 <input type="hidden" name="content" id="content_hidden">
                 <input type="hidden" name="type" id="type_hidden" value="{{ old('type', 'comunicado') }}">
-                <input type="hidden" name="status" id="status_hidden" value="{{ old('status', 'draft') }}">
-
+                <input type="hidden" name="status" id="status_hidden" value="{{ old('status', 'published') }}">
                 <div class="row">
                     <div class="col-lg-8 mb-4 mb-lg-0">
-
                         <div class="card mb-3 mb-lg-4">
                             <div class="card-body">
                                 <label class="form-label">Título del Documento</label>
-                                <input type="text" name="title" class="form-control form-control-lg"
-                                    placeholder="Escribe el título..." value="{{ old('title') }}" required>
+                                <input type="text" name="title" class="form-control form-control-lg" placeholder="Escribe el título..." value="{{ old('title') }}" required>
                             </div>
                         </div>
-
                         <div class="card mb-3 mb-lg-4">
                             <div class="card-body bg-light rounded-bottom">
                                 <div id="toolbar-container">
@@ -190,7 +164,6 @@
                                         <button class="ql-image"></button>
                                     </span>
                                 </div>
-
                                 <div class="a4-wrapper">
                                     <div class="a4-paper">
                                         <div id="editor">{!! old('content') !!}</div>
@@ -198,11 +171,8 @@
                                 </div>
                             </div>
                         </div>
-
                     </div>
-
                     <div class="col-lg-4">
-
                         <div class="card mb-3 mb-lg-4">
                             <div class="card-header border-bottom-0 pb-0">
                                 <h4 class="card-header-title"><i class="bi-bar-chart-line me-1"></i> Estadísticas</h4>
@@ -220,56 +190,41 @@
                                 </div>
                             </div>
                         </div>
-
                         <div class="card mb-3">
                             <div class="card-header border-bottom-0 pb-0">
                                 <h4 class="card-header-title">Asistente de Redacción</h4>
                             </div>
                             <div class="card-body">
                                 <textarea id="ai_prompt" class="form-control mb-2" rows="3" placeholder="¿Qué necesitas redactar?"></textarea>
-                                <button type="button" class="btn btn-primary w-100" id="btnGenerateAi"
-                                    style="font-weight: 600;">
-                                    <span id="aiContentSpinner" class="spinner-border spinner-border-sm d-none"
-                                        role="status"></span>
+                                <button type="button" class="btn btn-primary w-100" id="btnGenerateAi" style="font-weight: 600;">
+                                    <span id="aiContentSpinner" class="spinner-border spinner-border-sm d-none" role="status"></span>
                                     <span id="aiGenerateTxt">Generar con IA</span>
                                 </button>
                             </div>
                         </div>
-
                         <div class="card mb-3">
                             <div class="card-body">
-
                                 <div class="mb-4">
-                                    <label class="form-label text-muted text-uppercase fw-bold"
-                                        style="font-size: .75rem;">Clasificación</label>
+                                    <label class="form-label text-muted text-uppercase fw-bold" style="font-size: .75rem;">Clasificación</label>
                                     <div class="d-flex gap-2">
-                                        <div class="btn border type-opt w-100 {{ old('type', 'comunicado') == 'comunicado' ? 'active' : '' }}"
-                                            data-val="comunicado" onclick="setType(this)">Comunicado</div>
-                                        <div class="btn border type-opt w-100 {{ old('type') == 'actualizacion' ? 'active' : '' }}"
-                                            data-val="actualizacion" onclick="setType(this)">Actualización</div>
+                                        <div class="btn border type-opt w-100 {{ old('type', 'comunicado') == 'comunicado' ? 'active' : '' }}" data-val="comunicado" onclick="setType(this)">Comunicado</div>
+                                        <div class="btn border type-opt w-100 {{ old('type') == 'actualizacion' ? 'active' : '' }}" data-val="actualizacion" onclick="setType(this)">Actualización</div>
                                     </div>
                                 </div>
-
                                 <div class="mb-4">
-                                    <label class="form-label text-muted text-uppercase fw-bold"
-                                        style="font-size: .75rem;">Visibilidad</label>
+                                    <label class="form-label text-muted text-uppercase fw-bold" style="font-size: .75rem;">Visibilidad</label>
                                     <div class="d-flex gap-2">
-                                        <div class="btn border status-opt w-100 {{ old('status') == 'published' ? 'active-pub' : '' }}"
-                                            data-val="published" onclick="setStatus(this)">Público</div>
-                                        <div class="btn border status-opt w-100 {{ old('status', 'draft') == 'draft' ? 'active-dra' : '' }}"
-                                            data-val="draft" onclick="setStatus(this)">Borrador</div>
+                                        <div class="btn border status-opt w-100 {{ old('status', 'published') == 'published' ? 'active-pub' : '' }}" data-val="published" onclick="setStatus(this)">Público</div>
+                                        <div class="btn border status-opt w-100 {{ old('status') == 'draft' ? 'active-dra' : '' }}" data-val="draft" onclick="setStatus(this)">Borrador</div>
                                     </div>
                                 </div>
                             </div>
                         </div>
-
                         <div class="card mb-3">
                             <div class="card-body">
                                 <div class="mb-2">
                                     <label class="form-label text-muted text-uppercase fw-bold">Archivos Adjuntos</label>
-                                    <label for="documents"
-                                        class="d-flex flex-column align-items-center justify-content-center border-dashed rounded p-3 text-center"
-                                        style="cursor: pointer; border: 2px dashed #cbd5e1; background: #f8fafc; transition: all 0.2s;">
+                                    <label for="documents" class="d-flex flex-column align-items-center justify-content-center border-dashed rounded p-3 text-center" style="cursor: pointer; border: 2px dashed #cbd5e1; background: #f8fafc; transition: all 0.2s;">
                                         <i class="bi-cloud-arrow-up fs-3 text-primary mb-2"></i>
                                         <span class="fw-semibold text-dark">Haz clic para subir archivos</span>
                                         <small class="text-muted mt-1">PDF, DOC, DOCX, JPG, PNG (Max 5MB)</small>
@@ -279,23 +234,18 @@
                                 </div>
                             </div>
                         </div>
-
                         <div class="card mb-3">
                             <div class="card-body">
-                                <button type="submit" class="btn btn-primary w-100" id="saveBtn">Guardar
-                                    Documento</button>
+                                <button type="submit" class="btn btn-primary w-100" id="saveBtn">Guardar Documento</button>
                             </div>
                         </div>
-
                     </div>
                 </div>
             </form>
         </div>
     </main>
 @endsection
-
 @push('scripts')
-
     <script>
         document.addEventListener('DOMContentLoaded', function() {
 
@@ -308,7 +258,6 @@
                 }
             });
 
-            // ── Motor de Paginación Dinámica ──
             function paginateQuill() {
                 const pageHeight = 1056;
                 const topMargin = 132;
@@ -320,7 +269,7 @@
                 const blocks = Array.from(editorNode.children);
                 blocks.forEach(b => b.style.marginTop = '0px');
 
-                let maxBottom = 0; // Guardará el punto más bajo alcanzado por el contenido
+                let maxBottom = 0;
 
                 for (let i = 0; i < blocks.length; i++) {
                     const block = blocks[i];
@@ -333,36 +282,29 @@
                     const currentPage = Math.floor(blockTop / pageHeight);
                     const pageBottomLimit = ((currentPage + 1) * pageHeight) - bottomMargin;
 
-                    // Si el bloque sobrepasa el límite inferior de la página actual
                     if (blockBottom > pageBottomLimit) {
                         const nextPageStart = ((currentPage + 1) * pageHeight) + topMargin;
                         const pushAmount = Math.max(0, nextPageStart - blockTop);
                         block.style.marginTop = pushAmount + 'px';
 
-                        // Recalcular el nuevo fondo del bloque tras haberlo empujado
                         blockBottom = block.offsetTop + block.offsetHeight;
                     }
 
-                    // Registrar el punto más bajo del documento
                     if (blockBottom > maxBottom) {
                         maxBottom = blockBottom;
                     }
                 }
 
-                // Forzar la altura exacta de la hoja en múltiplos de 1056px
                 const paper = document.querySelector('.a4-paper');
                 if (paper) {
-                    // Calculamos cuántas páginas enteras necesitamos para cubrir 'maxBottom'
                     const requiredPages = Math.ceil(Math.max(1, maxBottom) / pageHeight);
                     const finalHeight = requiredPages * pageHeight;
 
-                    // Aplicamos la altura exacta a ambos contenedores para evitar scroll
                     paper.style.height = finalHeight + 'px';
                     editorNode.style.height = finalHeight + 'px';
                 }
             }
-
-            // ── Estadísticas ──
+            
             function updateStats() {
                 const text = quill.getText().trim();
                 const words = text.length ? text.split(/\s+/).filter(Boolean).length : 0;
@@ -381,7 +323,6 @@
             quill.root.addEventListener('load', paginateQuill, true);
             setTimeout(paginateQuill, 100);
 
-            // ── Eventos UI ──
             const form = document.getElementById('releaseForm');
             const saveBtn = document.getElementById('saveBtn');
 
@@ -422,7 +363,6 @@
                 }
             });
 
-            // ── AI Generation ──
             const btnGenerate = document.getElementById('btnGenerateAi');
             const aiSpinner = document.getElementById('aiContentSpinner');
             const aiTxt = document.getElementById('aiGenerateTxt');

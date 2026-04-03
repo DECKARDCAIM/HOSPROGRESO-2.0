@@ -1,6 +1,5 @@
 @extends('layouts.panel')
 @section('title', 'Municipios')
-
 @section('content')
 <main id="content" role="main" class="main">
     <div class="content container-fluid">
@@ -24,7 +23,6 @@
                 </div>
             </div>
         </div>
-
         <div class="row">
             <div class="col-sm-6 col-lg-4 mb-3 mb-lg-5">
                 <div class="card h-100">
@@ -63,42 +61,32 @@
                 </div>
             </div>
         </div>
-
         <div class="card">
             <div class="card-header card-header-content-md-between">
                 <div class="mb-2 mb-md-0">
                     <form action="{{ route('municipalities.index') }}" method="GET">
-                        <!-- Conservar otros filtros -->
                         @if(request('status')) <input type="hidden" name="status" value="{{ request('status') }}">
                         @endif
-                        @if(request('country_id')) <input type="hidden" name="country_id"
-                            value="{{ request('country_id') }}"> @endif
-                        @if(request('department_id')) <input type="hidden" name="department_id"
-                            value="{{ request('department_id') }}"> @endif
+                        @if(request('country_id')) <input type="hidden" name="country_id" value="{{ request('country_id') }}"> @endif
+                        @if(request('department_id')) <input type="hidden" name="department_id" value="{{ request('department_id') }}"> @endif
                         @if(request('per_page')) <input type="hidden" name="per_page" value="{{ request('per_page') }}">
                         @endif
-
                         <div class="input-group input-group-merge input-group-flush">
                             <button type="submit" class="input-group-prepend input-group-text bg-transparent border-0">
                                 <i class="bi-search"></i>
                             </button>
-                            <input name="search" type="text" class="form-control" placeholder="Buscar"
-                                aria-label="Buscar municipios" value="{{ request('search') }}">
+                            <input name="search" type="text" class="form-control" placeholder="Buscar" aria-label="Buscar municipios" value="{{ request('search') }}">
                             @if(request('search'))
-                            <a class="input-group-append input-group-text text-muted"
-                                href="{{ route('municipalities.index', request()->except('search')) }}">
+                            <a class="input-group-append input-group-text text-muted" href="{{ route('municipalities.index', request()->except('search')) }}">
                                 <i class="bi-x-lg"></i>
                             </a>
                             @endif
                         </div>
                     </form>
                 </div>
-
                 <div class="d-grid d-sm-flex justify-content-md-end align-items-sm-center gap-2">
-
                             <div class="dropdown" id="actionsDropdownWrapper" style="display: none;">
-                                <button type="button" class="btn btn-white btn-sm dropdown-toggle" id="actionsDropdown"
-                                    data-bs-toggle="dropdown" aria-expanded="false">
+                                <button type="button" class="btn btn-white btn-sm dropdown-toggle" id="actionsDropdown" data-bs-toggle="dropdown" aria-expanded="false">
                                     <i class="bi-gear me-2"></i> Acciones
                                 </button>
                                 <div class="dropdown-menu dropdown-menu-sm-end" aria-labelledby="actionsDropdown">
@@ -114,75 +102,55 @@
                                     @endif
                                 </div>
                             </div>
-
                     <div class="dropdown">
-                        <button type="button" class="btn btn-white btn-sm dropdown-toggle w-100"
-                            id="municipalitiesExportDropdown" data-bs-toggle="dropdown" aria-expanded="false">
+                        <button type="button" class="btn btn-white btn-sm dropdown-toggle w-100" id="municipalitiesExportDropdown" data-bs-toggle="dropdown" aria-expanded="false">
                             <i class="bi-download me-2"></i> Exportar
                         </button>
                         <div class="dropdown-menu dropdown-menu-sm-end" aria-labelledby="municipalitiesExportDropdown">
                             <span class="dropdown-header">Opciones</span>
                             <a id="export-print" class="dropdown-item" href="javascript:;">
-                                <img class="avatar avatar-xss avatar-4x3 me-2"
-                                    src="{{ asset('dist/svg/illustrations/print-icon.svg') }}" alt="Imprimir"> Imprimir
+                                <img class="avatar avatar-xss avatar-4x3 me-2" src="{{ asset('dist/svg/illustrations/print-icon.svg') }}" alt="Imprimir"> Imprimir
                             </a>
                             <div class="dropdown-divider"></div>
                             <span class="dropdown-header">Opciones de descarga</span>
                             <a id="export-excel" class="dropdown-item" href="javascript:;">
-                                <img class="avatar avatar-xss avatar-4x3 me-2"
-                                    src="{{ asset('dist/svg/brands/excel-icon.svg') }}" alt="Excel"> Excel
+                                <img class="avatar avatar-xss avatar-4x3 me-2" src="{{ asset('dist/svg/brands/excel-icon.svg') }}" alt="Excel"> Excel
                             </a>
                             <a id="export-csv" class="dropdown-item" href="javascript:;">
-                                <img class="avatar avatar-xss avatar-4x3 me-2"
-                                    src="{{ asset('dist/svg/components/placeholder-csv-format.svg') }}" alt="CSV"> .CSV
+                                <img class="avatar avatar-xss avatar-4x3 me-2" src="{{ asset('dist/svg/components/placeholder-csv-format.svg') }}" alt="CSV"> .CSV
                             </a>
                             <a id="export-pdf" class="dropdown-item" href="javascript:;">
-                                <img class="avatar avatar-xss avatar-4x3 me-2"
-                                    src="{{ asset('dist/svg/brands/pdf-icon.svg') }}" alt="PDF"> PDF
+                                <img class="avatar avatar-xss avatar-4x3 me-2" src="{{ asset('dist/svg/brands/pdf-icon.svg') }}" alt="PDF"> PDF
                             </a>
                         </div>
                     </div>
-
                     @php
                         $activeFilters = count(array_filter(request()->only(['country_id', 'department_id', 'status'])));
                     @endphp
                     <div class="dropdown">
-                        <button type="button" class="btn btn-white btn-sm w-100" id="municipalitiesFilterDropdown"
-                            data-bs-toggle="dropdown" data-bs-auto-close="outside" aria-expanded="false">
+                        <button type="button" class="btn btn-white btn-sm w-100" id="municipalitiesFilterDropdown" data-bs-toggle="dropdown" data-bs-auto-close="outside" aria-expanded="false">
                             <i class="bi-filter" style="font-style: normal;"> Filtrar </i>
                             @if($activeFilters > 0)
                                 <span class="badge bg-soft-dark text-dark rounded-circle ms-1">{{ $activeFilters }}</span>
                             @endif
                         </button>
-                        <div class="dropdown-menu dropdown-menu-sm-end dropdown-card card-dropdown-filter-centered"
-                            aria-labelledby="municipalitiesFilterDropdown" style="min-width: 22rem;">
+                        <div class="dropdown-menu dropdown-menu-sm-end dropdown-card card-dropdown-filter-centered" aria-labelledby="municipalitiesFilterDropdown" style="min-width: 22rem;">
                             <div class="card">
                                 <div class="card-header card-header-content-between">
                                     <h5 class="card-header-title">Filtrar municipios</h5>
                                 </div>
                                 <div class="card-body">
                                     <form action="{{ route('municipalities.index') }}" method="GET">
-                                        @if(request('search')) <input type="hidden" name="search"
-                                            value="{{ request('search') }}"> @endif
-                                        @if(request('per_page')) <input type="hidden" name="per_page"
-                                            value="{{ request('per_page') }}"> @endif
-
+                                        @if(request('search')) <input type="hidden" name="search" value="{{ request('search') }}"> @endif
+                                        @if(request('per_page')) <input type="hidden" name="per_page" value="{{ request('per_page') }}"> @endif
                                         <div class="row">
                                             <div class="col-12 mb-4">
                                                 <small class="text-cap text-body">País</small>
                                                 <div class="tom-select-custom">
-                                                    <select name="country_id"
-                                                        class="js-select form-select form-select-sm"
-                                                        data-hs-tom-select-options='{
-                                                                "placeholder": "Todos",
-                                                                "searchInDropdown": false,
-                                                                "hideSearch": true,
-                                                                "dropdownWidth": "10rem"
-                                                            }'>
+                                                    <select name="country_id" class="js-select form-select form-select-sm" data-hs-tom-select-options='{"placeholder": "Todos", "searchInDropdown": false, "hideSearch": true, "dropdownWidth": "10rem"}'>
                                                         <option value="">Todos</option>
                                                         @foreach ($countries as $country)
-                                                        <option value="{{ $country->id }}" {{
-                                                            request('country_id')==$country->id ? 'selected' : '' }}>
+                                                        <option value="{{ $country->id }}" {{ request('country_id')==$country->id ? 'selected' : '' }}>
                                                             {{ $country->name }}
                                                         </option>
                                                         @endforeach
@@ -192,18 +160,10 @@
                                             <div class="col-12 mb-4">
                                                 <small class="text-cap text-body">Departamento</small>
                                                 <div class="tom-select-custom">
-                                                    <select name="department_id"
-                                                        class="js-select form-select form-select-sm"
-                                                        data-hs-tom-select-options='{
-                                                                "placeholder": "Todos",
-                                                                "searchInDropdown": false,
-                                                                "hideSearch": true,
-                                                                "dropdownWidth": "10rem"
-                                                            }'>
+                                                    <select name="department_id" class="js-select form-select form-select-sm" data-hs-tom-select-options='{"placeholder": "Todos", "searchInDropdown": false, "hideSearch": true, "dropdownWidth": "10rem"}'>
                                                         <option value="">Todos</option>
                                                         @foreach ($departments as $dept)
-                                                        <option value="{{ $dept->id }}" {{
-                                                            request('department_id')==$dept->id ? 'selected' : '' }}>
+                                                        <option value="{{ $dept->id }}" {{ request('department_id')==$dept->id ? 'selected' : '' }}>
                                                             {{ $dept->name }}
                                                         </option>
                                                         @endforeach
@@ -215,53 +175,36 @@
                                             <div class="col-12 mb-4">
                                                 <small class="text-cap text-body">Estado</small>
                                                 <div class="tom-select-custom">
-                                                    <select name="status" class="js-select form-select form-select-sm"
-                                                        data-hs-tom-select-options='{
-                                                                "searchInDropdown": false,
-                                                                "hideSearch": true,
-                                                                "dropdownWidth": "10rem"
-                                                            }'>
-                                                        <option value="active" {{ request('status', 'active')=='active'
-                                                            ? 'selected' : '' }}>Activo</option>
-                                                        <option value="inactive" {{ request('status')=='inactive'
-                                                            ? 'selected' : '' }}>Inactivo</option>
+                                                    <select name="status" class="js-select form-select form-select-sm" data-hs-tom-select-options='{"searchInDropdown": false, "hideSearch": true, "dropdownWidth": "10rem"}'>
+                                                        <option value="active" {{ request('status', 'active')=='active' ? 'selected' : '' }}>Activo</option>
+                                                        <option value="inactive" {{ request('status')=='inactive' ? 'selected' : '' }}>Inactivo</option>
                                                     </select>
                                                 </div>
                                             </div>
                                         </div>
                                         <div class="d-grid gap-2">
                                             <button type="submit" class="btn btn-primary">Aplicar</button>
-                                            <a class="btn btn-white"
-                                                href="{{ route('municipalities.index') }}">Limpiar</a>
+                                            <a class="btn btn-white" href="{{ route('municipalities.index') }}">Limpiar</a>
                                         </div>
                                     </form>
                                 </div>
                             </div>
                         </div>
                     </div>
-
-                    <!-- Contador seleccionados -->
                     <span id="selectedCountWrapper" class="text-body small align-items-center gap-2 ms-2" style="display: flex; display: none !important; border-left: 1px solid #e7eaf3; padding-left: .5rem;">
                         <span><span class="fw-semibold" id="selectedCount">0</span> selec.</span>
-                        
-                        <!-- Checkbox "Seleccionar Todo" escondido en el contador -->
                         <div class="form-check form-check-sm mb-0" title="Seleccionar todos los registros ({{ count($allFilteredIds) }})">
                             <input class="form-check-input" type="checkbox" id="selectAllFiltered" data-ids="{{ json_encode($allFilteredIds) }}">
                             <label class="form-check-label text-muted" style="font-size: 0.7rem; margin-top: 1px;" for="selectAllFiltered">Todos</label>
                         </div>
-                        
                         <button type="button" id="clearSelection" class="btn btn-link btn-sm p-0 ms-1 text-muted" style="line-height: 1; font-size: 0.75rem; opacity: 0.7; transition: opacity 0.2s;" onmouseover="this.style.opacity='1'" onmouseout="this.style.opacity='0.7'" title="Limpiar selección">
                             <i class="bi-x-lg"></i>
                         </button>
                     </span>
-
                 </div>
             </div>
-
             <div class="table-responsive datatable-custom position-relative">
-                <table id="datatable"
-                    class="table table-lg table-borderless table-thead-bordered table-nowrap table-align-middle card-table"
-                    data-hs-datatables-options='{
+                <table id="datatable" class="table table-lg table-borderless table-thead-bordered table-nowrap table-align-middle card-table" data-hs-datatables-options='{
                            "columnDefs": [{"targets": [0, 5], "orderable": false}],
                            "order": [],
                            "info": {"totalQty": "#datatableWithPaginationInfoTotalQty"},
@@ -289,10 +232,8 @@
                         <tr>
                             <td class="table-column-pe-0">
                                 <div class="form-check">
-                                    <input class="form-check-input" type="checkbox" value="{{ $municipality->id }}"
-                                        id="municipalitiesDataCheck{{ $municipality->id }}">
-                                    <label class="form-check-label"
-                                        for="municipalitiesDataCheck{{ $municipality->id }}"></label>
+                                    <input class="form-check-input" type="checkbox" value="{{ $municipality->id }}" id="municipalitiesDataCheck{{ $municipality->id }}">
+                                    <label class="form-check-label" for="municipalitiesDataCheck{{ $municipality->id }}"></label>
                                 </div>
                             </td>
                             <td class="table-column-ps-0">
@@ -309,14 +250,12 @@
                             </td>
                             <td>
                                 <div class="d-flex gap-2">
-                                    <a href="{{ route('municipalities.edit', $municipality->id) }}"
-                                        class="btn btn-white btn-sm">
+                                    <a href="{{ route('municipalities.edit', $municipality->id) }}" class="btn btn-white btn-sm">
                                         <i class="bi-pencil-fill me-1"></i> Editar
                                     </a>
 
                                     @if ($municipality->is_active)
-                                    <form action="{{ route('municipalities.destroy', $municipality->id) }}"
-                                        method="POST">
+                                    <form action="{{ route('municipalities.destroy', $municipality->id) }}" method="POST">
                                         @csrf
                                         @method('DELETE')
                                         <button type="submit" class="btn btn-white btn-sm" title="Desactivar">
@@ -324,8 +263,7 @@
                                         </button>
                                     </form>
                                     @else
-                                    <form action="{{ route('municipalities.restore', $municipality->id) }}"
-                                        method="POST">
+                                    <form action="{{ route('municipalities.restore', $municipality->id) }}" method="POST">
                                         @csrf
                                         <button type="submit" class="btn btn-white btn-sm" title="Reactivar">
                                             <i class="bi-arrow-counterclockwise"></i>
@@ -343,17 +281,13 @@
                     </tbody>
                 </table>
             </div>
-
             <div class="card-footer">
                 <div class="row justify-content-center justify-content-sm-between align-items-sm-center">
                     <div class="col-sm mb-2 mb-sm-0">
                         <div class="d-flex justify-content-center justify-content-sm-start align-items-center">
                             <span class="me-2">Mostrando:</span>
                             <div class="tom-select-custom">
-                                <select id="datatableEntries"
-                                    class="js-select form-select form-select-borderless w-auto" autocomplete="off"
-                                    data-hs-tom-select-options='{"searchInDropdown": false, "hideSearch": true}'
-                                    onchange="window.location.href = '{{ route('municipalities.index', request()->except(['per_page', 'page'])) }}' + ( '{{ route('municipalities.index', request()->except(['per_page', 'page'])) }}'.includes('?') ? '&' : '?' ) + 'per_page=' + this.value">
+                                <select id="datatableEntries" class="js-select form-select form-select-borderless w-auto" autocomplete="off" data-hs-tom-select-options='{"searchInDropdown": false, "hideSearch": true}' onchange="window.location.href = '{{ route('municipalities.index', request()->except(['per_page', 'page'])) }}' + ( '{{ route('municipalities.index', request()->except(['per_page', 'page'])) }}'.includes('?') ? '&' : '?' ) + 'per_page=' + this.value">
                                     <option value="10" {{ request('per_page')==10 ? 'selected' : '' }}>10</option>
                                     <option value="25" {{ request('per_page', 25)==25 ? 'selected' : '' }}>25</option>
                                     <option value="50" {{ request('per_page')==50 ? 'selected' : '' }}>50</option>
@@ -375,9 +309,7 @@
     </div>
 </main>
 @endsection
-
 @push('scripts')
-
 <script>
     document.addEventListener('DOMContentLoaded', function () {
         const storageKey = 'selectedMunicipalities';
