@@ -317,12 +317,12 @@
                                     <td class="table-column-ps-0">
                                         <a class="d-flex align-items-start" href="{{ route('patients.show', $patient) }}">
                                             <div class="avatar avatar-soft-primary avatar-circle flex-shrink-0">
-                                                <span class="avatar-initials">{{ strtoupper(substr($patient->first_name ?? ($patient->mother_first_name ?? 'P'), 0, 1)) }}</span>
+                                                <span class="avatar-initials">{{ strtoupper(substr($patient->first_name ?? ($patient->mother->first_name ?? 'P'), 0, 1)) }}</span>
                                             </div>
                                             <div class="ms-3 flex-grow-1">
                                                 <span class="d-block h5 text-inherit mb-0">{{ $patient->only_names ?: 'Sin nombre' }}</span>
                                                 <span class="d-block h5 text-inherit mb-0">{{ $patient->only_last_names ?: '' }}</span>
-                                                <span class="d-block fs-6 text-muted">{{ $patient->dpi ?: 'Sin DPI' }}</span>
+                                                <span class="d-block fs-6 text-muted">{{ $patient->cui ?: 'Sin CUI' }}</span>
                                             </div>
                                         </a>
                                     </td>
@@ -336,7 +336,7 @@
                                     <td>{{ $patient->birth_date ? $patient->birth_date->format('d/m/Y') : '-' }}</td>
                                     <td>{{ $patient->age ? $patient->age . ' años' : '-' }}</td>
                                     <td>
-                                        <span class="d-block text-inherit mb-0">{{ $patient->country ? $patient->country->name : '-' }}</span>
+                                        <span class="d-block text-inherit mb-0">{{ ($patient->municipality && $patient->municipality->department && $patient->municipality->department->country) ? $patient->municipality->department->country->name : '-' }}</span>
                                         <span class="d-block fs-6 text-body">{{ $patient->department ? $patient->department->name : '-' }}</span>
                                         <span class="d-block fs-6 text-muted">{{ $patient->municipality ? $patient->municipality->name : '-' }}</span>
                                     </td>

@@ -48,7 +48,7 @@ class LoginController extends Controller
      */
     protected function authenticated(Request $request, $user)
     {
-        if (!$user->is_active || !$user->role_id || !$user->work_department_id) {
+        if (!$user->is_active || !$user->role_id || !($user->staff && $user->staff->work_department_id)) {
             auth()->logout();
             return redirect()->route('login')->withErrors([
                 'access_denied' => 'Su cuenta no está completada o se encuentra inactiva (Falta rol o departamento). Por favor, contacte con el departamento de informática para soporte técnico.'

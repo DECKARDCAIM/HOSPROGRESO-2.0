@@ -107,30 +107,28 @@
                                     <div class="row mb-4">
                                         <div class="col-md-4 mb-2">
                                             <label for="cuiLabel" class="form-label">CUI</label>
-                                            <input type="text" class="form-control" name="cui" id="cuiLabel" autocomplete="off" placeholder="CUI" value="{{ old('cui', $user->cui) }}">
+                                            <input type="text" class="form-control" name="cui" id="cuiLabel" autocomplete="off" placeholder="CUI" value="{{ old('cui', $user->staff->cui ?? '') }}">
                                         </div>
                                         <div class="col-md-4 mb-2">
                                             <label for="nitLabel" class="form-label">NIT</label>
-                                            <input type="text" class="form-control" name="nit" id="nitLabel" autocomplete="off" placeholder="NIT" value="{{ old('nit', $user->nit) }}">
+                                            <input type="text" class="form-control" name="nit" id="nitLabel" autocomplete="off" placeholder="NIT" value="{{ old('nit', $user->staff->nit ?? '') }}">
                                         </div>
                                         <div class="col-md-4 mb-2">
-                                            <label for="maritalStatusLabel" class="form-label">Estado Civil</label>
-                                            <div class="tom-select-custom">
-                                                <select class="js-select form-select" name="marital_status" id="maritalStatusLabel" autocomplete="off" data-hs-tom-select-options='{ "placeholder": "Seleccione..." }'>
-                                                    <option value="">Seleccione</option>
-                                                    <option value="soltero" {{ old('marital_status', $user->marital_status) == 'soltero' ? 'selected' : '' }}>Soltero(a)</option>
-                                                    <option value="casado" {{ old('marital_status', $user->marital_status) == 'casado' ? 'selected' : '' }}>Casado(a)</option>
-                                                    <option value="divorciado" {{ old('marital_status', $user->marital_status) == 'divorciado' ? 'selected' : '' }}>Divorciado(a)</option>
-                                                    <option value="viudo" {{ old('marital_status', $user->marital_status) == 'viudo' ? 'selected' : '' }}>Viudo(a)</option>
-                                                    <option value="union_libre" {{ old('marital_status', $user->marital_status) == 'union_libre' ? 'selected' : '' }}>Unión Libre</option>
-                                                </select>
-                                            </div>
-                                        </div>
+                                             <label for="civilStatusLabel" class="form-label">Estado Civil</label>
+                                             <div class="tom-select-custom">
+                                                 <select class="js-select form-select" name="civil_status_id" id="civilStatusLabel" autocomplete="off" data-hs-tom-select-options='{ "placeholder": "Seleccione..." }'>
+                                                     <option value="">Seleccione</option>
+                                                     @foreach ($civilStatuses ?? [] as $status)
+                                                         <option value="{{ $status->id }}" {{ old('civil_status_id', $user->staff->civil_status_id ?? '') == $status->id ? 'selected' : '' }}>{{ $status->name }}</option>
+                                                     @endforeach
+                                                 </select>
+                                             </div>
+                                         </div>
                                     </div>
                                     <div class="row mb-4">
                                         <div class="col-md-4 mb-2">
                                             <label for="birthDateLabel" class="form-label">Fecha de Nacimiento</label>
-                                            <input type="date" class="form-control" name="birth_date" id="birthDateLabel" autocomplete="off" value="{{ old('birth_date', $user->birth_date ? \Carbon\Carbon::parse($user->birth_date)->format('Y-m-d') : '') }}">
+                                            <input type="date" class="form-control" name="birth_date" id="birthDateLabel" autocomplete="off" value="{{ old('birth_date', (isset($user->staff) && $user->staff->birth_date) ? \Carbon\Carbon::parse($user->staff->birth_date)->format('Y-m-d') : '') }}">
                                         </div>
                                         <div class="col-md-4 mb-2">
                                             <label for="genderLabel" class="form-label">Género</label>
@@ -138,14 +136,14 @@
                                                 <select class="js-select form-select" name="gender_id" id="genderLabel" autocomplete="off" data-hs-tom-select-options='{ "placeholder": "Seleccione..." }'>
                                                     <option value="">Seleccione</option>
                                                     @foreach ($genders ?? [] as $gender)
-                                                        <option value="{{ $gender->id }}" {{ old('gender_id', $user->gender_id) == $gender->id ? 'selected' : '' }}>{{ $gender->name }}</option>
+                                                        <option value="{{ $gender->id }}" {{ old('gender_id', $user->staff->gender_id ?? '') == $gender->id ? 'selected' : '' }}>{{ $gender->name }}</option>
                                                     @endforeach
                                                 </select>
                                             </div>
                                         </div>
                                         <div class="col-md-4 mb-2">
                                             <label for="phoneLabel" class="form-label">Teléfono</label>
-                                            <input type="text" class="form-control" name="phone" id="phoneLabel" autocomplete="off" placeholder="Ej. +12345678" value="{{ old('phone', $user->phone) }}">
+                                            <input type="text" class="form-control" name="phone" id="phoneLabel" autocomplete="off" placeholder="Ej. +12345678" value="{{ old('phone', $user->staff->phone ?? '') }}">
                                         </div>
                                     </div>
                                     <div class="row mb-4">
@@ -188,7 +186,7 @@
                                                 <select class="js-select form-select" name="unity_execution_id" id="unityExecutionIdLabel" autocomplete="off" data-hs-tom-select-options='{ "placeholder": "Seleccione Unidad..." }'>
                                                     <option value="">Seleccione Unidad</option>
                                                     @foreach ($unityExecutions ?? [] as $unity)
-                                                        <option value="{{ $unity->id }}" {{ old('unity_execution_id', $user->unity_execution_id) == $unity->id ? 'selected' : '' }}>{{ $unity->name }}</option>
+                                                        <option value="{{ $unity->id }}" {{ old('unity_execution_id', $user->staff->unity_execution_id ?? '') == $unity->id ? 'selected' : '' }}>{{ $unity->name }}</option>
                                                     @endforeach
                                                 </select>
                                             </div>
@@ -199,7 +197,7 @@
                                                 <select class="js-select form-select" name="work_department_id" id="workDepartmentIdLabel" autocomplete="off" data-hs-tom-select-options='{ "placeholder": "Seleccione Departamento..." }'>
                                                     <option value="">Seleccione Departamento</option>
                                                     @foreach ($workDepartments ?? [] as $wd)
-                                                        <option value="{{ $wd->id }}" {{ old('work_department_id', $user->work_department_id) == $wd->id ? 'selected' : '' }}>{{ $wd->name }}</option>
+                                                        <option value="{{ $wd->id }}" {{ old('work_department_id', $user->staff->work_department_id ?? '') == $wd->id ? 'selected' : '' }}>{{ $wd->name }}</option>
                                                     @endforeach
                                                 </select>
                                             </div>
@@ -212,10 +210,14 @@
                                                 <select class="js-select form-select" name="specialty_id" id="specialtyLabel" autocomplete="off" data-hs-tom-select-options='{ "placeholder": "Seleccione Especialidad..." }'>
                                                     <option value="">Seleccione Especialidad</option>
                                                     @foreach ($specialties ?? [] as $specialty)
-                                                        <option value="{{ $specialty->id }}" {{ old('specialty_id', $user->specialty_id) == $specialty->id ? 'selected' : '' }}>{{ $specialty->name }}</option>
+                                                        <option value="{{ $specialty->id }}" {{ old('specialty_id', $user->staff->specialty_id ?? '') == $specialty->id ? 'selected' : '' }}>{{ $specialty->name }}</option>
                                                     @endforeach
                                                 </select>
                                             </div>
+                                        </div>
+                                        <div class="col-sm-6 mb-2">
+                                            <label for="collegiateNumberLabel" class="form-label">Número de Colegiado</label>
+                                            <input type="text" class="form-control" name="collegiate_number" id="collegiateNumberLabel" autocomplete="off" placeholder="Número de colegiado" value="{{ old('collegiate_number', $user->staff->collegiate_number ?? '') }}">
                                         </div>
                                         <div class="col-sm-6 mb-2">
                                             <label for="scheduleIdLabel" class="form-label">Asignar Horario de Trabajo</label>
@@ -223,7 +225,7 @@
                                                 <select class="js-select form-select" name="schedule_id" id="scheduleIdLabel" autocomplete="off" data-hs-tom-select-options='{ "placeholder": "Seleccione Horario..." }'>
                                                     <option value="">Seleccione Horario</option>
                                                     @foreach ($schedules ?? [] as $schedule)
-                                                        <option value="{{ $schedule->id }}" {{ old('schedule_id', $user->schedule_id) == $schedule->id ? 'selected' : '' }}>{{ $schedule->name }}</option>
+                                                        <option value="{{ $schedule->id }}" {{ old('schedule_id', $user->staff->schedule_id ?? '') == $schedule->id ? 'selected' : '' }}>{{ $schedule->name }}</option>
                                                     @endforeach
                                                 </select>
                                             </div>
@@ -264,7 +266,7 @@
                                                 <select class="js-select form-select" name="country_id" id="countryIdLabel" autocomplete="off" data-hs-tom-select-options='{ "placeholder": "Seleccione un país..." }'>
                                                     <option value="">Seleccione un país</option>
                                                     @foreach ($countries ?? [] as $country)
-                                                        <option value="{{ $country->id }}" {{ old('country_id', $user->country_id) == $country->id ? 'selected' : '' }}>{{ $country->name }}</option>
+                                                        <option value="{{ $country->id }}" {{ old('country_id', ($user->staff && $user->staff->municipality && $user->staff->municipality->department) ? $user->staff->municipality->department->country_id : '') == $country->id ? 'selected' : '' }}>{{ $country->name }}</option>
                                                     @endforeach
                                                 </select>
                                             </div>
@@ -277,7 +279,7 @@
                                                 <select class="js-select form-select" name="department_id" id="departmentIdLabel" autocomplete="off" {{ $departments->isEmpty() ? 'disabled' : '' }} data-hs-tom-select-options='{ "placeholder": "Seleccione un departamento..." }'>
                                                     <option value="">Seleccione primero un país</option>
                                                     @foreach ($departments as $dept)
-                                                        <option value="{{ $dept->id }}" {{ old('department_id', $user->department_id) == $dept->id ? 'selected' : '' }}>{{ $dept->name }}</option>
+                                                        <option value="{{ $dept->id }}" {{ old('department_id', ($user->staff && $user->staff->municipality) ? $user->staff->municipality->department_id : '') == $dept->id ? 'selected' : '' }}>{{ $dept->name }}</option>
                                                     @endforeach
                                                 </select>
                                             </div>
@@ -290,7 +292,7 @@
                                                 <select class="js-select form-select" name="municipality_id" id="municipalityIdLabel" autocomplete="off" {{ $municipalities->isEmpty() ? 'disabled' : '' }} data-hs-tom-select-options='{ "placeholder": "Seleccione un municipio..." }'>
                                                     <option value="">Seleccione primero un departamento</option>
                                                     @foreach ($municipalities as $muni)
-                                                        <option value="{{ $muni->id }}" {{ old('municipality_id', $user->municipality_id) == $muni->id ? 'selected' : '' }}>{{ $muni->name }}</option>
+                                                        <option value="{{ $muni->id }}" {{ old('municipality_id', $user->staff->municipality_id ?? '') == $muni->id ? 'selected' : '' }}>{{ $muni->name }}</option>
                                                     @endforeach
                                                 </select>
                                             </div>
@@ -299,7 +301,7 @@
                                     <div class="row mb-4">
                                         <label for="addressLabel" class="col-sm-3 col-form-label form-label">Dirección Exacta</label>
                                         <div class="col-sm-9">
-                                            <input type="text" class="form-control" name="address" id="addressLabel" autocomplete="off" placeholder="Ej. 1ra Avenida 2-33 Zona 1" value="{{ old('address', $user->address) }}">
+                                            <input type="text" class="form-control" name="address" id="addressLabel" autocomplete="off" placeholder="Ej. 1ra Avenida 2-33 Zona 1" value="{{ old('address', $user->staff->address ?? '') }}">
                                         </div>
                                     </div>
                                 </div>
@@ -452,7 +454,7 @@
                     set('confirm-fullName', fullName);
                     set('confirm-cui', getVal('cuiLabel'));
                     set('confirm-nit', getVal('nitLabel'));
-                    set('confirm-maritalStatus', getText('maritalStatusLabel'));
+                    set('confirm-maritalStatus', getText('civilStatusLabel'));
                     set('confirm-birthDate', getVal('birthDateLabel'));
                     set('confirm-gender', getText('genderLabel'));
                     set('confirm-phone', getVal('phoneLabel'));
@@ -461,6 +463,7 @@
                     set('confirm-unityExecution', getText('unityExecutionIdLabel'));
                     set('confirm-workDepartment', getText('workDepartmentIdLabel'));
                     set('confirm-specialty', getText('specialtyLabel'));
+                    set('confirm-collegiateNumber', getVal('collegiateNumberLabel'));
                     set('confirm-scheduleId', getText('scheduleIdLabel'));
                     set('confirm-isActive', getText('isActiveLabel'));
                     set('confirm-countryId', getText('countryIdLabel'));

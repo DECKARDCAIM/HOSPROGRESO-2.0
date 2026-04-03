@@ -16,7 +16,7 @@ return new class extends Migration
             $table->string('title');
             $table->longText('content');
             $table->foreignId('author_id')->constrained('users')->onDelete('cascade');
-            $table->enum('status', ['draft', 'published', 'archived'])->default('published');
+            $table->enum('status', ['borrador', 'publicado'])->default('publicado');
             $table->enum('type', ['actualizacion', 'comunicado'])->default('comunicado');
             $table->text('document_path')->nullable();
             $table->string('background_image')->nullable();

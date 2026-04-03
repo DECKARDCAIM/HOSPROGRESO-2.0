@@ -18,7 +18,7 @@ class PatientRelative extends Model
         'first_last_name',
         'second_last_name',
         'married_last_name',
-        'dpi',
+        'cui',
     ];
 
     /**

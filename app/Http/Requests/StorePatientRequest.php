@@ -29,7 +29,7 @@ class StorePatientRequest extends FormRequest
             'married_last_name'      => ['nullable', 'string', 'max:100'],
             'email'                  => ['nullable', 'email', 'max:255', 'unique:patients,email'],
             'phone'                  => ['nullable', 'string', 'max:8'],
-            'dpi'                    => ['nullable', 'string', 'max:20', 'unique:patients,dpi'],
+            'cui'                    => ['nullable', 'string', 'max:13', 'unique:patients,cui'],
                         'birth_date'             => ['required', 'date'],
 
             // Catálogos
@@ -43,19 +43,9 @@ class StorePatientRequest extends FormRequest
             'occupation'             => ['nullable', 'string', 'max:255'],
 
             // Dirección
-            'country_id'             => ['nullable', 'integer', 'exists:countries,id'],
-            'department_id'          => ['nullable', 'integer', 'exists:departments,id'],
             'municipality_id'        => ['nullable', 'integer', 'exists:municipalities,id'],
             'place'                  => ['nullable', 'string', 'max:500'],
 
-            // Datos de la madre (usados si es menor de edad)
-            'mother_first_name'      => ['nullable', 'string', 'max:100'],
-            'mother_second_name'     => ['nullable', 'string', 'max:100'],
-            'mother_third_name'      => ['nullable', 'string', 'max:100'],
-            'mother_first_last_name' => ['nullable', 'string', 'max:100'],
-            'mother_second_last_name'=> ['nullable', 'string', 'max:100'],
-            'mother_married_last_name'=> ['nullable', 'string', 'max:100'],
-            'mother_dpi'             => ['nullable', 'string', 'max:20'],
 
             // Familiares dinámicos (array)
             'relatives'                        => ['nullable', 'array'],
@@ -65,7 +55,7 @@ class StorePatientRequest extends FormRequest
             'relatives.*.first_last_name'      => ['required_with:relatives', 'string', 'max:100'],
             'relatives.*.second_last_name'     => ['nullable', 'string', 'max:100'],
             'relatives.*.married_last_name'    => ['nullable', 'string', 'max:100'],
-            'relatives.*.dpi'                  => ['nullable', 'string', 'max:20'],
+            'relatives.*.cui'                  => ['nullable', 'string', 'max:13'],
         ];
     }
 
@@ -78,14 +68,12 @@ class StorePatientRequest extends FormRequest
             'first_name'             => 'primer nombre',
             'first_last_name'        => 'primer apellido',
             'email'                  => 'correo electrónico',
-            'dpi'                    => 'DPI',
+            'cui'                    => 'CUI',
             'birth_date'             => 'fecha de nacimiento',
             'gender_id'              => 'género',
             'civil_status_id'        => 'estado civil',
             'ethnicity_id'           => 'etnia',
             'linguistic_community_id'=> 'comunidad lingüística',
-            'country_id'             => 'país',
-            'department_id'          => 'departamento',
             'municipality_id'        => 'municipio',
             'relatives.*.relationship'    => 'relación del familiar',
             'relatives.*.first_name'      => 'primer nombre del familiar',
@@ -101,7 +89,7 @@ class StorePatientRequest extends FormRequest
     {
         return [
             'email.unique'           => 'El correo electrónico ya está registrado en el sistema.',
-            'dpi.unique'             => 'El DPI ya está registrado en el sistema.',
+            'cui.unique'             => 'El CUI ya está registrado en el sistema.',
             'relatives.*.relationship.in' => 'La relación del familiar no es válida.',
         ];
     }

@@ -20,7 +20,7 @@ class Patient extends Model
         'married_last_name',
         'email',
         'phone',
-        'dpi',
+        'cui',
         'birth_date',
         'gender_id',
         'civil_status_id',
@@ -28,18 +28,8 @@ class Patient extends Model
         'linguistic_community_id',
         'education',
         'occupation',
-        'country_id',
-        'department_id',
         'municipality_id',
         'place',
-        // Datos de la madre (para menores de edad)
-        'mother_first_name',
-        'mother_second_name',
-        'mother_third_name',
-        'mother_first_last_name',
-        'mother_second_last_name',
-        'mother_married_last_name',
-        'mother_dpi',
     ];
 
     /**
@@ -56,6 +46,17 @@ class Patient extends Model
     public function relatives()
     {
         return $this->hasMany(PatientRelative::class);
+    }
+
+    /**
+     * Get the mother of the patient from relatives table.
+     */
+    public function mother()
+    {
+        return $this->hasOne(PatientRelative::class)
+            ->whereHas('relationshipType', function($q) {
+                $q->where('name', 'Madre');
+            });
     }
 
     protected $casts = [
@@ -82,14 +83,16 @@ class Patient extends Model
         return $this->belongsTo(LinguisticCommunity::class);
     }
 
-    public function country()
-    {
-        return $this->belongsTo(Country::class);
-    }
-
     public function department()
     {
-        return $this->belongsTo(Department::class);
+        return $this->hasOneThrough(
+            Department::class,
+            Municipality::class,
+            'id', // ID on municipalities table
+            'id', // ID on departments table
+            'municipality_id', // Local key on patients table
+            'department_id' // Local key on municipalities table
+        );
     }
 
     public function municipality()
@@ -130,8 +133,9 @@ class Patient extends Model
 
     public function getFullNameAttribute()
     {
-        if (!$this->first_name && $this->mother_full_name) {
-            return "Hijo de {$this->mother_full_name}";
+        $motherFullName = $this->mother_full_name;
+        if (!$this->first_name && $motherFullName) {
+            return "Hijo de {$motherFullName}";
         }
         
         $names = array_filter([
@@ -152,8 +156,9 @@ class Patient extends Model
 
     public function getOnlyNamesAttribute()
     {
-        if (!$this->first_name && $this->mother_full_name) {
-            return "Hijo de {$this->mother_first_name} {$this->mother_second_name} {$this->mother_third_name}";
+        $mother = $this->mother;
+        if (!$this->first_name && $mother) {
+            return "Hijo de {$mother->first_name} {$mother->second_name} {$mother->third_name}";
         }
 
         $names = array_filter([
@@ -167,12 +172,13 @@ class Patient extends Model
 
     public function getOnlyLastNamesAttribute()
     {
-        if (!$this->first_name && $this->mother_full_name) {
+        $mother = $this->mother;
+        if (!$this->first_name && $mother) {
             $lastNames = array_filter([
-                $this->mother_first_last_name,
-                $this->mother_second_last_name,
+                $mother->first_last_name,
+                $mother->second_last_name,
             ]);
-            $married = $this->mother_married_last_name ? " de {$this->mother_married_last_name}" : '';
+            $married = $mother->married_last_name ? " de {$mother->married_last_name}" : '';
             return trim(implode(' ', $lastNames) . $married);
         }
 
@@ -188,22 +194,23 @@ class Patient extends Model
 
     public function getMotherFullNameAttribute()
     {
-        if (!$this->mother_first_name) {
+        $mother = $this->mother;
+        if (!$mother) {
             return null;
         }
         
         $names = array_filter([
-            $this->mother_first_name,
-            $this->mother_second_name,
-            $this->mother_third_name,
+            $mother->first_name,
+            $mother->second_name,
+            $mother->third_name,
         ]);
         
         $lastNames = array_filter([
-            $this->mother_first_last_name,
-            $this->mother_second_last_name,
+            $mother->first_last_name,
+            $mother->second_last_name,
         ]);
         
-        $marriedLastName = $this->mother_married_last_name ? " de {$this->mother_married_last_name}" : '';
+        $marriedLastName = $mother->married_last_name ? " de {$mother->married_last_name}" : '';
         
         return trim(implode(' ', $names) . ' ' . implode(' ', $lastNames) . $marriedLastName);
     }
@@ -220,13 +227,15 @@ class Patient extends Model
             ->orWhere('third_name', 'like', "%{$search}%")
             ->orWhere('first_last_name', 'like', "%{$search}%")
             ->orWhere('second_last_name', 'like', "%{$search}%")
-            ->orWhere('dpi', 'like', "%{$search}%")
-            ->orWhere('mother_first_name', 'like', "%{$search}%")
-            ->orWhere('mother_second_name', 'like', "%{$search}%")
-            ->orWhere('mother_third_name', 'like', "%{$search}%")
-            ->orWhere('mother_first_last_name', 'like', "%{$search}%")
-            ->orWhere('mother_second_last_name', 'like', "%{$search}%")
-            ->orWhere('mother_dpi', 'like', "%{$search}%");
+            ->orWhere('cui', 'like', "%{$search}%")
+            ->orWhereHas('relatives', function ($sub) use ($search) {
+                $sub->where('first_name', 'like', "%{$search}%")
+                ->orWhere('second_name', 'like', "%{$search}%")
+                ->orWhere('third_name', 'like', "%{$search}%")
+                ->orWhere('first_last_name', 'like', "%{$search}%")
+                ->orWhere('second_last_name', 'like', "%{$search}%")
+                ->orWhere('cui', 'like', "%{$search}%");
+            });
         });
     }
 
@@ -253,12 +262,16 @@ class Patient extends Model
 
     public function scopeByCountry($query, $countryId)
     {
-        return $query->where('country_id', $countryId);
+        return $query->whereHas('municipality.department', function ($q) use ($countryId) {
+            $q->where('country_id', $countryId);
+        });
     }
 
     public function scopeByDepartment($query, $departmentId)
     {
-        return $query->where('department_id', $departmentId);
+        return $query->whereHas('municipality', function ($q) use ($departmentId) {
+            $q->where('department_id', $departmentId);
+        });
     }
 
     public function scopeByMunicipality($query, $municipalityId)

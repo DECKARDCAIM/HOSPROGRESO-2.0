@@ -110,15 +110,13 @@
                                             <input type="text" class="form-control" name="nit" id="nitLabel" autocomplete="off" placeholder="NIT">
                                         </div>
                                         <div class="col-md-4 mb-2">
-                                            <label for="maritalStatusLabel" class="form-label">Estado Civil</label>
+                                            <label for="civilStatusLabel" class="form-label">Estado Civil</label>
                                             <div class="tom-select-custom">
-                                                <select class="js-select form-select" name="marital_status" id="maritalStatusLabel" autocomplete="off" data-hs-tom-select-options='{ "placeholder": "Seleccione..." }'>
+                                                <select class="js-select form-select" name="civil_status_id" id="civilStatusLabel" autocomplete="off" data-hs-tom-select-options='{ "placeholder": "Seleccione..." }'>
                                                     <option value="">Seleccione</option>
-                                                    <option value="soltero">Soltero(a)</option>
-                                                    <option value="casado">Casado(a)</option>
-                                                    <option value="divorciado">Divorciado(a)</option>
-                                                    <option value="viudo">Viudo(a)</option>
-                                                    <option value="union_libre">Unión Libre</option>
+                                                    @foreach ($civilStatuses ?? [] as $status)
+                                                        <option value="{{ $status->id }}">{{ $status->name }}</option>
+                                                    @endforeach
                                                 </select>
                                             </div>
                                         </div>
@@ -212,6 +210,10 @@
                                                     @endforeach
                                                 </select>
                                             </div>
+                                        </div>
+                                        <div class="col-sm-6 mb-2">
+                                            <label for="collegiateNumberLabel" class="form-label">Número de Colegiado</label>
+                                            <input type="text" class="form-control" name="collegiate_number" id="collegiateNumberLabel" autocomplete="off" placeholder="Número de colegiado">
                                         </div>
                                         <div class="col-sm-6 mb-2">
                                             <label for="scheduleIdLabel" class="form-label">Asignar Horario de Trabajo</label>
@@ -373,7 +375,7 @@
                             @if (session('success'))
                                 <div id="successMessageContent">
                                     <div class="text-center">
-                                        <img class="img-fluid mb-3" src="{{ asset('svg/illustrations/oc-hi-five.svg') }}" alt="Image Description" data-hs-theme-appearance="default" style="max-width: 15rem;">
+                                        <img class="img-fluid mb-3" src="{{ asset('dist/svg/illustrations/oc-hi-five.svg') }}" alt="Image Description" data-hs-theme-appearance="default" style="max-width: 15rem;">
                                         <img class="img-fluid mb-3" src="{{ asset('dist/svg/illustrations-light/oc-hi-five.svg') }}" alt="Image Description" data-hs-theme-appearance="dark" style="max-width: 15rem;">
                                         <div class="mb-4">
                                             <h2>¡Usuario Creado!</h2>
@@ -448,7 +450,7 @@
                     set('confirm-fullName', fullName);
                     set('confirm-cui', getVal('cuiLabel'));
                     set('confirm-nit', getVal('nitLabel'));
-                    set('confirm-maritalStatus', getText('maritalStatusLabel'));
+                    set('confirm-maritalStatus', getText('civilStatusLabel'));
                     set('confirm-birthDate', getVal('birthDateLabel'));
                     set('confirm-gender', getText('genderLabel'));
                     set('confirm-phone', getVal('phoneLabel'));
@@ -457,6 +459,7 @@
                     set('confirm-unityExecution', getText('unityExecutionIdLabel'));
                     set('confirm-workDepartment', getText('workDepartmentIdLabel'));
                     set('confirm-specialty', getText('specialtyLabel'));
+                    set('confirm-collegiateNumber', getVal('collegiateNumberLabel'));
                     set('confirm-scheduleId', getText('scheduleIdLabel'));
                     set('confirm-isActive', getText('isActiveLabel'));
                     set('confirm-countryId', getText('countryIdLabel'));

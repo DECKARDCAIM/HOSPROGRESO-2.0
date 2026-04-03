@@ -32,68 +32,18 @@ class User extends Authenticatable
         
         'profile_photo_path',
         'banner_photo_path',
-        'cui',
-        'nit',
-        'marital_status',
-        'phone',
-        'unity_execution_id',
-        'work_department_id',
-        'collegiate_number',
-        'specialty_id',
-        'address',
-        'birth_date',
-        'gender_id',
         'estado',
         'theme_preference',
-        'country_id',
-        'department_id',
-        'municipality_id',
-        'schedule_id',
     ];
+
+    public function staff()
+    {
+        return $this->hasOne(Staff::class);
+    }
 
     public function role()
     {
         return $this->belongsTo(Role::class);
-    }
-
-    public function unityExecution()
-    {
-        return $this->belongsTo(UnityExecution::class);
-    }
-
-    public function workDepartment()
-    {
-        return $this->belongsTo(WorkDepartment::class);
-    }
-
-    public function country()
-    {
-        return $this->belongsTo(Country::class);
-    }
-
-    public function department()
-    {
-        return $this->belongsTo(Department::class);
-    }
-
-    public function municipality()
-    {
-        return $this->belongsTo(Municipality::class);
-    }
-
-    public function schedule()
-    {
-        return $this->belongsTo(Schedule::class);
-    }
-
-    public function gender()
-    {
-        return $this->belongsTo(Gender::class);
-    }
-
-    public function specialty()
-    {
-        return $this->belongsTo(Specialty::class);
     }
 
     /**

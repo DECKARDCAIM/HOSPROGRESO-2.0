@@ -33,9 +33,7 @@ class PatientController extends Controller
             'civilStatus',
             'ethnicity',
             'linguisticCommunity',
-            'country',
-            'department',
-            'municipality',
+            'municipality.department.country',
             'relatives',
         ]);
 
@@ -240,7 +238,7 @@ class PatientController extends Controller
                         'first_last_name' => $relativeData['first_last_name'],
                         'second_last_name' => $relativeData['second_last_name'] ?? null,
                         'married_last_name' => $relativeData['married_last_name'] ?? null,
-                        'dpi' => $relativeData['dpi'] ?? null,
+                        'cui' => $relativeData['cui'] ?? null,
                     ]);
                 }
             }
@@ -269,9 +267,7 @@ class PatientController extends Controller
             'civilStatus',
             'ethnicity',
             'linguisticCommunity',
-            'country',
-            'department',
-            'municipality'
+            'municipality.department.country'
         ]);
 
         return view('modules.patient.show', compact('patient'));
@@ -286,14 +282,14 @@ class PatientController extends Controller
         // Cargar todos los catálogos necesarios
         $countries = Country::where('is_active', true)->orderBy('name')->get();
         
-        // Cargar departamentos según el país del paciente
-        $departments = $patient->country 
-            ? Department::where('country_id', $patient->country_id)->where('is_active', true)->orderBy('name')->get()
+        // Cargar departamentos según el país del paciente (vía municipio)
+        $departments = ($patient->municipality && $patient->municipality->department)
+            ? Department::where('country_id', $patient->municipality->department->country_id)->where('is_active', true)->orderBy('name')->get()
             : collect();
         
         // Cargar municipios según el departamento del paciente
-        $municipalities = $patient->department 
-            ? Municipality::where('department_id', $patient->department_id)->where('is_active', true)->orderBy('name')->get()
+        $municipalities = $patient->municipality 
+            ? Municipality::where('department_id', $patient->municipality->department_id)->where('is_active', true)->orderBy('name')->get()
             : collect();
         
         $genders = Gender::where('is_active', true)->orderBy('name')->get();
@@ -320,7 +316,7 @@ class PatientController extends Controller
                 'first_last_name'      => $r->first_last_name,
                 'second_last_name'     => $r->second_last_name,
                 'married_last_name'    => $r->married_last_name,
-                'dpi'                  => $r->dpi,
+                'cui'                  => $r->cui,
                 'relationship_type_id' => $r->relationship_type_id,
                 'name'                 => trim(implode(' ', array_filter([
                     $r->first_name, $r->second_name, $r->third_name,
@@ -374,7 +370,7 @@ class PatientController extends Controller
                     'first_last_name'      => $relativeData['first_last_name'],
                     'second_last_name'     => $relativeData['second_last_name'] ?? null,
                     'married_last_name'    => $relativeData['married_last_name'] ?? null,
-                    'dpi'                  => $relativeData['dpi'] ?? null,
+                    'cui'                  => $relativeData['cui'] ?? null,
                 ]);
             }
         }
@@ -480,7 +476,7 @@ class PatientController extends Controller
             fputcsv($file, [
                 'ID',
                 'Nombre Completo',
-                'DPI',
+                'CUI',
                 'Fecha de Nacimiento',
                 'Edad',
                 'Género',
@@ -500,7 +496,7 @@ class PatientController extends Controller
                 fputcsv($file, [
                     $patient->id,
                     $patient->full_name,
-                    $patient->dpi ?: '',
+                    $patient->cui ?: '',
                     $patient->birth_date ? $patient->birth_date->format('d/m/Y') : '',
                     $patient->age ?: '',
                     $patient->gender ? $patient->gender->name : '',
@@ -627,7 +623,7 @@ class PatientController extends Controller
     }
 
     /**
-     * Buscar familiares existentes por nombre o DPI (para AJAX)
+     * Buscar familiares existentes por nombre o CUI (para AJAX)
      */
     public function searchRelatives(Request $request)
     {
@@ -651,12 +647,12 @@ class PatientController extends Controller
                   ->orWhere('first_last_name', 'like', "%{$word}%")
                   ->orWhere('second_last_name', 'like', "%{$word}%")
                   ->orWhere('married_last_name', 'like', "%{$word}%")
-                  ->orWhere('dpi', 'like', "%{$word}%");
+                  ->orWhere('cui', 'like', "%{$word}%");
             });
         }
 
         $results = $query
-            ->select('id', 'first_name', 'second_name', 'first_last_name', 'second_last_name', 'married_last_name', 'dpi')
+            ->select('id', 'first_name', 'second_name', 'first_last_name', 'second_last_name', 'married_last_name', 'cui')
             ->limit(10)
             ->get()
             ->map(function ($r) {
@@ -664,7 +660,7 @@ class PatientController extends Controller
                 return [
                     'id'                => $r->id,
                     'name'              => $name,
-                    'dpi'               => $r->dpi,
+                    'cui'               => $r->cui,
                     'first_name'        => $r->first_name,
                     'second_name'       => $r->second_name,
                     'first_last_name'   => $r->first_last_name,
@@ -693,7 +689,7 @@ class PatientController extends Controller
             'second_name'      => $request->input('second_name'),
             'first_last_name'  => $request->input('first_last_name'),
             'second_last_name' => $request->input('second_last_name'),
-            'dpi'              => $request->input('dpi'),
+            'cui'              => $request->input('cui'),
         ];
         $name = trim("{$data['first_name']} {$data['second_name']} {$data['first_last_name']} {$data['second_last_name']}");
 
@@ -701,7 +697,7 @@ class PatientController extends Controller
         return response()->json([
             'id'        => null, // no persisted yet
             'name'      => $name,
-            'dpi'       => $data['dpi'],
+            'cui'       => $data['cui'],
             'first_name'       => $data['first_name'],
             'second_name'      => $data['second_name'],
             'first_last_name'  => $data['first_last_name'],

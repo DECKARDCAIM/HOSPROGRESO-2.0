@@ -27,7 +27,7 @@ return new class extends Migration
             $table->string('second_last_name')->nullable();
             $table->string('married_last_name')->nullable();
 
-            $table->string('dpi', 20)->nullable();
+            $table->string('cui', 13)->nullable();
 
             $table->timestamps();
 

@@ -100,9 +100,9 @@
                                     <div class="row mb-12">
                                         <div class="row mb-3">
                                             <div class="col-md-6">
-                                                <label for="dpiLabel" class="col-sm-3 col-form-label form-label">DPI <i class="bi-question-circle text-body ms-1" data-bs-toggle="tooltip" data-bs-placement="top" title="Rellene el DPI del paciente"></i></label>
+                                                <label for="cuiLabel" class="col-sm-3 col-form-label form-label">CUI <i class="bi-question-circle text-body ms-1" data-bs-toggle="tooltip" data-bs-placement="top" title="Rellene el CUI del paciente"></i></label>
                                                 <div class="col-sm-9">
-                                                    <input type="text" class="js-input-mask form-control" name="dpi" id="dpiLabel" placeholder="0000 00000 0000" aria-label="DPI" value="{{ old('dpi', $patient->dpi) }}" autocomplete="off" data-hs-mask-options='{"mask": "0000 00000 0000"}'>
+                                                    <input type="text" class="js-input-mask form-control" name="cui" id="cuiLabel" placeholder="0000 00000 0000" aria-label="CUI" value="{{ old('cui', $patient->cui) }}" autocomplete="off" data-hs-mask-options='{"mask": "0000 00000 0000"}'>
                                                 </div>
                                             </div>
                                             <div class="col-md-6">
@@ -264,7 +264,7 @@
                                                 <select class="js-select form-select" name="country_id" id="countryLabel" data-hs-tom-select-options='{"placeholder": "Seleccione un país..."}'>
                                                     <option value="">Seleccione un país</option>
                                                     @foreach ($countries as $country)
-                                                        <option value="{{ $country->id }}" {{ old('country_id', $patient->country_id) == $country->id ? 'selected' : '' }}>{{ $country->name }}</option>
+                                                        <option value="{{ $country->id }}" {{ old('country_id', ($patient->municipality && $patient->municipality->department) ? $patient->municipality->department->country_id : null) == $country->id ? 'selected' : '' }}>{{ $country->name }}</option>
                                                     @endforeach
                                                 </select>
                                             </div>
@@ -277,7 +277,7 @@
                                                 <select class="js-select form-select" name="department_id" id="departmentLabel" {{ $departments->isEmpty() ? 'disabled' : '' }} data-hs-tom-select-options='{"placeholder": "Seleccione un departamento..."}'>
                                                     <option value="">Seleccione primero un país</option>
                                                     @foreach ($departments as $dept)
-                                                        <option value="{{ $dept->id }}" {{ old('department_id', $patient->department_id) == $dept->id ? 'selected' : '' }}>{{ $dept->name }}</option>
+                                                        <option value="{{ $dept->id }}" {{ old('department_id', $patient->municipality ? $patient->municipality->department_id : null) == $dept->id ? 'selected' : '' }}>{{ $dept->name }}</option>
                                                     @endforeach
                                                 </select>
                                             </div>
@@ -317,11 +317,11 @@
                             <div id="addUserStepFamily" class="card card-lg" style="display: none;">
                                 <div class="card-body">
                                     <h4 class="card-header-title mb-1">Familiares</h4>
-                                    <p class="text-muted small mb-4">Busca un familiar por nombre o DPI. Si no existe, puedes crearlo desde aquí.</p>
+                                    <p class="text-muted small mb-4">Busca un familiar por nombre o CUI. Si no existe, puedes crearlo desde aquí.</p>
                                     <div class="position-relative mb-4">
                                         <div class="input-group">
                                             <span class="input-group-text"><i class="bi-search"></i></span>
-                                            <input type="text" id="relativeSearchInput" class="form-control" placeholder="Buscar por nombre o DPI..." autocomplete="off">
+                                            <input type="text" id="relativeSearchInput" class="form-control" placeholder="Buscar por nombre o CUI..." autocomplete="off">
                                             <button type="button" class="btn btn-outline-primary" id="btnNewRelative">
                                                 <i class="bi-person-plus me-1"></i> Crear nuevo
                                             </button>
@@ -356,8 +356,8 @@
                                                     <input type="text" class="form-control form-control-sm" id="newRelMarriedLastName" placeholder="Apellido de casada" autocomplete="off">
                                                 </div>
                                                 <div class="col-md-6">
-                                                    <label class="form-label form-label-sm">DPI</label>
-                                                    <input type="text" class="form-control form-control-sm js-input-mask" id="newRelDpi" placeholder="0000 00000 0000" data-hs-mask-options='{"mask": "0000 00000 0000"}' autocomplete="off">
+                                                    <label class="form-label form-label-sm">CUI</label>
+                                                    <input type="text" class="form-control form-control-sm js-input-mask" id="newRelCui" placeholder="0000 00000 0000" data-hs-mask-options='{"mask": "0000 00000 0000"}' autocomplete="off">
                                                 </div>
                                                 <div class="col-md-6 d-flex align-items-end">
                                                     <button type="button" class="btn btn-primary btn-sm w-100" id="btnSaveNewRelative">
@@ -424,8 +424,8 @@
                                         <dd class="col-sm-6">
                                             <hr class="my-2 w-100">
                                         </dd>
-                                        <dt class="col-sm-6 text-sm-end">DPI:</dt>
-                                        <dd class="col-sm-6" id="confirm-dpi">—</dd>
+                                        <dt class="col-sm-6 text-sm-end">CUI:</dt>
+                                        <dd class="col-sm-6" id="confirm-cui">—</dd>
                                         <dt class="col-sm-6 text-sm-end">Fecha de nacimiento:</dt>
                                         <dd class="col-sm-6" id="confirm-birthDate">—</dd>
                                         <dt class="col-sm-6 text-sm-end">Género:</dt>
@@ -561,7 +561,7 @@
                     setEl('confirm-firstLastName', getVal('firstLastNameLabel'));
                     setEl('confirm-secondLastName', getVal('secondLastNameLabel'));
                     setEl('confirm-marriedLastName', getVal('marriedLastNameLabel'));
-                    setEl('confirm-dpi', getVal('dpiLabel'));
+                    setEl('confirm-cui', getVal('cuiLabel'));
                     setEl('confirm-birthDate', getVal('birthDateLabel'));
                     setEl('confirm-gender', getText('genderLabel'));
                     setEl('confirm-civilStatus', getText('civilStatusLabel'));
@@ -619,7 +619,7 @@
                                             item.className =
                                                 'list-group-item list-group-item-action py-2';
                                             item.innerHTML =
-                                                `<strong>${rel.name}</strong>${rel.married_last_name ? ` (de ${rel.married_last_name})` : ''}${rel.dpi ? ` <span class="text-muted small">· DPI: ${rel.dpi}</span>` : ''}`;
+                                                `<strong>${rel.name}</strong>${rel.married_last_name ? ` (de ${rel.married_last_name})` : ''}${rel.cui ? ` <span class="text-muted small">· CUI: ${rel.cui}</span>` : ''}`;
                                             item.addEventListener('click', () => {
                                                 addSelectedRelative(rel);
                                                 searchInput.value = '';
@@ -662,7 +662,7 @@
                         second_last_name: document.getElementById('newRelSecondLastName').value.trim(),
                         married_last_name: document.getElementById('newRelMarriedLastName').value
                             .trim(),
-                        dpi: document.getElementById('newRelDpi').value.trim(),
+                        cui: document.getElementById('newRelCui').value.trim(),
                         name: [firstName, document.getElementById('newRelSecondName').value.trim(),
                             firstLastName, document.getElementById('newRelSecondLastName').value
                             .trim()
@@ -675,7 +675,7 @@
 
                 function clearCreateForm() {
                     ['newRelFirstName', 'newRelSecondName', 'newRelFirstLastName', 'newRelSecondLastName',
-                        'newRelMarriedLastName', 'newRelDpi'
+                        'newRelMarriedLastName', 'newRelCui'
                     ].forEach(id => {
                         const el = document.getElementById(id);
                         if (el) el.value = '';
@@ -696,7 +696,7 @@
                     </div>
                     <div class="flex-grow-1">
                         <div class="fw-semibold">${rel.name}</div>
-                        ${rel.dpi ? `<div class="text-muted small">DPI: ${rel.dpi}</div>` : ''}
+                        ${rel.cui ? `<div class="text-muted small">CUI: ${rel.cui}</div>` : ''}
                     </div>
                     <div style="min-width:180px;">
                         <select class="form-select form-select-sm" name="relatives[${idx}][relationship_type_id]" required>
@@ -714,7 +714,7 @@
                     <input type="hidden" name="relatives[${idx}][first_last_name]"  value="${rel.first_last_name || ''}">
                     <input type="hidden" name="relatives[${idx}][second_last_name]" value="${rel.second_last_name || ''}">
                     <input type="hidden" name="relatives[${idx}][married_last_name]" value="${rel.married_last_name || ''}">
-                    <input type="hidden" name="relatives[${idx}][dpi]"              value="${rel.dpi || ''}">
+                    <input type="hidden" name="relatives[${idx}][cui]"              value="${rel.cui || ''}">
                 </div>
             `;
                     selectedContainer.appendChild(card);

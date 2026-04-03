@@ -21,8 +21,9 @@ return new class extends Migration
             $table->string('email')->nullable()->unique();
             $table->string('phone', 8)->nullable();
 
-            $table->string('dpi', 20)->unique()->nullable();
+            $table->string('cui', 13)->unique()->nullable();
             $table->date('birth_date')->nullable();
+
 
             // Relaciones
             $table->foreignId('gender_id')->nullable()->constrained('genders')->nullOnDelete();
@@ -35,8 +36,6 @@ return new class extends Migration
             $table->string('occupation')->nullable();
 
             // Dirección
-            $table->foreignId('country_id')->nullable()->constrained('countries')->nullOnDelete();
-            $table->foreignId('department_id')->nullable()->constrained('departments')->nullOnDelete();
             $table->foreignId('municipality_id')->nullable()->constrained('municipalities')->nullOnDelete();
             $table->string('place')->nullable();
 
@@ -49,8 +48,6 @@ return new class extends Migration
             $table->index('civil_status_id');
             $table->index('ethnicity_id');
             $table->index('linguistic_community_id');
-            $table->index('country_id');
-            $table->index('department_id');
             $table->index('municipality_id');
             $table->index('email');
             $table->index('phone');

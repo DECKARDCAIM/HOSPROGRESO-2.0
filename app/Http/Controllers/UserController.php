@@ -12,6 +12,7 @@ use App\Models\Country;
 use App\Models\Department;
 use App\Models\Municipality;
 use App\Models\Specialty;
+use App\Models\CivilStatus;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\File;
 use Illuminate\Support\Str;
@@ -23,7 +24,7 @@ class UserController extends Controller
         $perPage = $request->get('per_page', 25);
         $search = $request->get('search');
 
-        $query = \App\Models\User::with(['role', 'workDepartment', 'unityExecution', 'specialty', 'schedule', 'country', 'department', 'municipality']);
+        $query = \App\Models\User::with(['role', 'staff.workDepartment', 'staff.unityExecution', 'staff.specialty', 'staff.schedule', 'staff.municipality.department.country', 'staff.civilStatus']);
 
         // Buscador
         if ($search) {
@@ -31,12 +32,11 @@ class UserController extends Controller
                 $q->where('first_name', 'like', "%{$search}%")
                   ->orWhere('first_last_name', 'like', "%{$search}%")
                   ->orWhere('email', 'like', "%{$search}%")
-                  ->orWhere('collegiate_number', 'like', "%{$search}%")
-                  ->orWhereHas('role', function($q) use ($search) {
-                      $q->where('name', 'like', "%{$search}%");
-                  })
-                  ->orWhereHas('workDepartment', function($q) use ($search) {
-                      $q->where('name', 'like', "%{$search}%");
+                  ->orWhereHas('staff', function($q) use ($search) {
+                      $q->where('collegiate_number', 'like', "%{$search}%")
+                        ->orWhereHas('workDepartment', function($sq) use ($search) {
+                            $sq->where('name', 'like', "%{$search}%");
+                        });
                   });
             });
         }
@@ -47,11 +47,15 @@ class UserController extends Controller
         }
 
         if ($request->filled('work_department_id')) {
-            $query->where('work_department_id', $request->work_department_id);
+            $query->whereHas('staff', function($q) use ($request) {
+                $q->where('work_department_id', $request->work_department_id);
+            });
         }
 
         if ($request->filled('specialty_id')) {
-            $query->where('specialty_id', $request->specialty_id);
+            $query->whereHas('staff', function($q) use ($request) {
+                $q->where('specialty_id', $request->specialty_id);
+            });
         }
 
         if ($request->filled('status')) {
@@ -62,27 +66,39 @@ class UserController extends Controller
         }
 
         if ($request->filled('gender_id')) {
-            $query->where('gender_id', $request->gender_id);
+            $query->whereHas('staff', function($q) use ($request) {
+                $q->where('gender_id', $request->gender_id);
+            });
         }
 
         if ($request->filled('country_id')) {
-            $query->where('country_id', $request->country_id);
+            $query->whereHas('staff.municipality.department', function($q) use ($request) {
+                $q->where('country_id', $request->country_id);
+            });
         }
 
         if ($request->filled('department_id')) {
-            $query->where('department_id', $request->department_id);
+            $query->whereHas('staff.municipality', function($q) use ($request) {
+                $q->where('department_id', $request->department_id);
+            });
         }
 
         if ($request->filled('municipality_id')) {
-            $query->where('municipality_id', $request->municipality_id);
+            $query->whereHas('staff', function($q) use ($request) {
+                $q->where('municipality_id', $request->municipality_id);
+            });
         }
 
         if ($request->filled('birth_date_from')) {
-            $query->whereDate('birth_date', '>=', $request->birth_date_from);
+            $query->whereHas('staff', function($q) use ($request) {
+                $q->whereDate('birth_date', '>=', $request->birth_date_from);
+            });
         }
 
         if ($request->filled('birth_date_to')) {
-            $query->whereDate('birth_date', '<=', $request->birth_date_to);
+            $query->whereHas('staff', function($q) use ($request) {
+                $q->whereDate('birth_date', '<=', $request->birth_date_to);
+            });
         }
 
         $users = $query->paginate($perPage)->appends($request->query());
@@ -95,6 +111,7 @@ class UserController extends Controller
         $departments = Department::orderBy('name')->get();
         $municipalities = Municipality::orderBy('name')->get();
         $genders = \App\Models\Gender::where('is_active', true)->orderBy('name')->get();
+        $civilStatuses = \App\Models\CivilStatus::where('is_active', true)->orderBy('name')->get();
 
         // Contadores
         $totalUsers = \App\Models\User::count();
@@ -103,7 +120,7 @@ class UserController extends Controller
 
         return view('modules.administration.user.index', compact(
             'users', 'totalUsers', 'activeUsers', 'inactiveUsers',
-            'roles', 'workDepartments', 'specialties', 'countries', 'departments', 'municipalities', 'genders'
+            'roles', 'workDepartments', 'specialties', 'countries', 'departments', 'municipalities', 'genders', 'civilStatuses'
         ));
     }
 
@@ -206,16 +223,16 @@ class UserController extends Controller
      */
     public function show($id)
     {
-        $user = \App\Models\User::with(['role', 'workDepartment', 'unityExecution'])->findOrFail($id);
+        $user = \App\Models\User::with(['role', 'staff.workDepartment', 'staff.unityExecution'])->findOrFail($id);
 
         // Miembros del departamento del usuario
         $departamentMembers = \App\Models\User::where('id', '!=', $user->id)
             ->where('is_active', true)
-            ->where(function ($query) use ($user) {
-                if ($user->unity_execution_id) {
-                    $query->where('unity_execution_id', $user->unity_execution_id);
-                } elseif ($user->work_department_id) {
-                    $query->where('work_department_id', $user->work_department_id);
+            ->whereHas('staff', function ($query) use ($user) {
+                if ($user->staff && $user->staff->unity_execution_id) {
+                    $query->where('unity_execution_id', $user->staff->unity_execution_id);
+                } elseif ($user->staff && $user->staff->work_department_id) {
+                    $query->where('work_department_id', $user->staff->work_department_id);
                 } else {
                     $query->whereRaw('1 = 0');
                 }
@@ -235,9 +252,10 @@ class UserController extends Controller
         $unityExecutions = \App\Models\UnityExecution::orderBy('name')->get();
         $workDepartments = \App\Models\WorkDepartment::orderBy('name')->get();
         $genders         = \App\Models\Gender::where('is_active', true)->orderBy('name')->get();
+        $civilStatuses   = CivilStatus::where('is_active', true)->orderBy('name')->get();
 
         return view('modules.administration.user.create', compact(
-            'roles', 'schedules', 'countries', 'specialties', 'unityExecutions', 'workDepartments', 'genders'
+            'roles', 'schedules', 'countries', 'specialties', 'unityExecutions', 'workDepartments', 'genders', 'civilStatuses'
         ));
     }
 
@@ -248,8 +266,11 @@ class UserController extends Controller
             'first_last_name' => 'required|string|max:255',
             'email' => 'required|string|email|max:255|unique:users',
             'password' => 'required|string|min:8',
-            'role_id' => 'nullable|exists:roles,id',
+             'role_id' => 'nullable|exists:roles,id',
             'gender_id' => 'nullable|exists:genders,id',
+            'civil_status_id' => 'nullable|exists:civil_statuses,id',
+            'cui' => 'nullable|string|max:13|unique:staff,cui',
+            'phone' => 'nullable|string|max:8',
         ]);
 
         try {
@@ -263,20 +284,8 @@ class UserController extends Controller
                 'second_last_name' => $request->second_last_name,
                 'married_last_name' => $request->married_last_name,
                 'email' => $request->email,
-                'password' => $request->password, // Password hashing is handled by User model cast
-                'cui' => $request->cui,
-                'nit' => $request->nit,
-                'marital_status' => $request->marital_status,
-                'phone' => $request->phone,
-                'birth_date' => $request->birth_date,
-                'gender_id' => $request->gender_id,
+                'password' => $request->password,
                 'role_id' => $request->role_id,
-                'specialty_id' => $request->specialty_id,
-                'schedule_id' => $request->schedule_id,
-                'country_id' => $request->country_id,
-                'department_id' => $request->department_id,
-                'municipality_id' => $request->municipality_id,
-                'address' => $request->address,
                 'is_active' => $request->input('is_active', 1) == '1',
                 'estado' => 'disponible'
             ];
@@ -292,6 +301,23 @@ class UserController extends Controller
             }
 
             $user = \App\Models\User::create($userData);
+
+            // Crear Staff record
+            $user->staff()->create([
+                'cui' => $request->cui,
+                'nit' => $request->nit,
+                'civil_status_id' => $request->civil_status_id,
+                'phone' => $request->phone,
+                'birth_date' => $request->birth_date,
+                'gender_id' => $request->gender_id,
+                'specialty_id' => $request->specialty_id,
+                'schedule_id' => $request->schedule_id,
+                'municipality_id' => $request->municipality_id,
+                'address' => $request->address,
+                'unity_execution_id' => $request->unity_execution_id,
+                'work_department_id' => $request->work_department_id,
+                'collegiate_number' => $request->collegiate_number,
+            ]);
 
             DB::commit();
 
@@ -314,20 +340,21 @@ class UserController extends Controller
         $unityExecutions = \App\Models\UnityExecution::orderBy('name')->get();
         $workDepartments = \App\Models\WorkDepartment::orderBy('name')->get();
         $genders         = \App\Models\Gender::where('is_active', true)->orderBy('name')->get();
+        $civilStatuses   = CivilStatus::where('is_active', true)->orderBy('name')->get();
 
-        // Cargar departamentos según el país del usuario (igual que PatientController)
-        $departments = $user->country_id
-            ? Department::where('country_id', $user->country_id)->where('is_active', true)->orderBy('name')->get()
+        // Cargar departamentos según el país del usuario (vía municipio)
+        $departments = ($user->staff && $user->staff->municipality && $user->staff->municipality->department)
+            ? Department::where('country_id', $user->staff->municipality->department->country_id)->where('is_active', true)->orderBy('name')->get()
             : collect();
 
         // Cargar municipios según el departamento del usuario
-        $municipalities = $user->department_id
-            ? Municipality::where('department_id', $user->department_id)->where('is_active', true)->orderBy('name')->get()
+        $municipalities = ($user->staff && $user->staff->municipality)
+            ? Municipality::where('department_id', $user->staff->municipality->department_id)->where('is_active', true)->orderBy('name')->get()
             : collect();
 
         return view('modules.administration.user.edit', compact(
             'user', 'roles', 'schedules', 'countries', 'departments', 'municipalities',
-            'specialties', 'unityExecutions', 'workDepartments', 'genders'
+            'specialties', 'unityExecutions', 'workDepartments', 'genders', 'civilStatuses'
         ));
     }
 
@@ -340,8 +367,11 @@ class UserController extends Controller
             'first_last_name' => 'required|string|max:255',
             'email' => 'required|string|email|max:255|unique:users,email,' . $user->id,
             'password' => 'nullable|string|min:8',
-            'role_id' => 'nullable|exists:roles,id',
+             'role_id' => 'nullable|exists:roles,id',
             'gender_id' => 'nullable|exists:genders,id',
+            'civil_status_id' => 'nullable|exists:civil_statuses,id',
+            'cui' => 'nullable|string|max:13|unique:staff,cui,' . ($user->staff->id ?? 0),
+            'phone' => 'nullable|string|max:8',
         ]);
 
         try {
@@ -355,19 +385,7 @@ class UserController extends Controller
                 'second_last_name' => $request->second_last_name,
                 'married_last_name' => $request->married_last_name,
                 'email' => $request->email,
-                'cui' => $request->cui,
-                'nit' => $request->nit,
-                'marital_status' => $request->marital_status,
-                'phone' => $request->phone,
-                'birth_date' => $request->birth_date,
-                'gender_id' => $request->gender_id,
                 'role_id' => $request->role_id,
-                'specialty_id' => $request->specialty_id,
-                'schedule_id' => $request->schedule_id,
-                'country_id' => $request->country_id,
-                'department_id' => $request->department_id,
-                'municipality_id' => $request->municipality_id,
-                'address' => $request->address,
                 'is_active' => $request->input('is_active', 1) == '1',
             ];
 
@@ -396,6 +414,26 @@ class UserController extends Controller
             }
 
             $user->update($updateData);
+
+            // Update Staff record (create if not exists)
+            $user->staff()->updateOrCreate(
+                ['user_id' => $user->id],
+                [
+                    'cui' => $request->cui,
+                    'nit' => $request->nit,
+                    'civil_status_id' => $request->civil_status_id,
+                    'phone' => $request->phone,
+                    'birth_date' => $request->birth_date,
+                    'gender_id' => $request->gender_id,
+                    'specialty_id' => $request->specialty_id,
+                    'schedule_id' => $request->schedule_id,
+                    'municipality_id' => $request->municipality_id,
+                    'address' => $request->address,
+                    'unity_execution_id' => $request->unity_execution_id,
+                    'work_department_id' => $request->work_department_id,
+                    'collegiate_number' => $request->collegiate_number,
+                ]
+            );
 
             DB::commit();
 

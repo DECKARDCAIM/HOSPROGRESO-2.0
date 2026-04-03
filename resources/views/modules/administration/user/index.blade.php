@@ -312,11 +312,11 @@
                                     </td>
                                     <td>
                                         <span class="d-block h5 mb-0">{{ $user->role->name ?? 'Sin Rol' }}</span>
-                                        <span class="d-block fs-5">{{ $user->workDepartment->name ?? 'Sin departamento' }}</span>
+                                        <span class="d-block fs-5">{{ $user->staff->workDepartment->name ?? 'Sin departamento' }}</span>
                                     </td>
                                     <td>
-                                        <span class="d-block h5 mb-0">{{ $user->specialty->name ?? 'No especificada' }}</span>
-                                        <span class="d-block fs-5">{{ $user->collegiate_number ?? 'N/A' }}</span>
+                                        <span class="d-block h5 mb-0">{{ $user->staff->specialty->name ?? 'No especificada' }}</span>
+                                        <span class="d-block fs-5">{{ $user->staff->collegiate_number ?? 'N/A' }}</span>
                                     </td>
                                     <td>
                                         @if ($user->is_active)

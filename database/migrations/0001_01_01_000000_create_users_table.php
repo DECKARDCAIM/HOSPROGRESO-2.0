@@ -24,25 +24,7 @@ return new class extends Migration
 
             $table->string('profile_photo_path', 2048)->nullable();
             $table->string('banner_photo_path', 2048)->nullable();
-            $table->string('cui', 13)->nullable()->unique();
-            $table->string('nit')->nullable()->unique();
-            $table->enum('marital_status', ['soltero', 'casado', 'divorciado', 'viudo', 'union_libre'])->nullable();
-            $table->string('phone')->nullable();
             $table->foreignId('role_id')->nullable()->constrained('roles')->nullOnDelete();
-            $table->foreignId('unity_execution_id')->nullable()->constrained('unity_executions')->nullOnDelete();
-            $table->foreignId('work_department_id')->nullable()->constrained('work_departments')->nullOnDelete();
-
-            $table->foreignId('country_id')->nullable()->constrained('countries')->nullOnDelete();
-            $table->foreignId('department_id')->nullable()->constrained('departments')->nullOnDelete();
-            $table->foreignId('municipality_id')->nullable()->constrained('municipalities')->nullOnDelete();
-            $table->foreignId('schedule_id')->nullable()->constrained('schedules')->nullOnDelete();
-
-            $table->string('collegiate_number')->nullable();
-            $table->foreignId('specialty_id')->nullable()->constrained('specialties')->nullOnDelete();
-
-            $table->text('address')->nullable();
-            $table->date('birth_date')->nullable();
-            $table->foreignId('gender_id')->nullable()->constrained('genders')->onDelete('set null');
 
             $table->enum('estado', ['disponible', 'ocupado', 'ausente', 'privado', 'desconectado'])->default('disponible');
             $table->string('theme_preference')->nullable()->default('auto');

@@ -79,30 +79,33 @@
                                 <ul class="list-unstyled list-py-2 text-dark mb-0">
                                     <li class="pb-0"><span class="card-subtitle">Acerca de</span></li>
                                     <li><i class="bi-person dropdown-item-icon"></i> {{ $nombreCompleto }}</li>
-                                    <li><i class="bi-briefcase dropdown-item-icon"></i> {{ $user->workDepartment ? $user->workDepartment->name : ($user->unityExecution ? $user->unityExecution->name : 'Sin departamento') }}</li>
-                                    @if ($user->birth_date)
-                                    <li><i class="bi-calendar dropdown-item-icon"></i> Nacimiento: {{ date('d/m/Y', strtotime($user->birth_date)) }}</li>
+                                    <li><i class="bi-briefcase dropdown-item-icon"></i> {{ $user->staff->workDepartment->name ?? ($user->staff->unityExecution->name ?? 'Sin departamento') }}</li>
+                                    @if ($user->staff->birth_date ?? null)
+                                    <li><i class="bi-calendar dropdown-item-icon"></i> Nacimiento: {{ date('d/m/Y', strtotime($user->staff->birth_date)) }}</li>
                                     @endif
-                                    @if ($user->gender)
-                                    <li><i class="bi-gender-ambiguous dropdown-item-icon"></i> Género: {{ ucfirst($user->gender) }}</li>
+                                    @if ($user->staff->gender->name ?? null)
+                                    <li><i class="bi-gender-ambiguous dropdown-item-icon"></i> Género: {{ ucfirst($user->staff->gender->name) }}</li>
                                     @endif
-                                    @if ($user->marital_status)
-                                    <li><i class="bi-heart dropdown-item-icon"></i> Estado civil: {{ ucfirst(str_replace('_', ' ', $user->marital_status)) }}</li>
+                                    @if ($user->staff->marital_status ?? null)
+                                    <li><i class="bi-heart dropdown-item-icon"></i> Estado civil: {{ ucfirst(str_replace('_', ' ', $user->staff->marital_status)) }}</li>
                                     @endif
                                     <li class="pt-4 pb-0"><span class="card-subtitle">Contacto</span></li>
                                     <li><i class="bi-at dropdown-item-icon"></i> {{ $user->email }}</li>
-                                    @if ($user->phone)
-                                    <li><i class="bi-phone dropdown-item-icon"></i> {{ $user->phone }}</li>
+                                    @if ($user->staff->phone ?? null)
+                                    <li><i class="bi-phone dropdown-item-icon"></i> {{ $user->staff->phone }}</li>
                                     @endif
-                                    @if ($user->address)
-                                    <li><i class="bi-geo-alt dropdown-item-icon"></i> {{ $user->address }}</li>
+                                    @if ($user->staff->address ?? null)
+                                    <li><i class="bi-geo-alt dropdown-item-icon"></i> {{ $user->staff->address }}</li>
                                     @endif
                                     <li class="pt-4 pb-0"><span class="card-subtitle">Documentos</span></li>
-                                    @if ($user->cui)
-                                    <li><i class="bi-card-heading dropdown-item-icon"></i> CUI / DPI: {{ $user->cui }}</li>
+                                    @if ($user->staff->cui ?? null)
+                                    <li><i class="bi-card-heading dropdown-item-icon"></i> CUI: {{ $user->staff->cui }}</li>
                                     @endif
-                                    @if ($user->nit)
-                                    <li><i class="bi-card-text dropdown-item-icon"></i> NIT: {{ $user->nit }}</li>
+                                    @if ($user->staff->nit ?? null)
+                                    <li><i class="bi-card-text dropdown-item-icon"></i> NIT: {{ $user->staff->nit }}</li>
+                                    @endif
+                                    @if ($user->staff->collegiate_number ?? null)
+                                    <li><i class="bi-patch-check dropdown-item-icon"></i> Colegiado: {{ $user->staff->collegiate_number }}</li>
                                     @endif
                                     <li class="pt-4 pb-0"><span class="card-subtitle">Miembros del departamento</span></li>
                                     @forelse ($departamentMembers as $member)
