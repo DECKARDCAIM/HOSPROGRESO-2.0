@@ -4,6 +4,7 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Support\Facades\Cache;
 
 class Municipality extends Model
 {
@@ -18,6 +19,12 @@ class Municipality extends Model
     protected $casts = [
         'is_active' => 'boolean',
     ];
+
+    protected static function booted()
+    {
+        static::saved(fn () => Cache::tags(['municipalities'])->flush());
+        static::deleted(fn () => Cache::tags(['municipalities'])->flush());
+    }
 
     public function department()
     {
