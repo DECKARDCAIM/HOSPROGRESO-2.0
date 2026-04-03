@@ -2,28 +2,27 @@
 
 namespace App\Http\Requests;
 
-use Illuminate\Contracts\Validation\ValidationRule;
 use Illuminate\Foundation\Http\FormRequest;
+use Illuminate\Validation\Rule;
 
 class UpdateDepartmentRequest extends FormRequest
 {
-    /**
-     * Determine if the user is authorized to make this request.
-     */
     public function authorize(): bool
     {
         return true;
     }
 
-    /**
-     * Get the validation rules that apply to the request.
-     *
-     * @return array<string, \Illuminate\Contracts\Validation\ValidationRule|array<mixed>|string>
-     */
     public function rules(): array
     {
         return [
-            'name' => 'required|string|min:5',
+            'name' => [
+                'required',
+                'string',
+                'min:4',
+                Rule::unique('departments')
+                    ->where(fn ($query) => $query->where('country_id', $this->country_id))
+                    ->ignore($this->route('department')),
+            ],
             'country_id' => 'required|exists:countries,id',
         ];
     }
@@ -33,9 +32,10 @@ class UpdateDepartmentRequest extends FormRequest
         return [
             'name.required' => 'El campo nombre es obligatorio.',
             'name.string' => 'El campo nombre debe ser una cadena de texto.',
+            'name.min' => 'El campo nombre debe tener al menos 4 caracteres.',
+            'name.unique' => 'Este departamento ya se encuentra registrado en el país seleccionado.',
             'country_id.required' => 'El campo país es obligatorio.',
             'country_id.exists' => 'El país seleccionado no es válido.',
-            'name.min' => 'El campo nombre debe tener al menos 5 caracteres.',
         ];
     }
 }
