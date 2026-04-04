@@ -4,6 +4,7 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Support\Facades\Cache;
 
 class PatientRelative extends Model
 {
@@ -21,17 +22,17 @@ class PatientRelative extends Model
         'cui',
     ];
 
-    /**
-     * Get the patient that owns the relative.
-     */
+    protected static function booted()
+    {
+        static::saved(fn () => Cache::tags(['patient_relatives', 'patients'])->flush());
+        static::deleted(fn () => Cache::tags(['patient_relatives', 'patients'])->flush());
+    }
+
     public function patient()
     {
         return $this->belongsTo(Patient::class);
     }
 
-    /**
-     * Get the relationship type.
-     */
     public function relationshipType()
     {
         return $this->belongsTo(RelationshipType::class);
