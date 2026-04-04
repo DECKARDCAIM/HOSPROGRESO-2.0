@@ -61,12 +61,7 @@ class AllergyController extends Controller
     {
         $item = Allergy::create($request->validated());
 
-        $notification = [
-            'message' => 'La alergia "'.$item->name.'" se ha creado correctamente.',
-            'alert-type' => 'success',
-        ];
-
-        return redirect()->route('allergies.index')->with(compact('notification'));
+        return redirect()->route('allergies.index')->with('success', 'La alergia "'.$item->name.'" se ha creado correctamente.');
     }
 
     public function show(Allergy $allergy) {}
@@ -80,12 +75,7 @@ class AllergyController extends Controller
     {
         $allergy->update($request->validated());
 
-        $notification = [
-            'message' => 'La alergia "'.$allergy->name.'" se ha actualizado correctamente.',
-            'alert-type' => 'info',
-        ];
-
-        return redirect()->route('allergies.index')->with(compact('notification'));
+        return redirect()->route('allergies.index')->with('success', 'La alergia "'.$allergy->name.'" se ha actualizado correctamente.');
     }
 
     public function destroy(Allergy $allergy)
@@ -94,12 +84,7 @@ class AllergyController extends Controller
 
         Cache::tags(['allergies'])->flush();
 
-        $notification = [
-            'message' => 'La alergia "'.$allergy->name.'" ha sido desactivada.',
-            'alert-type' => 'warning',
-        ];
-
-        return redirect()->route('allergies.index')->with(compact('notification'));
+        return redirect()->route('allergies.index')->with('success', 'La alergia "'.$allergy->name.'" ha sido desactivada.');
     }
 
     public function restore(Allergy $allergy)
@@ -108,12 +93,7 @@ class AllergyController extends Controller
 
         Cache::tags(['allergies'])->flush();
 
-        $notification = [
-            'message' => 'La alergia "'.$allergy->name.'" ha sido reactivada.',
-            'alert-type' => 'success',
-        ];
-
-        return redirect()->route('allergies.index')->with(compact('notification'));
+        return redirect()->route('allergies.index')->with('success', 'La alergia "'.$allergy->name.'" ha sido reactivada.');
     }
 
     public function destroyMultiple(Request $request)

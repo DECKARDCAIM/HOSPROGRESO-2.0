@@ -61,12 +61,7 @@ class SpecialtyController extends Controller
     {
         $item = Specialty::create($request->validated());
 
-        $notification = [
-            'message' => 'La especialidad "'.$item->name.'" se ha creado correctamente.',
-            'alert-type' => 'success',
-        ];
-
-        return redirect()->route('specialties.index')->with(compact('notification'));
+        return redirect()->route('specialties.index')->with('success', 'La especialidad "'.$item->name.'" se ha creado correctamente.');
     }
 
     public function show(Specialty $specialty) {}
@@ -80,12 +75,7 @@ class SpecialtyController extends Controller
     {
         $specialty->update($request->validated());
 
-        $notification = [
-            'message' => 'La especialidad "'.$specialty->name.'" se ha actualizado correctamente.',
-            'alert-type' => 'info',
-        ];
-
-        return redirect()->route('specialties.index')->with(compact('notification'));
+        return redirect()->route('specialties.index')->with('success', 'La especialidad "'.$specialty->name.'" se ha actualizado correctamente.');
     }
 
     public function destroy(Specialty $specialty)
@@ -94,12 +84,7 @@ class SpecialtyController extends Controller
 
         Cache::tags(['specialties'])->flush();
 
-        $notification = [
-            'message' => 'La especialidad "'.$specialty->name.'" ha sido desactivada.',
-            'alert-type' => 'warning',
-        ];
-
-        return redirect()->route('specialties.index')->with(compact('notification'));
+        return redirect()->route('specialties.index')->with('success', 'La especialidad "'.$specialty->name.'" ha sido desactivada.');
     }
 
     public function restore(Specialty $specialty)
@@ -108,12 +93,7 @@ class SpecialtyController extends Controller
 
         Cache::tags(['specialties'])->flush();
 
-        $notification = [
-            'message' => 'La especialidad "'.$specialty->name.'" ha sido reactivada.',
-            'alert-type' => 'success',
-        ];
-
-        return redirect()->route('specialties.index')->with(compact('notification'));
+        return redirect()->route('specialties.index')->with('success', 'La especialidad "'.$specialty->name.'" ha sido reactivada.');
     }
 
     public function destroyMultiple(Request $request)

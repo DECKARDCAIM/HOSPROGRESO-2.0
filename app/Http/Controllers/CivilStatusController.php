@@ -61,12 +61,7 @@ class CivilStatusController extends Controller
     {
         $item = CivilStatus::create($request->validated());
 
-        $notification = [
-            'message' => 'El estado civil "'.$item->name.'" se ha creado correctamente.',
-            'alert-type' => 'success',
-        ];
-
-        return redirect()->route('civil-statuses.index')->with(compact('notification'));
+        return redirect()->route('civil-statuses.index')->with('success', 'El estado civil "'.$item->name.'" se ha creado correctamente.');
     }
 
     public function show(CivilStatus $civilStatus) {}
@@ -80,12 +75,7 @@ class CivilStatusController extends Controller
     {
         $civilStatus->update($request->validated());
 
-        $notification = [
-            'message' => 'El estado civil "'.$civilStatus->name.'" se ha actualizado correctamente.',
-            'alert-type' => 'info',
-        ];
-
-        return redirect()->route('civil-statuses.index')->with(compact('notification'));
+        return redirect()->route('civil-statuses.index')->with('success', 'El estado civil "'.$civilStatus->name.'" se ha actualizado correctamente.');
     }
 
     public function destroy(CivilStatus $civilStatus)
@@ -94,12 +84,7 @@ class CivilStatusController extends Controller
 
         Cache::tags(['civil_statuses'])->flush();
 
-        $notification = [
-            'message' => 'El estado civil "'.$civilStatus->name.'" ha sido desactivado.',
-            'alert-type' => 'warning',
-        ];
-
-        return redirect()->route('civil-statuses.index')->with(compact('notification'));
+        return redirect()->route('civil-statuses.index')->with('success', 'El estado civil "'.$civilStatus->name.'" ha sido desactivado.');
     }
 
     public function restore(CivilStatus $civilStatus)
@@ -108,12 +93,7 @@ class CivilStatusController extends Controller
 
         Cache::tags(['civil_statuses'])->flush();
 
-        $notification = [
-            'message' => 'El estado civil "'.$civilStatus->name.'" ha sido reactivado.',
-            'alert-type' => 'success',
-        ];
-
-        return redirect()->route('civil-statuses.index')->with(compact('notification'));
+        return redirect()->route('civil-statuses.index')->with('success', 'El estado civil "'.$civilStatus->name.'" ha sido reactivado.');
     }
 
     public function destroyMultiple(Request $request)

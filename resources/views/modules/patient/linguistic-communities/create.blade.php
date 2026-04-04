@@ -12,7 +12,18 @@
         <div class="col-auto"><a href="{{ route('linguistic-communities.index') }}" class="btn btn-primary"><i class="bi-arrow-left"></i> Regresar</a></div>
     </div></div>
     <div class="row justify-content-lg-center"><div class="col-lg-9">
-        <form action="{{ route('linguistic-communities.store') }}" method="POST" id="itemForm" class="needs-validation" novalidate>
+@if ($errors->any())
+                <div class="alert alert-danger text-white mb-4" role="alert">
+                    <strong>¡Ups! Ha ocurrido un problema:</strong>
+                    <ul class="mb-0 mt-2">
+                        @foreach ($errors->all() as $error)
+                            <li>{{ $error }}</li>
+                        @endforeach
+                    </ul>
+                </div>
+            @endif
+
+            <form action="{{ route('linguistic-communities.store') }}" method="POST" id="itemForm" class="needs-validation" novalidate>
             @csrf
             <div class="card card-lg mb-3 mb-lg-5">
                 <div class="card-header"><h4 class="card-header-title">Detalles del idioma</h4></div>
@@ -34,5 +45,5 @@
 </div></main>
 @endsection
 @push('scripts')
-<script>document.addEventListener('DOMContentLoaded',function(){const form=document.querySelector('#itemForm');form.addEventListener('submit',function(event){if(!form.checkValidity()){event.preventDefault();event.stopPropagation();const p=document.getElementById('loading-spinner');if(p){p.style.setProperty('display','none','important');p.style.opacity='0';}window.showToast('Atención','Por favor, completa los campos requeridos.','warning');}form.classList.add('was-validated');},false);});</script>
+<script>document.addEventListener('DOMContentLoaded',function(){const form=document.querySelector('#itemForm');form.addEventListener('submit',function(event){if(!form.checkValidity()){event.preventDefault();event.stopPropagation();const p=document.getElementById('loading-spinner');if(p){p.style.setProperty('display','none','important');p.style.opacity='0';}}form.classList.add('was-validated');},false);});</script>
 @endpush

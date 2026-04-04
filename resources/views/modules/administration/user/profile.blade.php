@@ -7,7 +7,7 @@
             <div class="col-lg-10">
                 <div class="profile-cover">
                     <div class="profile-cover-img-wrapper">
-                        <img id="profileCoverImg" class="profile-cover-img" src="{{ $user->banner_photo_path ? asset('storage/' . $user->banner_photo_path) : asset('img/1920x400/img2.jpg') }}" data-src="{{ $user->banner_photo_path ? asset('storage/' . $user->banner_photo_path) : asset('img/1920x400/img2.jpg') }}" alt="Image Description" onerror="this.onerror=null; retryImageLoad(this);">
+                        <img id="profileCoverImg" class="profile-cover-img" src="{{ $user->banner_photo_path ? asset('storage/' . $user->banner_photo_path) : asset('dist/img/1920x400/img2.jpg') }}" data-src="{{ $user->banner_photo_path ? asset('storage/' . $user->banner_photo_path) : asset('dist/img/1920x400/img2.jpg') }}" alt="Image Description" onerror="this.onerror=null; retryImageLoad(this);">
                     </div>
                 </div>
                 <div class="text-center mb-5">
@@ -62,7 +62,7 @@
                         </li>
                         <li class="nav-item ms-auto">
                             <div class="d-flex gap-2">
-                                <a class="btn btn-white btn-sm" href="{{ route('profile.index') }}">
+                                <a class="btn btn-white btn-sm" href="{{ route('users.index') }}">
                                     <i class="bi-arrow-left me-1"></i> Regresar
                                 </a>
                             </div>
@@ -133,17 +133,7 @@
                                                     </div>
                                                     @endif
                                                 </div>
-                                                @if($member->estado === 'disponible')
-                                                <span class="avatar-status avatar-sm-status avatar-status-success"></span>
-                                                @elseif($member->estado === 'ocupado')
-                                                <span class="avatar-status avatar-sm-status avatar-status-danger"></span>
-                                                @elseif($member->estado === 'ausente')
-                                                <span class="avatar-status avatar-sm-status avatar-status-warning"></span>
-                                                @elseif($member->estado === 'privado')
-                                                <span class="avatar-status avatar-sm-status avatar-status-dark"></span>
-                                                @elseif($member->estado === 'desconectado')
-                                                <span class="avatar-status avatar-sm-status avatar-status-secondary"></span>
-                                                @endif
+
                                             </div>
                                             <div class="flex-grow-1 ms-2">
                                                 <span class="text-dark">{{ $memNombreMostrar }}</span>

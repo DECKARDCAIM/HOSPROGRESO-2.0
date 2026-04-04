@@ -26,7 +26,6 @@ return new class extends Migration
             $table->string('banner_photo_path', 2048)->nullable();
             $table->foreignId('role_id')->nullable()->constrained('roles')->nullOnDelete();
 
-            $table->enum('estado', ['disponible', 'ocupado', 'ausente', 'privado', 'desconectado'])->default('disponible');
             $table->string('theme_preference')->nullable()->default('auto');
             $table->rememberToken();
             $table->timestamps();

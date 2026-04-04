@@ -50,7 +50,6 @@ class DatabaseSeeder extends Seeder
             'role_id' => $roleId,
             'profile_photo_path' => null,
             'banner_photo_path' => null,
-            'estado' => 'disponible',
             'theme_preference' => 'auto',
         ]);
 
@@ -79,7 +78,6 @@ class DatabaseSeeder extends Seeder
             'role_id' => $roleId,
             'profile_photo_path' => null,
             'banner_photo_path' => null,
-            'estado' => 'disponible',
             'theme_preference' => 'auto',
         ]);
 

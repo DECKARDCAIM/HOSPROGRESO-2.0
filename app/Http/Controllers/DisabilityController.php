@@ -61,12 +61,7 @@ class DisabilityController extends Controller
     {
         $item = Disability::create($request->validated());
 
-        $notification = [
-            'message' => 'La discapacidad "'.$item->name.'" se ha creado correctamente.',
-            'alert-type' => 'success',
-        ];
-
-        return redirect()->route('disabilities.index')->with(compact('notification'));
+        return redirect()->route('disabilities.index')->with('success', 'La discapacidad "'.$item->name.'" se ha creado correctamente.');
     }
 
     public function show(Disability $disability) {}
@@ -80,12 +75,7 @@ class DisabilityController extends Controller
     {
         $disability->update($request->validated());
 
-        $notification = [
-            'message' => 'La discapacidad "'.$disability->name.'" se ha actualizado correctamente.',
-            'alert-type' => 'info',
-        ];
-
-        return redirect()->route('disabilities.index')->with(compact('notification'));
+        return redirect()->route('disabilities.index')->with('success', 'La discapacidad "'.$disability->name.'" se ha actualizado correctamente.');
     }
 
     public function destroy(Disability $disability)
@@ -94,12 +84,7 @@ class DisabilityController extends Controller
 
         Cache::tags(['disabilities'])->flush();
 
-        $notification = [
-            'message' => 'La discapacidad "'.$disability->name.'" ha sido desactivada.',
-            'alert-type' => 'warning',
-        ];
-
-        return redirect()->route('disabilities.index')->with(compact('notification'));
+        return redirect()->route('disabilities.index')->with('success', 'La discapacidad "'.$disability->name.'" ha sido desactivada.');
     }
 
     public function restore(Disability $disability)
@@ -108,12 +93,7 @@ class DisabilityController extends Controller
 
         Cache::tags(['disabilities'])->flush();
 
-        $notification = [
-            'message' => 'La discapacidad "'.$disability->name.'" ha sido reactivada.',
-            'alert-type' => 'success',
-        ];
-
-        return redirect()->route('disabilities.index')->with(compact('notification'));
+        return redirect()->route('disabilities.index')->with('success', 'La discapacidad "'.$disability->name.'" ha sido reactivada.');
     }
 
     public function destroyMultiple(Request $request)

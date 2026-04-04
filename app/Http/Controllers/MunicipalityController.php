@@ -102,12 +102,7 @@ class MunicipalityController extends Controller
     {
         $municipality = Municipality::create($request->validated());
 
-        $notification = [
-            'message' => 'El municipio '.$municipality->name.' se ha creado correctamente.',
-            'alert-type' => 'success',
-        ];
-
-        return redirect()->route('municipalities.index')->with(compact('notification'));
+        return redirect()->route('municipalities.index')->with('success', 'El municipio '.$municipality->name.' se ha creado correctamente.');
     }
 
     public function show(Municipality $municipality) {}
@@ -129,12 +124,7 @@ class MunicipalityController extends Controller
     {
         $municipality->update($request->validated());
 
-        $notification = [
-            'message' => 'El municipio '.$municipality->name.' se ha actualizado correctamente.',
-            'alert-type' => 'info',
-        ];
-
-        return redirect()->route('municipalities.index')->with(compact('notification'));
+        return redirect()->route('municipalities.index')->with('success', 'El municipio '.$municipality->name.' se ha actualizado correctamente.');
     }
 
     public function destroy(Municipality $municipality)
@@ -143,12 +133,7 @@ class MunicipalityController extends Controller
 
         Cache::tags(['municipalities'])->flush();
 
-        $notification = [
-            'message' => 'El municipio '.$municipality->name.' ha sido desactivado correctamente.',
-            'alert-type' => 'warning',
-        ];
-
-        return redirect()->route('municipalities.index')->with(compact('notification'));
+        return redirect()->route('municipalities.index')->with('success', 'El municipio '.$municipality->name.' ha sido desactivado correctamente.');
     }
 
     public function restore(Municipality $municipality)
@@ -157,12 +142,7 @@ class MunicipalityController extends Controller
 
         Cache::tags(['municipalities'])->flush();
 
-        $notification = [
-            'message' => 'El municipio '.$municipality->name.' ha sido reactivado correctamente.',
-            'alert-type' => 'success',
-        ];
-
-        return redirect()->route('municipalities.index')->with(compact('notification'));
+        return redirect()->route('municipalities.index')->with('success', 'El municipio '.$municipality->name.' ha sido reactivado correctamente.');
     }
 
     public function destroyMultiple(Request $request)

@@ -25,7 +25,18 @@
         </div>
         <div class="row justify-content-lg-center">
             <div class="col-lg-10">
-                <form action="{{ route('patient-relatives.update', $patientRelative->id) }}" method="POST" id="mainForm" class="needs-validation" novalidate>
+@if ($errors->any())
+                <div class="alert alert-danger text-white mb-4" role="alert">
+                    <strong>¡Ups! Ha ocurrido un problema:</strong>
+                    <ul class="mb-0 mt-2">
+                        @foreach ($errors->all() as $error)
+                            <li>{{ $error }}</li>
+                        @endforeach
+                    </ul>
+                </div>
+            @endif
+
+            <form action="{{ route('patient-relatives.update', $patientRelative->id) }}" method="POST" id="mainForm" class="needs-validation" novalidate>
                     @csrf
                     @method('PUT')
                     <div class="card card-lg mb-3 mb-lg-5">
@@ -71,11 +82,11 @@
                                 </div>
                                 <div class="col-sm-4 mb-4">
                                     <label for="secondNameLabel" class="form-label">Segundo Nombre</label>
-                                    <input type="text" class="form-control" name="second_name" id="secondNameLabel" placeholder="Ej. Antonio" value="{{ old('second_name', $patientRelative->second_name) }}">
+                                    <input type="text" class="form-control @error('second_name') is-invalid @enderror" name="second_name" id="secondNameLabel" placeholder="Ej. Antonio" value="{{ old('second_name', $patientRelative->second_name) }}">
                                 </div>
                                 <div class="col-sm-4 mb-4">
                                     <label for="thirdNameLabel" class="form-label">Tercer Nombre</label>
-                                    <input type="text" class="form-control" name="third_name" id="thirdNameLabel" placeholder="Otros nombres" value="{{ old('third_name', $patientRelative->third_name) }}">
+                                    <input type="text" class="form-control @error('third_name') is-invalid @enderror" name="third_name" id="thirdNameLabel" placeholder="Otros nombres" value="{{ old('third_name', $patientRelative->third_name) }}">
                                 </div>
                             </div>
                             <div class="row">
@@ -85,11 +96,11 @@
                                 </div>
                                 <div class="col-sm-4 mb-4">
                                     <label for="secondLastLabel" class="form-label">Segundo Apellido</label>
-                                    <input type="text" class="form-control" name="second_last_name" id="secondLastLabel" placeholder="Ej. García" value="{{ old('second_last_name', $patientRelative->second_last_name) }}">
+                                    <input type="text" class="form-control @error('second_last_name') is-invalid @enderror" name="second_last_name" id="secondLastLabel" placeholder="Ej. García" value="{{ old('second_last_name', $patientRelative->second_last_name) }}">
                                 </div>
                                 <div class="col-sm-4 mb-4">
                                     <label for="marriedLastLabel" class="form-label">Apellido de Casada</label>
-                                    <input type="text" class="form-control" name="married_last_name" id="marriedLastLabel" placeholder="Si aplica" value="{{ old('married_last_name', $patientRelative->married_last_name) }}">
+                                    <input type="text" class="form-control @error('married_last_name') is-invalid @enderror" name="married_last_name" id="marriedLastLabel" placeholder="Si aplica" value="{{ old('married_last_name', $patientRelative->married_last_name) }}">
                                 </div>
                             </div>
                             <div class="row">
@@ -121,7 +132,7 @@
             if (!form.checkValidity()) {
                 event.preventDefault();
                 event.stopPropagation();
-                window.showToast('Atención', 'Por favor, completa los campos requeridos.', 'warning');
+                
             }
             form.classList.add('was-validated');
         }, false);

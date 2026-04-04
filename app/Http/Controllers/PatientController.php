@@ -167,12 +167,7 @@ class PatientController extends Controller
             $patient->disabilities()->sync($request->input('disabilities', []));
         });
 
-        $notification = [
-            'message' => 'Paciente registrado exitosamente.',
-            'alert-type' => 'success',
-        ];
-
-        return redirect()->route('patients.index')->with('notification', $notification);
+        return redirect()->route('patients.index')->with('success', 'Paciente registrado exitosamente.');
     }
 
     public function show(Patient $patient)
@@ -252,24 +247,14 @@ class PatientController extends Controller
             $patient->disabilities()->sync($request->input('disabilities', []));
         });
 
-        $notification = [
-            'message' => 'Paciente actualizado exitosamente.',
-            'alert-type' => 'info',
-        ];
-
-        return redirect()->route('patients.index')->with('notification', $notification);
+        return redirect()->route('patients.index')->with('success', 'Paciente actualizado exitosamente.');
     }
 
     public function destroy(Patient $patient)
     {
         $patient->delete();
 
-        $notification = [
-            'message' => 'Paciente eliminado exitosamente.',
-            'alert-type' => 'warning',
-        ];
-
-        return redirect()->route('patients.index')->with('notification', $notification);
+        return redirect()->route('patients.index')->with('success', 'Paciente eliminado exitosamente.');
     }
 
     public function destroyMultiple(Request $request)
@@ -292,12 +277,7 @@ class PatientController extends Controller
         $patient = Patient::withTrashed()->findOrFail($id);
         $patient->restore();
 
-        $notification = [
-            'message' => 'Paciente reactivado exitosamente.',
-            'alert-type' => 'success',
-        ];
-
-        return redirect()->route('patients.index')->with('notification', $notification);
+        return redirect()->route('patients.index')->with('success', 'Paciente reactivado exitosamente.');
     }
 
     public function exportExcel(Request $request)

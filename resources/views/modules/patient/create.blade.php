@@ -21,7 +21,19 @@
                         </a>
                     </div>
                 </div>
-            </div>
+</div>
+            
+            @if ($errors->any())
+                <div class="alert alert-danger text-white mb-4" role="alert">
+                    <strong>¡Ups! Ha ocurrido un problema:</strong>
+                    <ul class="mb-0 mt-2">
+                        @foreach ($errors->all() as $error)
+                            <li>{{ $error }}</li>
+                        @endforeach
+                    </ul>
+                </div>
+            @endif
+
             <form id="addPatientForm" action="{{ route('patients.store') }}" method="POST" class="js-step-form py-md-5" autocomplete="off" data-hs-step-form-options='{"progressSelector": "#addUserStepFormProgress","stepsSelector": "#addUserStepFormContent","endSelector": "#addUserFinishBtn","isValidate": false}'>
                 @csrf
                 <div class="row justify-content-lg-center">
@@ -80,9 +92,9 @@
                                         <label for="firstNameLabel" class="col-sm-3 col-form-label form-label">Nombres <i class="bi-question-circle text-body ms-1" data-bs-toggle="tooltip" data-bs-placement="top" title="Rellene los nombres del paciente"></i></label>
                                         <div class="col-sm-9">
                                             <div class="input-group input-group-sm-vertical">
-                                                <input type="text" class="form-control" name="first_name" id="firstNameLabel" placeholder="Primer nombre" aria-label="Primer nombre" required>
-                                                <input type="text" class="form-control" name="second_name" id="secondNameLabel" placeholder="Segundo nombre" aria-label="Segundo nombre">
-                                                <input type="text" class="form-control" name="third_name" id="thirdNameLabel" placeholder="Tercer nombre" aria-label="Tercer nombre">
+                                                <input type="text" class="form-control @error('first_name') is-invalid @enderror" name="first_name" value="{{ old('first_name') }}" id="firstNameLabel" placeholder="Primer nombre" aria-label="Primer nombre" required>
+                                                <input type="text" class="form-control @error('second_name') is-invalid @enderror" name="second_name" value="{{ old('second_name') }}" id="secondNameLabel" placeholder="Segundo nombre" aria-label="Segundo nombre">
+                                                <input type="text" class="form-control @error('third_name') is-invalid @enderror" name="third_name" value="{{ old('third_name') }}" id="thirdNameLabel" placeholder="Tercer nombre" aria-label="Tercer nombre">
                                             </div>
                                         </div>
                                     </div>
@@ -90,9 +102,9 @@
                                         <label for="firstLastNameLabel" class="col-sm-3 col-form-label form-label">Apellidos <i class="bi-question-circle text-body ms-1" data-bs-toggle="tooltip" data-bs-placement="top" title="Rellene los apellidos del paciente"></i></label>
                                         <div class="col-sm-9">
                                             <div class="input-group input-group-sm-vertical">
-                                                <input type="text" class="form-control" name="first_last_name" id="firstLastNameLabel" placeholder="Primer apellido" aria-label="Primer apellido" required>
-                                                <input type="text" class="form-control" name="second_last_name" id="secondLastNameLabel" placeholder="Segundo apellido" aria-label="Segundo apellido">
-                                                <input type="text" class="form-control" name="married_last_name" id="marriedLastNameLabel" placeholder="Apellido de casada" aria-label="Apellido de casada">
+                                                <input type="text" class="form-control @error('first_last_name') is-invalid @enderror" name="first_last_name" value="{{ old('first_last_name') }}" id="firstLastNameLabel" placeholder="Primer apellido" aria-label="Primer apellido" required>
+                                                <input type="text" class="form-control @error('second_last_name') is-invalid @enderror" name="second_last_name" value="{{ old('second_last_name') }}" id="secondLastNameLabel" placeholder="Segundo apellido" aria-label="Segundo apellido">
+                                                <input type="text" class="form-control @error('married_last_name') is-invalid @enderror" name="married_last_name" value="{{ old('married_last_name') }}" id="marriedLastNameLabel" placeholder="Apellido de casada" aria-label="Apellido de casada">
                                             </div>
                                         </div>
                                     </div>
@@ -101,13 +113,13 @@
                                             <div class="col-md-6">
                                                 <label for="cuiLabel" class="col-sm-3 col-form-label form-label">CUI <i class="bi-question-circle text-body ms-1" data-bs-toggle="tooltip" data-bs-placement="top" title="Rellene el CUI del paciente"></i></label>
                                                 <div class="col-sm-9">
-                                                    <input type="text" class="js-input-mask form-control" name="cui" id="cuiLabel" placeholder="0000 00000 0000" aria-label="CUI" data-hs-mask-options='{"mask": "0000 00000 0000"}'>
+                                                    <input type="text" class="js-input-mask form-control @error('cui') is-invalid @enderror" name="cui" value="{{ old('cui') }}" id="cuiLabel" placeholder="0000000000000" aria-label="CUI" data-hs-mask-options='{"mask": "0000000000000"}'>
                                                 </div>
                                             </div>
                                             <div class="col-md-6">
                                                 <label for="birthDateLabel" class="col-sm-6 col-form-label form-label">Fecha de nacimiento</label>
                                                 <div class="col-sm-9">
-                                                    <input type="date" class="form-control" name="birth_date" id="birthDateLabel" required>
+                                                    <input type="date" class="form-control @error('birth_date') is-invalid @enderror" name="birth_date" value="{{ old('birth_date') }}" id="birthDateLabel" required>
                                                 </div>
                                             </div>
                                         </div>
@@ -122,13 +134,13 @@
                                             <div class="col-md-6">
                                                 <label for="emailLabel" class="col-sm-9 col-form-label form-label">Correo electrónico <span class="form-label-secondary">(Opcional)</span></label>
                                                 <div class="col-sm-9">
-                                                    <input type="email" class="form-control" name="email" id="emailLabel" placeholder="ejemplo@correo.com" aria-label="ejemplo@correo.com">
+                                                    <input type="email" class="form-control @error('email') is-invalid @enderror" name="email" value="{{ old('email') }}" id="emailLabel" placeholder="ejemplo@correo.com" aria-label="ejemplo@correo.com">
                                                 </div>
                                             </div>
                                             <div class="col-md-6">
                                                 <label for="phoneLabel" class="col-sm-9 col-form-label form-label">Teléfono <span class="form-label-secondary">(Opcional)</span></label>
                                                 <div class="col-sm-9">
-                                                    <input type="text" class="js-input-mask form-control" name="phone" id="phoneLabel" placeholder="00000000" aria-label="00000000" data-hs-mask-options='{"mask": "00000000"}'>
+                                                    <input type="text" class="js-input-mask form-control @error('phone') is-invalid @enderror" name="phone" value="{{ old('phone') }}" id="phoneLabel" placeholder="00000000" aria-label="00000000" data-hs-mask-options='{"mask": "00000000"}'>
                                                 </div>
                                             </div>
                                         </div>
@@ -143,10 +155,10 @@
                                             <div class="col-md-6">
                                                 <label for="genderLabel" class="form-label">Género</label>
                                                 <div class="tom-select-custom">
-                                                    <select class="js-select form-select form-select-sm" name="gender_id" id="genderLabel" data-hs-tom-select-options='{ "placeholder": "Seleccione género..." }'>
+                                                    <select class="js-select form-select form-select-sm @error('gender_id') is-invalid @enderror" name="gender_id" id="genderLabel" data-hs-tom-select-options='{ "placeholder": "Seleccione género..." }'>
                                                         <option value="">Seleccione</option>
                                                         @foreach ($genders as $gender)
-                                                            <option value="{{ $gender->id }}">{{ $gender->name }}</option>
+                                                            <option value="{{ $gender->id }}" {{ old('gender_id') == $gender->id ? 'selected' : '' }}>{{ $gender->name }}</option>
                                                         @endforeach
                                                     </select>
                                                 </div>
@@ -154,10 +166,10 @@
                                             <div class="col-md-6">
                                                 <label for="civilStatusLabel" class="form-label">Estado civil</label>
                                                 <div class="tom-select-custom">
-                                                    <select class="js-select form-select form-select-sm" name="civil_status_id" id="civilStatusLabel" data-hs-tom-select-options='{ "placeholder": "Seleccione estado civil..." }'>
+                                                    <select class="js-select form-select form-select-sm @error('civil_status_id') is-invalid @enderror" name="civil_status_id" id="civilStatusLabel" data-hs-tom-select-options='{ "placeholder": "Seleccione estado civil..." }'>
                                                         <option value="">Seleccione</option>
                                                         @foreach ($civilStatuses as $status)
-                                                            <option value="{{ $status->id }}">{{ $status->name }}</option>
+                                                            <option value="{{ $status->id }}" {{ old('civil_status_id') == $status->id ? 'selected' : '' }}>{{ $status->name }}</option>
                                                         @endforeach
                                                     </select>
                                                 </div>
@@ -167,10 +179,10 @@
                                             <div class="col-md-6">
                                                 <label for="ethnicityLabel" class="form-label">Etnia</label>
                                                 <div class="tom-select-custom">
-                                                    <select class="js-select form-select form-select-sm" name="ethnicity_id" id="ethnicityLabel" data-hs-tom-select-options='{ "placeholder": "Seleccione etnia..." }'>
+                                                    <select class="js-select form-select form-select-sm @error('ethnicity_id') is-invalid @enderror" name="ethnicity_id" id="ethnicityLabel" data-hs-tom-select-options='{ "placeholder": "Seleccione etnia..." }'>
                                                         <option value="">Seleccione</option>
                                                         @foreach ($ethnicities as $ethnicity)
-                                                            <option value="{{ $ethnicity->id }}">{{ $ethnicity->name }}</option>
+                                                            <option value="{{ $ethnicity->id }}" {{ old('ethnicity_id') == $ethnicity->id ? 'selected' : '' }}>{{ $ethnicity->name }}</option>
                                                         @endforeach
                                                     </select>
                                                 </div>
@@ -178,10 +190,10 @@
                                             <div class="col-md-6">
                                                 <label for="linguisticCommunityLabel" class="form-label">Comunidad lingüística</label>
                                                 <div class="tom-select-custom">
-                                                    <select class="js-select form-select form-select-sm" name="linguistic_community_id" id="linguisticCommunityLabel" data-hs-tom-select-options='{ "placeholder": "Seleccione comunidad..." }'>
+                                                    <select class="js-select form-select form-select-sm @error('linguistic_community_id') is-invalid @enderror" name="linguistic_community_id" id="linguisticCommunityLabel" data-hs-tom-select-options='{ "placeholder": "Seleccione comunidad..." }'>
                                                         <option value="">Seleccione</option>
                                                         @foreach ($linguisticCommunities as $community)
-                                                            <option value="{{ $community->id }}">{{ $community->name }}</option>
+                                                            <option value="{{ $community->id }}" {{ old('linguistic_community_id') == $community->id ? 'selected' : '' }}>{{ $community->name }}</option>
                                                         @endforeach
                                                     </select>
                                                 </div>
@@ -198,20 +210,20 @@
                                             <div class="col-md-6">
                                                 <label for="educationLabel" class="form-label">Escolaridad <span class="form-label-secondary">(Opcional)</span></label>
                                                 <div class="tom-select-custom">
-                                                    <select class="js-select form-select form-select-sm" name="education" id="educationLabel" data-hs-tom-select-options='{ "placeholder": "Seleccione escolaridad..." }'>
+                                                    <select class="js-select form-select form-select-sm @error('education') is-invalid @enderror" name="education" id="educationLabel" data-hs-tom-select-options='{ "placeholder": "Seleccione escolaridad..." }'>
                                                         <option value="">Seleccione</option>
-                                                        <option value="ninguna">Ninguna</option>
-                                                        <option value="primaria">Primaria</option>
-                                                        <option value="basico">Básico</option>
-                                                        <option value="diversificado">Diversificado</option>
-                                                        <option value="universitario">Universitario</option>
-                                                        <option value="postgrado">Postgrado</option>
+                                                        <option value="ninguna" {{ old('education') == 'ninguna' ? 'selected' : '' }}>Ninguna</option>
+                                                        <option value="primaria" {{ old('education') == 'primaria' ? 'selected' : '' }}>Primaria</option>
+                                                        <option value="basico" {{ old('education') == 'basico' ? 'selected' : '' }}>Básico</option>
+                                                        <option value="diversificado" {{ old('education') == 'diversificado' ? 'selected' : '' }}>Diversificado</option>
+                                                        <option value="universitario" {{ old('education') == 'universitario' ? 'selected' : '' }}>Universitario</option>
+                                                        <option value="postgrado" {{ old('education') == 'postgrado' ? 'selected' : '' }}>Postgrado</option>
                                                     </select>
                                                 </div>
                                             </div>
                                             <div class="col-md-6">
                                                 <label for="occupationLabel" class="form-label">Ocupación <span class="form-label-secondary">(Opcional)</span></label>
-                                                <input type="text" class="form-control form-control-sm" name="occupation" id="occupationLabel" placeholder="Ej: Agricultor, Estudiante, Ama de casa...">
+                                                <input type="text" class="form-control form-control-sm @error('occupation') is-invalid @enderror" name="occupation" value="{{ old('occupation') }}" id="occupationLabel" placeholder="Ej: Agricultor, Estudiante, Ama de casa...">
                                             </div>
                                         </div>
                                     </div>
@@ -227,9 +239,9 @@
                                                 <p class="text-muted small">No hay alergias registradas en el catálogo.</p>
                                             @else
                                                 <div class="tom-select-custom tom-select-custom-with-tags">
-                                                    <select class="js-select form-select" name="allergies[]" id="allergiesSelect" multiple data-hs-tom-select-options='{ "placeholder": "Seleccione alergias..." }'>
+                                                    <select class="js-select form-select @error('allergies') is-invalid @enderror" name="allergies[]" id="allergiesSelect" multiple data-hs-tom-select-options='{ "placeholder": "Seleccione alergias..." }'>
                                                         @foreach ($allergies as $allergy)
-                                                            <option value="{{ $allergy->id }}">{{ $allergy->name }}</option>
+                                                            <option value="{{ $allergy->id }}" {{ (is_array(old('allergies')) && in_array($allergy->id, old('allergies'))) ? 'selected' : '' }}>{{ $allergy->name }}</option>
                                                         @endforeach
                                                     </select>
                                                 </div>
@@ -248,9 +260,9 @@
                                                 <p class="text-muted small">No hay discapacidades registradas en el catálogo.</p>
                                             @else
                                                 <div class="tom-select-custom tom-select-custom-with-tags">
-                                                    <select class="js-select form-select" name="disabilities[]" id="disabilitiesSelect" multiple data-hs-tom-select-options='{ "placeholder": "Seleccione discapacidades..." }'>
+                                                    <select class="js-select form-select @error('disabilities') is-invalid @enderror" name="disabilities[]" id="disabilitiesSelect" multiple data-hs-tom-select-options='{ "placeholder": "Seleccione discapacidades..." }'>
                                                         @foreach ($disabilities as $disability)
-                                                            <option value="{{ $disability->id }}">{{ $disability->name }}</option>
+                                                            <option value="{{ $disability->id }}" {{ (is_array(old('disabilities')) && in_array($disability->id, old('disabilities'))) ? 'selected' : '' }}>{{ $disability->name }}</option>
                                                         @endforeach
                                                     </select>
                                                 </div>
@@ -268,10 +280,10 @@
                                         <label for="countryLabel" class="col-sm-3 col-form-label form-label">País</label>
                                         <div class="col-sm-9">
                                                 <div class="tom-select-custom">
-                                                    <select class="js-select form-select" name="country_id" id="countryLabel" data-hs-tom-select-options='{ "placeholder": "Seleccione un país" }'>
+                                                    <select class="js-select form-select @error('country_id') is-invalid @enderror" name="country_id" id="countryLabel" data-hs-tom-select-options='{ "placeholder": "Seleccione un país" }'>
                                                         <option value="">Seleccione un país</option>
                                                         @foreach ($countries as $country)
-                                                            <option value="{{ $country->id }}">{{ $country->name }}</option>
+                                                            <option value="{{ $country->id }}" {{ old('country_id') == $country->id ? 'selected' : '' }}>{{ $country->name }}</option>
                                                         @endforeach
                                                     </select>
                                                 </div>
@@ -281,7 +293,7 @@
                                             <label for="departmentLabel" class="col-sm-3 col-form-label form-label">Departamento</label>
                                             <div class="col-sm-9">
                                                 <div class="tom-select-custom">
-                                                    <select class="js-select form-select" name="department_id" id="departmentLabel" disabled data-hs-tom-select-options='{ "placeholder": "Seleccione primero un país" }'>
+                                                    <select class="js-select form-select @error('department_id') is-invalid @enderror" name="department_id" id="departmentLabel" disabled data-hs-tom-select-options='{ "placeholder": "Seleccione primero un país" }'>
                                                         <option value="">Seleccione primero un país</option>
                                                     </select>
                                                 </div>
@@ -291,7 +303,7 @@
                                             <label for="municipalityLabel" class="col-sm-3 col-form-label form-label">Municipio</label>
                                             <div class="col-sm-9">
                                                 <div class="tom-select-custom">
-                                                    <select class="js-select form-select" name="municipality_id" id="municipalityLabel" disabled data-hs-tom-select-options='{ "placeholder": "Seleccione primero un departamento" }'>
+                                                    <select class="js-select form-select @error('municipality_id') is-invalid @enderror" name="municipality_id" id="municipalityLabel" disabled data-hs-tom-select-options='{ "placeholder": "Seleccione primero un departamento" }'>
                                                         <option value="">Seleccione primero un departamento</option>
                                                     </select>
                                                 </div>
@@ -300,7 +312,7 @@
                                     <div class="row mb-4">
                                         <label for="placeLabel" class="col-sm-3 col-form-label form-label">Dirección</label>
                                         <div class="col-sm-9">
-                                            <input type="text" class="form-control" name="place" id="placeLabel" placeholder="Dirección exacta" aria-label="Dirección exacta">
+                                            <input type="text" class="form-control @error('place') is-invalid @enderror" name="place" value="{{ old('place') }}" id="placeLabel" placeholder="Dirección exacta" aria-label="Dirección exacta">
                                         </div>
                                     </div>
                                 </div>
@@ -359,7 +371,7 @@
                                                 </div>
                                                 <div class="col-md-6">
                                                     <label class="form-label form-label-sm">CUI</label>
-                                                    <input type="text" class="form-control form-control-sm js-input-mask" id="newRelCui" placeholder="0000 00000 0000" data-hs-mask-options='{"mask": "0000 00000 0000"}'>
+                                                    <input type="text" class="form-control form-control-sm js-input-mask" id="newRelCui" placeholder="0000000000000" data-hs-mask-options='{"mask": "0000000000000"}'>
                                                 </div>
                                                 <div class="col-md-6 d-flex align-items-end">
                                                     <button type="button" class="btn btn-primary btn-sm w-100" id="btnSaveNewRelative">
@@ -693,7 +705,7 @@
                         ${rel.cui ? `<div class="text-muted small">CUI: ${rel.cui}</div>` : ''}
                     </div>
                     <div style="min-width:180px;">
-                        <select class="form-select form-select-sm" name="relatives[${idx}][relationship_type_id]" required>
+                        <select class="form-select form-select-sm @error('relatives[${idx}][relationship_type_id]') is-invalid @enderror" name="relatives[${idx}][relationship_type_id]" required>
                             <option value="">Relación *</option>
                             @foreach ($relationshipTypes as $type)
                                 <option value="{{ $type->id }}">{{ ucfirst($type->name) }}</option>

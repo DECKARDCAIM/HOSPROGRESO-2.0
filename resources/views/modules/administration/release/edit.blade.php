@@ -132,18 +132,30 @@
                     </div>
                 </div>
             </div>
+            
+            @if ($errors->any())
+                <div class="alert alert-danger text-white mb-4" role="alert">
+                    <strong>¡Ups! Ha ocurrido un problema:</strong>
+                    <ul class="mb-0 mt-2">
+                        @foreach ($errors->all() as $error)
+                            <li>{{ $error }}</li>
+                        @endforeach
+                    </ul>
+                </div>
+            @endif
+
             <form action="{{ route('releases.update', $release->id) }}" method="POST" enctype="multipart/form-data" id="releaseForm">
                 @csrf
                 @method('PUT')
-                <input type="hidden" name="content" id="content_hidden">
-                <input type="hidden" name="type" id="type_hidden" value="{{ old('type', $release->type) }}">
-                <input type="hidden" name="status" id="status_hidden" value="{{ old('status', $release->status) }}">
+                <input type="hidden" name="content" class="@error('content') is-invalid @enderror" id="content_hidden">
+                <input type="hidden" name="type" class="@error('type') is-invalid @enderror" id="type_hidden" value="{{ old('type', $release->type) }}">
+                <input type="hidden" name="status" class="@error('status') is-invalid @enderror" id="status_hidden" value="{{ old('status', $release->status) }}">
                 <div class="row">
                     <div class="col-lg-8 mb-4 mb-lg-0">
                         <div class="card mb-3 mb-lg-4">
                             <div class="card-body">
                                 <label class="form-label">Título del Documento</label>
-                                <input type="text" name="title" class="form-control form-control-lg" placeholder="Escribe el título..." value="{{ old('title', $release->title) }}" required>
+                                <input type="text" name="title" class="form-control form-control-lg @error('title') is-invalid @enderror" placeholder="Escribe el título..." value="{{ old('title', $release->title) }}" required>
                             </div>
                         </div>
                         <div class="card mb-3 mb-lg-4">

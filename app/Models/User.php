@@ -24,7 +24,6 @@ class User extends Authenticatable
         'is_active',
         'profile_photo_path',
         'banner_photo_path',
-        'estado',
         'theme_preference',
     ];
 

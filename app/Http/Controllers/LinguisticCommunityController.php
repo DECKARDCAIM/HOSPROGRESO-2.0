@@ -61,12 +61,7 @@ class LinguisticCommunityController extends Controller
     {
         $item = LinguisticCommunity::create($request->validated());
 
-        $notification = [
-            'message' => 'El idioma "'.$item->name.'" se ha creado correctamente.',
-            'alert-type' => 'success',
-        ];
-
-        return redirect()->route('linguistic-communities.index')->with(compact('notification'));
+        return redirect()->route('linguistic-communities.index')->with('success', 'El idioma "'.$item->name.'" se ha creado correctamente.');
     }
 
     public function show(LinguisticCommunity $linguisticCommunity) {}
@@ -80,12 +75,7 @@ class LinguisticCommunityController extends Controller
     {
         $linguisticCommunity->update($request->validated());
 
-        $notification = [
-            'message' => 'El idioma "'.$linguisticCommunity->name.'" se ha actualizado correctamente.',
-            'alert-type' => 'info',
-        ];
-
-        return redirect()->route('linguistic-communities.index')->with(compact('notification'));
+        return redirect()->route('linguistic-communities.index')->with('success', 'El idioma "'.$linguisticCommunity->name.'" se ha actualizado correctamente.');
     }
 
     public function destroy(LinguisticCommunity $linguisticCommunity)
@@ -94,12 +84,7 @@ class LinguisticCommunityController extends Controller
 
         Cache::tags(['linguistic_communities'])->flush();
 
-        $notification = [
-            'message' => 'El idioma "'.$linguisticCommunity->name.'" ha sido desactivado.',
-            'alert-type' => 'warning',
-        ];
-
-        return redirect()->route('linguistic-communities.index')->with(compact('notification'));
+        return redirect()->route('linguistic-communities.index')->with('success', 'El idioma "'.$linguisticCommunity->name.'" ha sido desactivado.');
     }
 
     public function restore(LinguisticCommunity $linguisticCommunity)
@@ -108,12 +93,7 @@ class LinguisticCommunityController extends Controller
 
         Cache::tags(['linguistic_communities'])->flush();
 
-        $notification = [
-            'message' => 'El idioma "'.$linguisticCommunity->name.'" ha sido reactivado.',
-            'alert-type' => 'success',
-        ];
-
-        return redirect()->route('linguistic-communities.index')->with(compact('notification'));
+        return redirect()->route('linguistic-communities.index')->with('success', 'El idioma "'.$linguisticCommunity->name.'" ha sido reactivado.');
     }
 
     public function destroyMultiple(Request $request)

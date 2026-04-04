@@ -78,12 +78,7 @@ class DepartmentController extends Controller
     {
         $department = Department::create($request->validated());
 
-        $notification = [
-            'message' => 'El departamento '.$department->name.' se ha creado correctamente.',
-            'alert-type' => 'success',
-        ];
-
-        return redirect()->route('departments.index')->with(compact('notification'));
+        return redirect()->route('departments.index')->with('success', 'El departamento '.$department->name.' se ha creado correctamente.');
     }
 
     public function show(Department $department) {}
@@ -101,12 +96,7 @@ class DepartmentController extends Controller
     {
         $department->update($request->validated());
 
-        $notification = [
-            'message' => 'El departamento '.$department->name.' se ha actualizado correctamente.',
-            'alert-type' => 'info',
-        ];
-
-        return redirect()->route('departments.index')->with(compact('notification'));
+        return redirect()->route('departments.index')->with('success', 'El departamento '.$department->name.' se ha actualizado correctamente.');
     }
 
     public function destroy(Department $department)
@@ -116,12 +106,7 @@ class DepartmentController extends Controller
 
         Cache::tags(['departments'])->flush();
 
-        $notification = [
-            'message' => 'El departamento '.$department->name.' ha sido desactivado correctamente.',
-            'alert-type' => 'warning',
-        ];
-
-        return redirect()->route('departments.index')->with(compact('notification'));
+        return redirect()->route('departments.index')->with('success', 'El departamento '.$department->name.' ha sido desactivado correctamente.');
     }
 
     public function restore(Department $department)
@@ -131,12 +116,7 @@ class DepartmentController extends Controller
 
         Cache::tags(['departments'])->flush();
 
-        $notification = [
-            'message' => 'El departamento '.$department->name.' ha sido reactivado correctamente.',
-            'alert-type' => 'success',
-        ];
-
-        return redirect()->route('departments.index')->with(compact('notification'));
+        return redirect()->route('departments.index')->with('success', 'El departamento '.$department->name.' ha sido reactivado correctamente.');
     }
 
     public function destroyMultiple(Request $request)

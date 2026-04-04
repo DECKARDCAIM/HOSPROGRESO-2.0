@@ -106,26 +106,6 @@ class UserController extends Controller
         return view('modules.administration.user.index', $data);
     }
 
-    public function updateEstado(Request $request)
-    {
-        try {
-            $request->validate(['estado' => 'required|in:disponible,ocupado,ausente,privado,desconectado']);
-            $user = Auth::user();
-
-            if (! $user) {
-                return response()->json(['success' => false, 'message' => 'Usuario no autenticado'], 401);
-            }
-
-            DB::table('users')->where('id', $user->id)->update(['estado' => $request->estado]);
-            $user->refresh();
-
-            return response()->json(['success' => true, 'message' => 'Estado actualizado correctamente', 'estado' => $user->estado]);
-        } catch (\Exception $e) {
-            Log::error('Error al actualizar estado: '.$e->getMessage());
-
-            return response()->json(['success' => false, 'message' => 'Error al actualizar el estado: '.$e->getMessage()], 500);
-        }
-    }
 
     public function updateThemePreference(Request $request)
     {
@@ -192,7 +172,6 @@ class UserController extends Controller
                 'password' => $validated['password'],
                 'role_id' => $validated['role_id'],
                 'is_active' => $request->input('is_active', 1) == '1',
-                'estado' => 'disponible',
             ];
 
             if ($request->hasFile('profile_photo')) {

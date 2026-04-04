@@ -61,12 +61,7 @@ class WorkDepartmentController extends Controller
     {
         $item = WorkDepartment::create($request->validated());
 
-        $notification = [
-            'message' => 'El departamento '.$item->name.' se ha creado correctamente.',
-            'alert-type' => 'success',
-        ];
-
-        return redirect()->route('work-departments.index')->with(compact('notification'));
+        return redirect()->route('work-departments.index')->with('success', 'El departamento '.$item->name.' se ha creado correctamente.');
     }
 
     public function show(WorkDepartment $workDepartment) {}
@@ -80,36 +75,21 @@ class WorkDepartmentController extends Controller
     {
         $workDepartment->update($request->validated());
 
-        $notification = [
-            'message' => 'El departamento '.$workDepartment->name.' se ha actualizado correctamente.',
-            'alert-type' => 'info',
-        ];
-
-        return redirect()->route('work-departments.index')->with(compact('notification'));
+        return redirect()->route('work-departments.index')->with('success', 'El departamento '.$workDepartment->name.' se ha actualizado correctamente.');
     }
 
     public function destroy(WorkDepartment $workDepartment)
     {
         $workDepartment->update(['is_active' => false]);
 
-        $notification = [
-            'message' => 'El departamento '.$workDepartment->name.' ha sido desactivado correctamente.',
-            'alert-type' => 'warning',
-        ];
-
-        return redirect()->route('work-departments.index')->with(compact('notification'));
+        return redirect()->route('work-departments.index')->with('success', 'El departamento '.$workDepartment->name.' ha sido desactivado correctamente.');
     }
 
     public function restore(WorkDepartment $workDepartment)
     {
         $workDepartment->update(['is_active' => true]);
 
-        $notification = [
-            'message' => 'El departamento '.$workDepartment->name.' ha sido reactivado correctamente.',
-            'alert-type' => 'success',
-        ];
-
-        return redirect()->route('work-departments.index')->with(compact('notification'));
+        return redirect()->route('work-departments.index')->with('success', 'El departamento '.$workDepartment->name.' ha sido reactivado correctamente.');
     }
 
     public function destroyMultiple(Request $request)

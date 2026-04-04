@@ -63,12 +63,7 @@ class CountryController extends Controller
     {
         $country = Country::create($request->validated());
 
-        $notification = [
-            'message' => 'El país '.$country->name.' se ha creado correctamente.',
-            'alert-type' => 'success',
-        ];
-
-        return redirect()->route('countries.index')->with(compact('notification'));
+        return redirect()->route('countries.index')->with('success', 'El país '.$country->name.' se ha creado correctamente.');
     }
 
     public function show(Country $country) {}
@@ -82,12 +77,7 @@ class CountryController extends Controller
     {
         $country->update($request->validated());
 
-        $notification = [
-            'message' => 'El país '.$country->name.' se ha actualizado correctamente.',
-            'alert-type' => 'info',
-        ];
-
-        return redirect()->route('countries.index')->with(compact('notification'));
+        return redirect()->route('countries.index')->with('success', 'El país '.$country->name.' se ha actualizado correctamente.');
     }
 
     public function destroy(Country $country)
@@ -100,12 +90,7 @@ class CountryController extends Controller
 
         Cache::tags(['countries'])->flush();
 
-        $notification = [
-            'message' => 'El país '.$country->name.' ha sido desactivado correctamente.',
-            'alert-type' => 'warning',
-        ];
-
-        return redirect()->route('countries.index')->with(compact('notification'));
+        return redirect()->route('countries.index')->with('success', 'El país '.$country->name.' ha sido desactivado correctamente.');
     }
 
     public function restore(Country $country)
@@ -118,12 +103,7 @@ class CountryController extends Controller
 
         Cache::tags(['countries'])->flush();
 
-        $notification = [
-            'message' => 'El país '.$country->name.' ha sido reactivado correctamente.',
-            'alert-type' => 'success',
-        ];
-
-        return redirect()->route('countries.index')->with(compact('notification'));
+        return redirect()->route('countries.index')->with('success', 'El país '.$country->name.' ha sido reactivado correctamente.');
     }
 
     public function destroyMultiple(Request $request)

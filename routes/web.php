@@ -41,7 +41,7 @@ Route::get('/home', [HomeController::class , 'index'])->name('home')->middleware
 
 Route::middleware(['auth', 'PreventBackHistory'])->group(function () {
     Route::post('/session/ping', [UserController::class, 'ping'])->name('session.ping');
-    Route::post('/user/update-estado', [UserController::class , 'updateEstado'])->name('user.estado');
+
     Route::post('/user/update-theme', [UserController::class , 'updateThemePreference'])->name('user.update-theme');
 
 

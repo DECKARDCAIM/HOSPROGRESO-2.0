@@ -61,12 +61,7 @@ class EthnicityController extends Controller
     {
         $item = Ethnicity::create($request->validated());
 
-        $notification = [
-            'message' => 'La etnia "'.$item->name.'" se ha creado correctamente.',
-            'alert-type' => 'success',
-        ];
-
-        return redirect()->route('ethnicities.index')->with(compact('notification'));
+        return redirect()->route('ethnicities.index')->with('success', 'La etnia "'.$item->name.'" se ha creado correctamente.');
     }
 
     public function show(Ethnicity $ethnicity) {}
@@ -80,12 +75,7 @@ class EthnicityController extends Controller
     {
         $ethnicity->update($request->validated());
 
-        $notification = [
-            'message' => 'La etnia "'.$ethnicity->name.'" se ha actualizado correctamente.',
-            'alert-type' => 'info',
-        ];
-
-        return redirect()->route('ethnicities.index')->with(compact('notification'));
+        return redirect()->route('ethnicities.index')->with('success', 'La etnia "'.$ethnicity->name.'" se ha actualizado correctamente.');
     }
 
     public function destroy(Ethnicity $ethnicity)
@@ -94,12 +84,7 @@ class EthnicityController extends Controller
 
         Cache::tags(['ethnicities'])->flush();
 
-        $notification = [
-            'message' => 'La etnia "'.$ethnicity->name.'" ha sido desactivada.',
-            'alert-type' => 'warning',
-        ];
-
-        return redirect()->route('ethnicities.index')->with(compact('notification'));
+        return redirect()->route('ethnicities.index')->with('success', 'La etnia "'.$ethnicity->name.'" ha sido desactivada.');
     }
 
     public function restore(Ethnicity $ethnicity)
@@ -108,12 +93,7 @@ class EthnicityController extends Controller
 
         Cache::tags(['ethnicities'])->flush();
 
-        $notification = [
-            'message' => 'La etnia "'.$ethnicity->name.'" ha sido reactivada.',
-            'alert-type' => 'success',
-        ];
-
-        return redirect()->route('ethnicities.index')->with(compact('notification'));
+        return redirect()->route('ethnicities.index')->with('success', 'La etnia "'.$ethnicity->name.'" ha sido reactivada.');
     }
 
     public function destroyMultiple(Request $request)

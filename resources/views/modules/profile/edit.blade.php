@@ -7,7 +7,7 @@
                 <div class="col-lg-10">
                     <div class="profile-cover">
                         <div class="profile-cover-img-wrapper">
-                            <img id="profileCoverImg" class="profile-cover-img" src="{{ $user->banner_photo_path ? asset('storage/' . $user->banner_photo_path) : asset('img/1920x400/img2.jpg') }}" data-src="{{ $user->banner_photo_path ? asset('storage/' . $user->banner_photo_path) : asset('img/1920x400/img2.jpg') }}" alt="Image Description" onerror="this.onerror=null; retryImageLoad(this);">
+                            <img id="profileCoverImg" class="profile-cover-img" src="{{ $user->banner_photo_path ? asset('storage/' . $user->banner_photo_path) : asset('dist/img/1920x400/img2.jpg') }}" data-src="{{ $user->banner_photo_path ? asset('storage/' . $user->banner_photo_path) : asset('dist/img/1920x400/img2.jpg') }}" alt="Image Description" onerror="this.onerror=null; retryImageLoad(this);">
                             <div class="profile-cover-content profile-cover-uploader p-3">
                                 <input type="file" class="js-file-attach profile-cover-uploader-input" id="profileCoverUplaoder" name="banner_photo" form="profileForm" data-hs-file-attach-options='{"textTarget": "#profileCoverImg", "mode": "image", "targetAttr": "src", "allowTypes": [".png", ".jpeg", ".jpg"]}'>
                                 <label class="profile-cover-uploader-label btn btn-sm btn-white" for="profileCoverUplaoder">

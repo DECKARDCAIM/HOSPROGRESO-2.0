@@ -25,7 +25,18 @@
         </div>
         <div class="row justify-content-lg-center">
             <div class="col-lg-9">
-                <form action="{{ route('work-departments.store') }}" method="POST" id="mainForm" class="needs-validation" novalidate>
+@if ($errors->any())
+                <div class="alert alert-danger text-white mb-4" role="alert">
+                    <strong>¡Ups! Ha ocurrido un problema:</strong>
+                    <ul class="mb-0 mt-2">
+                        @foreach ($errors->all() as $error)
+                            <li>{{ $error }}</li>
+                        @endforeach
+                    </ul>
+                </div>
+            @endif
+
+            <form action="{{ route('work-departments.store') }}" method="POST" id="mainForm" class="needs-validation" novalidate>
                     @csrf
                     <div class="card card-lg mb-3 mb-lg-5">
                         <div class="card-header">
@@ -64,7 +75,7 @@
             if (!form.checkValidity()) {
                 event.preventDefault();
                 event.stopPropagation();
-                window.showToast('Atención', 'Por favor, completa los campos requeridos.', 'warning');
+                
             }
             form.classList.add('was-validated');
         }, false);

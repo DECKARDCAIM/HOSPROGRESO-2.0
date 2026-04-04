@@ -61,12 +61,7 @@ class ScheduleController extends Controller
     {
         $item = Schedule::create($request->validated());
 
-        $notification = [
-            'message' => 'El turno "'.$item->name.'" se ha creado correctamente.',
-            'alert-type' => 'success',
-        ];
-
-        return redirect()->route('schedules.index')->with(compact('notification'));
+        return redirect()->route('schedules.index')->with('success', 'El turno "'.$item->name.'" se ha creado correctamente.');
     }
 
     public function show(Schedule $schedule) {}
@@ -80,12 +75,7 @@ class ScheduleController extends Controller
     {
         $schedule->update($request->validated());
 
-        $notification = [
-            'message' => 'El turno "'.$schedule->name.'" se ha actualizado correctamente.',
-            'alert-type' => 'info',
-        ];
-
-        return redirect()->route('schedules.index')->with(compact('notification'));
+        return redirect()->route('schedules.index')->with('success', 'El turno "'.$schedule->name.'" se ha actualizado correctamente.');
     }
 
     public function destroy(Schedule $schedule)
@@ -94,12 +84,7 @@ class ScheduleController extends Controller
 
         Cache::tags(['schedules'])->flush();
 
-        $notification = [
-            'message' => 'El turno "'.$schedule->name.'" ha sido desactivado.',
-            'alert-type' => 'warning',
-        ];
-
-        return redirect()->route('schedules.index')->with(compact('notification'));
+        return redirect()->route('schedules.index')->with('success', 'El turno "'.$schedule->name.'" ha sido desactivado.');
     }
 
     public function restore(Schedule $schedule)
@@ -108,12 +93,7 @@ class ScheduleController extends Controller
 
         Cache::tags(['schedules'])->flush();
 
-        $notification = [
-            'message' => 'El turno "'.$schedule->name.'" ha sido reactivado.',
-            'alert-type' => 'success',
-        ];
-
-        return redirect()->route('schedules.index')->with(compact('notification'));
+        return redirect()->route('schedules.index')->with('success', 'El turno "'.$schedule->name.'" ha sido reactivado.');
     }
 
     public function destroyMultiple(Request $request)

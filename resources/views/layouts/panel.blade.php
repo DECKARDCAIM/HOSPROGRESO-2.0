@@ -39,7 +39,6 @@
     <script src="{{ asset('dist/js/vendor.min.js') }}"></script>
     <script src="{{ asset('dist/js/theme.min.js') }}"></script>
     <script src="{{ asset('dist/js/hs.theme-appearance-helper.js') }}"></script>
-    @include ('includes.notification-toast')
     @stack('scripts')
 </body>
 </html>

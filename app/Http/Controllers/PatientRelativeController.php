@@ -59,12 +59,7 @@ class PatientRelativeController extends Controller
     {
         $item = PatientRelative::create($request->validated());
 
-        $notification = [
-            'message' => 'El familiar '.$item->first_name.' se ha registrado correctamente.',
-            'alert-type' => 'success',
-        ];
-
-        return redirect()->route('patient-relatives.index')->with(compact('notification'));
+        return redirect()->route('patient-relatives.index')->with('success', 'El familiar '.$item->first_name.' se ha registrado correctamente.');
     }
 
     public function show(PatientRelative $patientRelative) {}
@@ -81,24 +76,14 @@ class PatientRelativeController extends Controller
     {
         $patientRelative->update($request->validated());
 
-        $notification = [
-            'message' => 'El familiar '.$patientRelative->first_name.' se ha actualizado correctamente.',
-            'alert-type' => 'info',
-        ];
-
-        return redirect()->route('patient-relatives.index')->with(compact('notification'));
+        return redirect()->route('patient-relatives.index')->with('success', 'El familiar '.$patientRelative->first_name.' se ha actualizado correctamente.');
     }
 
     public function destroy(PatientRelative $patientRelative)
     {
         $patientRelative->delete();
 
-        $notification = [
-            'message' => 'El familiar '.$patientRelative->first_name.' ha sido eliminado correctamente.',
-            'alert-type' => 'warning',
-        ];
-
-        return redirect()->route('patient-relatives.index')->with(compact('notification'));
+        return redirect()->route('patient-relatives.index')->with('success', 'El familiar '.$patientRelative->first_name.' ha sido eliminado correctamente.');
     }
 
     public function destroyMultiple(Request $request)

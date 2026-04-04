@@ -22,6 +22,18 @@
                     </div>
                 </div>
             </div>
+            
+            @if ($errors->any())
+                <div class="alert alert-danger text-white mb-4" role="alert">
+                    <strong>¡Ups! Ha ocurrido un problema:</strong>
+                    <ul class="mb-0 mt-2">
+                        @foreach ($errors->all() as $error)
+                            <li>{{ $error }}</li>
+                        @endforeach
+                    </ul>
+                </div>
+            @endif
+
             <form action="{{ route('users.update', $user->id) }}" method="POST" enctype="multipart/form-data" autocomplete="off" class="js-step-form py-md-5" data-hs-step-form-options='{ "progressSelector": "#addUserStepFormProgress", "stepsSelector":   "#addUserStepFormContent", "endSelector":     "#addUserFinishBtn", "isValidate":      false }'>
                 @csrf
                 @method('PUT')
@@ -65,7 +77,7 @@
                                             <div class="d-flex align-items-center">
                                                 <label class="avatar avatar-xl avatar-circle avatar-uploader me-5" for="avatarUploader">
                                                     <img id="avatarImg" class="avatar-img" src="{{ $user->avatar_url ?? asset('img/160x160/img1.jpg') }}" alt="Avatar">
-                                                    <input type="file" name="profile_photo" class="js-file-attach avatar-uploader-input" id="avatarUploader" autocomplete="off" data-hs-file-attach-options='{ "textTarget": "#avatarImg", "mode": "image", "targetAttr": "src", "resetTarget": ".js-file-attach-reset-img", "resetImg": "{{ $user->avatar_url ?? asset('img/160x160/img1.jpg') }}", "allowTypes": [".png", ".jpeg", ".jpg"] }'>
+                                                    <input type="file" name="profile_photo" value="{{ old('profile_photo') }}" class="js-file-attach avatar-uploader-input @error('profile_photo') is-invalid @enderror" id="avatarUploader" autocomplete="off" data-hs-file-attach-options='{ "textTarget": "#avatarImg", "mode": "image", "targetAttr": "src", "resetTarget": ".js-file-attach-reset-img", "resetImg": "{{ $user->avatar_url ?? asset('img/160x160/img1.jpg') }}", "allowTypes": [".png", ".jpeg", ".jpg"] }'>
                                                     <span class="avatar-uploader-trigger">
                                                         <i class="bi-pencil avatar-uploader-icon shadow-sm"></i>
                                                     </span>
@@ -83,9 +95,9 @@
                                         <label class="col-sm-3 col-form-label form-label">Nombres</label>
                                         <div class="col-sm-9">
                                             <div class="input-group input-group-sm-vertical">
-                                                <input type="text" class="form-control" name="first_name" id="firstNameLabel" autocomplete="off" placeholder="Primer nombre" value="{{ old('first_name', $user->first_name) }}">
-                                                <input type="text" class="form-control" name="second_name" id="secondNameLabel" autocomplete="off" placeholder="Segundo nombre" value="{{ old('second_name', $user->second_name) }}">
-                                                <input type="text" class="form-control" name="third_name" id="thirdNameLabel" autocomplete="off" placeholder="Tercer nombre" value="{{ old('third_name', $user->third_name) }}">
+                                                <input type="text" class="form-control @error('first_name') is-invalid @enderror" name="first_name" id="firstNameLabel" autocomplete="off" placeholder="Primer nombre" value="{{ old('first_name', $user->first_name) }}">
+                                                <input type="text" class="form-control @error('second_name') is-invalid @enderror" name="second_name" id="secondNameLabel" autocomplete="off" placeholder="Segundo nombre" value="{{ old('second_name', $user->second_name) }}">
+                                                <input type="text" class="form-control @error('third_name') is-invalid @enderror" name="third_name" id="thirdNameLabel" autocomplete="off" placeholder="Tercer nombre" value="{{ old('third_name', $user->third_name) }}">
                                             </div>
                                         </div>
                                     </div>
@@ -93,9 +105,9 @@
                                         <label class="col-sm-3 col-form-label form-label">Apellidos</label>
                                         <div class="col-sm-9">
                                             <div class="input-group input-group-sm-vertical">
-                                                <input type="text" class="form-control" name="first_last_name" id="firstLastNameLabel" autocomplete="off" placeholder="Primer apellido" value="{{ old('first_last_name', $user->first_last_name) }}">
-                                                <input type="text" class="form-control" name="second_last_name" id="secondLastNameLabel" autocomplete="off" placeholder="Segundo apellido" value="{{ old('second_last_name', $user->second_last_name) }}">
-                                                <input type="text" class="form-control" name="married_last_name" id="marriedLastNameLabel" autocomplete="off" placeholder="Apellido de casada" value="{{ old('married_last_name', $user->married_last_name) }}">
+                                                <input type="text" class="form-control @error('first_last_name') is-invalid @enderror" name="first_last_name" id="firstLastNameLabel" autocomplete="off" placeholder="Primer apellido" value="{{ old('first_last_name', $user->first_last_name) }}">
+                                                <input type="text" class="form-control @error('second_last_name') is-invalid @enderror" name="second_last_name" id="secondLastNameLabel" autocomplete="off" placeholder="Segundo apellido" value="{{ old('second_last_name', $user->second_last_name) }}">
+                                                <input type="text" class="form-control @error('married_last_name') is-invalid @enderror" name="married_last_name" id="marriedLastNameLabel" autocomplete="off" placeholder="Apellido de casada" value="{{ old('married_last_name', $user->married_last_name) }}">
                                             </div>
                                         </div>
                                     </div>
@@ -107,16 +119,16 @@
                                     <div class="row mb-4">
                                         <div class="col-md-4 mb-2">
                                             <label for="cuiLabel" class="form-label">CUI</label>
-                                            <input type="text" class="form-control" name="cui" id="cuiLabel" autocomplete="off" placeholder="CUI" value="{{ old('cui', $user->staff->cui ?? '') }}">
+                                            <input type="text" class="form-control @error('cui') is-invalid @enderror" name="cui" id="cuiLabel" autocomplete="off" placeholder="CUI" value="{{ old('cui', $user->staff->cui ?? '') }}">
                                         </div>
                                         <div class="col-md-4 mb-2">
                                             <label for="nitLabel" class="form-label">NIT</label>
-                                            <input type="text" class="form-control" name="nit" id="nitLabel" autocomplete="off" placeholder="NIT" value="{{ old('nit', $user->staff->nit ?? '') }}">
+                                            <input type="text" class="form-control @error('nit') is-invalid @enderror" name="nit" id="nitLabel" autocomplete="off" placeholder="NIT" value="{{ old('nit', $user->staff->nit ?? '') }}">
                                         </div>
                                         <div class="col-md-4 mb-2">
                                              <label for="civilStatusLabel" class="form-label">Estado Civil</label>
                                              <div class="tom-select-custom">
-                                                 <select class="js-select form-select" name="civil_status_id" id="civilStatusLabel" autocomplete="off" data-hs-tom-select-options='{ "placeholder": "Seleccione..." }'>
+                                                 <select class="js-select form-select @error('civil_status_id') is-invalid @enderror" name="civil_status_id" id="civilStatusLabel" autocomplete="off" data-hs-tom-select-options='{ "placeholder": "Seleccione..." }'>
                                                      <option value="">Seleccione</option>
                                                      @foreach ($civilStatuses ?? [] as $status)
                                                          <option value="{{ $status->id }}" {{ old('civil_status_id', $user->staff->civil_status_id ?? '') == $status->id ? 'selected' : '' }}>{{ $status->name }}</option>
@@ -128,12 +140,12 @@
                                     <div class="row mb-4">
                                         <div class="col-md-4 mb-2">
                                             <label for="birthDateLabel" class="form-label">Fecha de Nacimiento</label>
-                                            <input type="date" class="form-control" name="birth_date" id="birthDateLabel" autocomplete="off" value="{{ old('birth_date', (isset($user->staff) && $user->staff->birth_date) ? \Carbon\Carbon::parse($user->staff->birth_date)->format('Y-m-d') : '') }}">
+                                            <input type="date" class="form-control @error('birth_date') is-invalid @enderror" name="birth_date" id="birthDateLabel" autocomplete="off" value="{{ old('birth_date', (isset($user->staff) && $user->staff->birth_date) ? \Carbon\Carbon::parse($user->staff->birth_date)->format('Y-m-d') : '') }}">
                                         </div>
                                         <div class="col-md-4 mb-2">
                                             <label for="genderLabel" class="form-label">Género</label>
                                             <div class="tom-select-custom">
-                                                <select class="js-select form-select" name="gender_id" id="genderLabel" autocomplete="off" data-hs-tom-select-options='{ "placeholder": "Seleccione..." }'>
+                                                <select class="js-select form-select @error('gender_id') is-invalid @enderror" name="gender_id" id="genderLabel" autocomplete="off" data-hs-tom-select-options='{ "placeholder": "Seleccione..." }'>
                                                     <option value="">Seleccione</option>
                                                     @foreach ($genders ?? [] as $gender)
                                                         <option value="{{ $gender->id }}" {{ old('gender_id', $user->staff->gender_id ?? '') == $gender->id ? 'selected' : '' }}>{{ $gender->name }}</option>
@@ -143,7 +155,7 @@
                                         </div>
                                         <div class="col-md-4 mb-2">
                                             <label for="phoneLabel" class="form-label">Teléfono</label>
-                                            <input type="text" class="form-control" name="phone" id="phoneLabel" autocomplete="off" placeholder="Ej. +12345678" value="{{ old('phone', $user->staff->phone ?? '') }}">
+                                            <input type="text" class="form-control @error('phone') is-invalid @enderror" name="phone" id="phoneLabel" autocomplete="off" placeholder="Ej. +12345678" value="{{ old('phone', $user->staff->phone ?? '') }}">
                                         </div>
                                     </div>
                                     <div class="row mb-4">
@@ -154,11 +166,11 @@
                                     <div class="row mb-4">
                                         <div class="col-sm-6 mb-2">
                                             <label for="emailLabel" class="form-label">Correo Electrónico</label>
-                                            <input type="email" class="form-control" name="email" id="emailLabel" autocomplete="off" placeholder="correo@ejemplo.com" value="{{ old('email', $user->email) }}">
+                                            <input type="email" class="form-control @error('email') is-invalid @enderror" name="email" id="emailLabel" autocomplete="off" placeholder="correo@ejemplo.com" value="{{ old('email', $user->email) }}">
                                         </div>
                                         <div class="col-sm-6 mb-2">
                                             <label for="passwordLabel" class="form-label">Contraseña <span class="text-muted fw-normal">(Opcional)</span></label>
-                                            <input type="password" class="form-control" name="password" id="passwordLabel" autocomplete="new-password" placeholder="Deja en blanco para no cambiar">
+                                            <input type="password" class="form-control @error('password') is-invalid @enderror" name="password" value="{{ old('password') }}" id="passwordLabel" autocomplete="new-password" placeholder="Deja en blanco para no cambiar">
                                         </div>
                                     </div>
                                 </div>
@@ -172,7 +184,7 @@
                                         <div class="col-sm-12 mb-4">
                                             <label for="roleIdLabel" class="form-label">Rol en el Sistema</label>
                                             <div class="tom-select-custom">
-                                                <select class="js-select form-select" name="role_id" id="roleIdLabel" autocomplete="off" data-hs-tom-select-options='{ "placeholder": "Seleccione Rol..." }'>
+                                                <select class="js-select form-select @error('role_id') is-invalid @enderror" name="role_id" id="roleIdLabel" autocomplete="off" data-hs-tom-select-options='{ "placeholder": "Seleccione Rol..." }'>
                                                     <option value="">Seleccione Rol</option>
                                                     @foreach ($roles ?? [] as $role)
                                                         <option value="{{ $role->id }}" {{ old('role_id', $user->role_id) == $role->id ? 'selected' : '' }}>{{ $role->name }}</option>
@@ -183,7 +195,7 @@
                                         <div class="col-sm-6 mb-4">
                                             <label for="unityExecutionIdLabel" class="form-label">Unidad Ejecutora</label>
                                             <div class="tom-select-custom">
-                                                <select class="js-select form-select" name="unity_execution_id" id="unityExecutionIdLabel" autocomplete="off" data-hs-tom-select-options='{ "placeholder": "Seleccione Unidad..." }'>
+                                                <select class="js-select form-select @error('unity_execution_id') is-invalid @enderror" name="unity_execution_id" id="unityExecutionIdLabel" autocomplete="off" data-hs-tom-select-options='{ "placeholder": "Seleccione Unidad..." }'>
                                                     <option value="">Seleccione Unidad</option>
                                                     @foreach ($unityExecutions ?? [] as $unity)
                                                         <option value="{{ $unity->id }}" {{ old('unity_execution_id', $user->staff->unity_execution_id ?? '') == $unity->id ? 'selected' : '' }}>{{ $unity->name }}</option>
@@ -194,7 +206,7 @@
                                         <div class="col-sm-6 mb-4">
                                             <label for="workDepartmentIdLabel" class="form-label">Departamento de Trabajo</label>
                                             <div class="tom-select-custom">
-                                                <select class="js-select form-select" name="work_department_id" id="workDepartmentIdLabel" autocomplete="off" data-hs-tom-select-options='{ "placeholder": "Seleccione Departamento..." }'>
+                                                <select class="js-select form-select @error('work_department_id') is-invalid @enderror" name="work_department_id" id="workDepartmentIdLabel" autocomplete="off" data-hs-tom-select-options='{ "placeholder": "Seleccione Departamento..." }'>
                                                     <option value="">Seleccione Departamento</option>
                                                     @foreach ($workDepartments ?? [] as $wd)
                                                         <option value="{{ $wd->id }}" {{ old('work_department_id', $user->staff->work_department_id ?? '') == $wd->id ? 'selected' : '' }}>{{ $wd->name }}</option>
@@ -207,7 +219,7 @@
                                         <div class="col-sm-6 mb-2">
                                             <label for="specialtyLabel" class="form-label">Especialidad (Si es Médico)</label>
                                             <div class="tom-select-custom">
-                                                <select class="js-select form-select" name="specialty_id" id="specialtyLabel" autocomplete="off" data-hs-tom-select-options='{ "placeholder": "Seleccione Especialidad..." }'>
+                                                <select class="js-select form-select @error('specialty_id') is-invalid @enderror" name="specialty_id" id="specialtyLabel" autocomplete="off" data-hs-tom-select-options='{ "placeholder": "Seleccione Especialidad..." }'>
                                                     <option value="">Seleccione Especialidad</option>
                                                     @foreach ($specialties ?? [] as $specialty)
                                                         <option value="{{ $specialty->id }}" {{ old('specialty_id', $user->staff->specialty_id ?? '') == $specialty->id ? 'selected' : '' }}>{{ $specialty->name }}</option>
@@ -217,12 +229,12 @@
                                         </div>
                                         <div class="col-sm-6 mb-2">
                                             <label for="collegiateNumberLabel" class="form-label">Número de Colegiado</label>
-                                            <input type="text" class="form-control" name="collegiate_number" id="collegiateNumberLabel" autocomplete="off" placeholder="Número de colegiado" value="{{ old('collegiate_number', $user->staff->collegiate_number ?? '') }}">
+                                            <input type="text" class="form-control @error('collegiate_number') is-invalid @enderror" name="collegiate_number" id="collegiateNumberLabel" autocomplete="off" placeholder="Número de colegiado" value="{{ old('collegiate_number', $user->staff->collegiate_number ?? '') }}">
                                         </div>
                                         <div class="col-sm-6 mb-2">
                                             <label for="scheduleIdLabel" class="form-label">Asignar Horario de Trabajo</label>
                                             <div class="tom-select-custom">
-                                                <select class="js-select form-select" name="schedule_id" id="scheduleIdLabel" autocomplete="off" data-hs-tom-select-options='{ "placeholder": "Seleccione Horario..." }'>
+                                                <select class="js-select form-select @error('schedule_id') is-invalid @enderror" name="schedule_id" id="scheduleIdLabel" autocomplete="off" data-hs-tom-select-options='{ "placeholder": "Seleccione Horario..." }'>
                                                     <option value="">Seleccione Horario</option>
                                                     @foreach ($schedules ?? [] as $schedule)
                                                         <option value="{{ $schedule->id }}" {{ old('schedule_id', $user->staff->schedule_id ?? '') == $schedule->id ? 'selected' : '' }}>{{ $schedule->name }}</option>
@@ -240,7 +252,7 @@
                                         <div class="col-sm-12">
                                             <label for="isActiveLabel" class="form-label">Estado del Usuario</label>
                                             <div class="tom-select-custom">
-                                                <select class="js-select form-select" name="is_active" id="isActiveLabel" autocomplete="off" data-hs-tom-select-options='{ "placeholder": "Seleccione Estado..." }'>
+                                                <select class="js-select form-select @error('is_active') is-invalid @enderror" name="is_active" id="isActiveLabel" autocomplete="off" data-hs-tom-select-options='{ "placeholder": "Seleccione Estado..." }'>
                                                     <option value="1" {{ old('is_active', $user->is_active ? '1' : '0') == '1' ? 'selected' : '' }}>Activo – puede iniciar sesión</option>
                                                     <option value="0" {{ old('is_active', $user->is_active ? '1' : '0') == '0' ? 'selected' : '' }}>Inactivo – no puede iniciar sesión</option>
                                                 </select>
@@ -263,7 +275,7 @@
                                         <label for="countryIdLabel" class="col-sm-3 col-form-label form-label">País</label>
                                         <div class="col-sm-9">
                                             <div class="tom-select-custom">
-                                                <select class="js-select form-select" name="country_id" id="countryIdLabel" autocomplete="off" data-hs-tom-select-options='{ "placeholder": "Seleccione un país..." }'>
+                                                <select class="js-select form-select @error('country_id') is-invalid @enderror" name="country_id" id="countryIdLabel" autocomplete="off" data-hs-tom-select-options='{ "placeholder": "Seleccione un país..." }'>
                                                     <option value="">Seleccione un país</option>
                                                     @foreach ($countries ?? [] as $country)
                                                         <option value="{{ $country->id }}" {{ old('country_id', ($user->staff && $user->staff->municipality && $user->staff->municipality->department) ? $user->staff->municipality->department->country_id : '') == $country->id ? 'selected' : '' }}>{{ $country->name }}</option>
@@ -276,7 +288,7 @@
                                         <label for="departmentIdLabel" class="col-sm-3 col-form-label form-label">Departamento</label>
                                         <div class="col-sm-9">
                                             <div class="tom-select-custom">
-                                                <select class="js-select form-select" name="department_id" id="departmentIdLabel" autocomplete="off" {{ $departments->isEmpty() ? 'disabled' : '' }} data-hs-tom-select-options='{ "placeholder": "Seleccione un departamento..." }'>
+                                                <select class="js-select form-select @error('department_id') is-invalid @enderror" name="department_id" id="departmentIdLabel" autocomplete="off" {{ $departments->isEmpty() ? 'disabled' : '' }} data-hs-tom-select-options='{ "placeholder": "Seleccione un departamento..." }'>
                                                     <option value="">Seleccione primero un país</option>
                                                     @foreach ($departments as $dept)
                                                         <option value="{{ $dept->id }}" {{ old('department_id', ($user->staff && $user->staff->municipality) ? $user->staff->municipality->department_id : '') == $dept->id ? 'selected' : '' }}>{{ $dept->name }}</option>
@@ -289,7 +301,7 @@
                                         <label for="municipalityIdLabel" class="col-sm-3 col-form-label form-label">Municipio</label>
                                         <div class="col-sm-9">
                                             <div class="tom-select-custom">
-                                                <select class="js-select form-select" name="municipality_id" id="municipalityIdLabel" autocomplete="off" {{ $municipalities->isEmpty() ? 'disabled' : '' }} data-hs-tom-select-options='{ "placeholder": "Seleccione un municipio..." }'>
+                                                <select class="js-select form-select @error('municipality_id') is-invalid @enderror" name="municipality_id" id="municipalityIdLabel" autocomplete="off" {{ $municipalities->isEmpty() ? 'disabled' : '' }} data-hs-tom-select-options='{ "placeholder": "Seleccione un municipio..." }'>
                                                     <option value="">Seleccione primero un departamento</option>
                                                     @foreach ($municipalities as $muni)
                                                         <option value="{{ $muni->id }}" {{ old('municipality_id', $user->staff->municipality_id ?? '') == $muni->id ? 'selected' : '' }}>{{ $muni->name }}</option>
@@ -301,7 +313,7 @@
                                     <div class="row mb-4">
                                         <label for="addressLabel" class="col-sm-3 col-form-label form-label">Dirección Exacta</label>
                                         <div class="col-sm-9">
-                                            <input type="text" class="form-control" name="address" id="addressLabel" autocomplete="off" placeholder="Ej. 1ra Avenida 2-33 Zona 1" value="{{ old('address', $user->staff->address ?? '') }}">
+                                            <input type="text" class="form-control @error('address') is-invalid @enderror" name="address" id="addressLabel" autocomplete="off" placeholder="Ej. 1ra Avenida 2-33 Zona 1" value="{{ old('address', $user->staff->address ?? '') }}">
                                         </div>
                                     </div>
                                 </div>

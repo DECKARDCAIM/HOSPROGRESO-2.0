@@ -20,6 +20,17 @@
             </div>
         </div>
         <div class="row justify-content-lg-center"><div class="col-lg-9">
+@if ($errors->any())
+                <div class="alert alert-danger text-white mb-4" role="alert">
+                    <strong>¡Ups! Ha ocurrido un problema:</strong>
+                    <ul class="mb-0 mt-2">
+                        @foreach ($errors->all() as $error)
+                            <li>{{ $error }}</li>
+                        @endforeach
+                    </ul>
+                </div>
+            @endif
+
             <form action="{{ route('genders.update', $item->id) }}" method="POST" id="itemForm" class="needs-validation" novalidate>
                 @csrf @method('PUT')
                 <div class="card card-lg mb-3 mb-lg-5">
@@ -49,7 +60,7 @@
 document.addEventListener('DOMContentLoaded', function () {
     const form = document.querySelector('#itemForm');
     form.addEventListener('submit', function (event) {
-        if (!form.checkValidity()) { event.preventDefault(); event.stopPropagation(); const p = document.getElementById('loading-spinner'); if (p) { p.style.setProperty('display', 'none', 'important'); p.style.opacity = '0'; } window.showToast('Atención', 'Por favor, completa los campos requeridos.', 'warning'); }
+        if (!form.checkValidity()) { event.preventDefault(); event.stopPropagation(); const p = document.getElementById('loading-spinner'); if (p) { p.style.setProperty('display', 'none', 'important'); p.style.opacity = '0'; }  }
         form.classList.add('was-validated');
     }, false);
 });

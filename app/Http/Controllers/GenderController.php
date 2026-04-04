@@ -61,12 +61,7 @@ class GenderController extends Controller
     {
         $item = Gender::create($request->validated());
 
-        $notification = [
-            'message' => 'El género "'.$item->name.'" se ha creado correctamente.',
-            'alert-type' => 'success',
-        ];
-
-        return redirect()->route('genders.index')->with(compact('notification'));
+        return redirect()->route('genders.index')->with('success', 'El género "'.$item->name.'" se ha creado correctamente.');
     }
 
     public function show(Gender $gender) {}
@@ -80,12 +75,7 @@ class GenderController extends Controller
     {
         $gender->update($request->validated());
 
-        $notification = [
-            'message' => 'El género "'.$gender->name.'" se ha actualizado correctamente.',
-            'alert-type' => 'info',
-        ];
-
-        return redirect()->route('genders.index')->with(compact('notification'));
+        return redirect()->route('genders.index')->with('success', 'El género "'.$gender->name.'" se ha actualizado correctamente.');
     }
 
     public function destroy(Gender $gender)
@@ -94,12 +84,7 @@ class GenderController extends Controller
 
         Cache::tags(['genders'])->flush();
 
-        $notification = [
-            'message' => 'El género "'.$gender->name.'" ha sido desactivado.',
-            'alert-type' => 'warning',
-        ];
-
-        return redirect()->route('genders.index')->with(compact('notification'));
+        return redirect()->route('genders.index')->with('success', 'El género "'.$gender->name.'" ha sido desactivado.');
     }
 
     public function restore(Gender $gender)
@@ -108,12 +93,7 @@ class GenderController extends Controller
 
         Cache::tags(['genders'])->flush();
 
-        $notification = [
-            'message' => 'El género "'.$gender->name.'" ha sido reactivado.',
-            'alert-type' => 'success',
-        ];
-
-        return redirect()->route('genders.index')->with(compact('notification'));
+        return redirect()->route('genders.index')->with('success', 'El género "'.$gender->name.'" ha sido reactivado.');
     }
 
     public function destroyMultiple(Request $request)

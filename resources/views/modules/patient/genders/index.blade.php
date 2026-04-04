@@ -20,6 +20,22 @@
                 </div>
             </div>
         </div>
+            @if (session('success'))
+                <div class="alert alert-success text-white mb-4" role="alert">
+                    <strong>¡Éxito!</strong> {{ session('success') }}
+                </div>
+            @endif
+            @if (session('error'))
+                <div class="alert alert-danger text-white mb-4" role="alert">
+                    <strong>¡Ups!</strong> {{ session('error') }}
+                </div>
+            @endif
+            @if (session('notification'))
+                <div class="alert alert-{{ session('notification')['type'] == 'success' ? 'success' : (session('notification')['type'] == 'error' ? 'danger' : 'info') }} text-white mb-4" role="alert">
+                    <strong>¡Atención!</strong> {{ session('notification')['message'] }}
+                </div>
+            @endif
+
         <div class="row">
             <div class="col-sm-6 col-lg-4 mb-3 mb-lg-5"><div class="card h-100"><div class="card-body"><h6 class="card-subtitle mb-2">Total registrados</h6><span class="js-counter display-4 text-dark">{{ $total ?? 0 }}</span></div></div></div>
             <div class="col-sm-6 col-lg-4 mb-3 mb-lg-5"><div class="card h-100"><div class="card-body"><h6 class="card-subtitle mb-2">Activos</h6><span class="js-counter display-4 text-dark">{{ $active ?? 0 }}</span></div></div></div>

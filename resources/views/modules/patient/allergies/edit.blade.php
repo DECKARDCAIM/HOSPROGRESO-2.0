@@ -27,7 +27,18 @@
 
         <div class="row justify-content-lg-center">
             <div class="col-lg-9">
-                <form action="{{ route('allergies.update', $item->id) }}" method="POST" id="itemForm" class="needs-validation" novalidate>
+@if ($errors->any())
+                <div class="alert alert-danger text-white mb-4" role="alert">
+                    <strong>¡Ups! Ha ocurrido un problema:</strong>
+                    <ul class="mb-0 mt-2">
+                        @foreach ($errors->all() as $error)
+                            <li>{{ $error }}</li>
+                        @endforeach
+                    </ul>
+                </div>
+            @endif
+
+            <form action="{{ route('allergies.update', $item->id) }}" method="POST" id="itemForm" class="needs-validation" novalidate>
                     @csrf
                     @method('PUT')
                     <div class="card card-lg mb-3 mb-lg-5">
@@ -72,7 +83,7 @@
                 event.stopPropagation();
                 const preloader = document.getElementById('loading-spinner');
                 if (preloader) { preloader.style.setProperty('display', 'none', 'important'); preloader.style.opacity = '0'; }
-                window.showToast('Atención', 'Por favor, completa los campos requeridos.', 'warning');
+                
             }
             form.classList.add('was-validated');
         }, false);
