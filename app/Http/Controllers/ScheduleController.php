@@ -2,13 +2,14 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\Schedule;
-use Illuminate\Http\Request;
+use App\Exports\ScheduleExport;
 use App\Http\Requests\StoreScheduleRequest;
 use App\Http\Requests\UpdateScheduleRequest;
-use App\Exports\ScheduleExport;
-use Maatwebsite\Excel\Facades\Excel;
+use App\Models\Schedule;
 use Barryvdh\DomPDF\Facade\Pdf;
+use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Cache;
+use Maatwebsite\Excel\Facades\Excel;
 
 class ScheduleController extends Controller
 {
@@ -19,28 +20,36 @@ class ScheduleController extends Controller
 
     public function index(Request $request)
     {
-        $query = Schedule::query();
+        $cacheKey = 'schedules_index_'.md5(json_encode($request->all()));
 
-        if ($request->filled('search')) {
-            $query->where('name', 'LIKE', "%{$request->search}%");
-        }
+        $data = Cache::tags(['schedules'])->remember($cacheKey, now()->addDays(1), function () use ($request) {
+            $query = Schedule::query();
 
-        $status = $request->input('status', 'active');
-        if ($status === 'active') {
-            $query->where('is_active', true);
-        } elseif ($status === 'inactive') {
-            $query->where('is_active', false);
-        }
+            if ($request->filled('search')) {
+                $query->where('name', 'LIKE', "%{$request->search}%");
+            }
 
-        $perPage        = $request->input('per_page', 25);
-        $allFilteredIds = (clone $query)->pluck('id')->toArray();
-        $items          = $query->orderBy('id')->paginate($perPage)->appends($request->query());
+            $status = $request->input('status', 'active');
 
-        $total    = Schedule::count();
-        $active   = Schedule::where('is_active', true)->count();
-        $inactive = Schedule::where('is_active', false)->count();
+            if ($status === 'active') {
+                $query->where('is_active', true);
+            } elseif ($status === 'inactive') {
+                $query->where('is_active', false);
+            }
 
-        return view('modules.medical.schedules.index', compact('items', 'allFilteredIds', 'total', 'active', 'inactive'));
+            $perPage = $request->input('per_page', 25);
+
+            $allFilteredIds = (clone $query)->pluck('id')->toArray();
+            $items = $query->orderBy('id')->paginate($perPage)->appends($request->query());
+
+            $total = Schedule::count();
+            $active = Schedule::where('is_active', true)->count();
+            $inactive = Schedule::where('is_active', false)->count();
+
+            return compact('items', 'allFilteredIds', 'total', 'active', 'inactive');
+        });
+
+        return view('modules.medical.schedules.index', $data);
     }
 
     public function create()
@@ -50,11 +59,13 @@ class ScheduleController extends Controller
 
     public function store(StoreScheduleRequest $request)
     {
-        $item = new Schedule();
-        $item->name = $request->input('name');
-        $item->save();
+        $item = Schedule::create($request->validated());
 
-        $notification = ['message' => 'El turno "' . $item->name . '" se ha creado correctamente.', 'alert-type' => 'success'];
+        $notification = [
+            'message' => 'El turno "'.$item->name.'" se ha creado correctamente.',
+            'alert-type' => 'success',
+        ];
+
         return redirect()->route('schedules.index')->with(compact('notification'));
     }
 
@@ -67,56 +78,83 @@ class ScheduleController extends Controller
 
     public function update(UpdateScheduleRequest $request, Schedule $schedule)
     {
-        $schedule->name = $request->input('name');
-        $schedule->save();
+        $schedule->update($request->validated());
 
-        $notification = ['message' => 'El turno "' . $schedule->name . '" se ha actualizado correctamente.', 'alert-type' => 'info'];
+        $notification = [
+            'message' => 'El turno "'.$schedule->name.'" se ha actualizado correctamente.',
+            'alert-type' => 'info',
+        ];
+
         return redirect()->route('schedules.index')->with(compact('notification'));
     }
 
     public function destroy(Schedule $schedule)
     {
-        $schedule->is_active = false;
-        $schedule->save();
+        $schedule->update(['is_active' => false]);
 
-        $notification = ['message' => 'El turno "' . $schedule->name . '" ha sido desactivado.', 'alert-type' => 'warning'];
+        Cache::tags(['schedules'])->flush();
+
+        $notification = [
+            'message' => 'El turno "'.$schedule->name.'" ha sido desactivado.',
+            'alert-type' => 'warning',
+        ];
+
         return redirect()->route('schedules.index')->with(compact('notification'));
     }
 
     public function restore(Schedule $schedule)
     {
-        $schedule->is_active = true;
-        $schedule->save();
+        $schedule->update(['is_active' => true]);
 
-        $notification = ['message' => 'El turno "' . $schedule->name . '" ha sido reactivado.', 'alert-type' => 'success'];
+        Cache::tags(['schedules'])->flush();
+
+        $notification = [
+            'message' => 'El turno "'.$schedule->name.'" ha sido reactivado.',
+            'alert-type' => 'success',
+        ];
+
         return redirect()->route('schedules.index')->with(compact('notification'));
     }
 
     public function destroyMultiple(Request $request)
     {
         $ids = json_decode($request->input('ids', '[]'), true);
-        if (empty($ids)) return back()->with('error', 'No se seleccionaron registros.');
+
+        if (empty($ids)) {
+            return back()->with('error', 'No se seleccionaron registros.');
+        }
+
         Schedule::whereIn('id', $ids)->update(['is_active' => false]);
-        return back()->with('success', count($ids) . ' turnos han sido desactivados.');
+        Cache::tags(['schedules'])->flush();
+
+        return back()->with('success', count($ids).' turnos han sido desactivados.');
     }
 
     public function restoreMultiple(Request $request)
     {
         $ids = json_decode($request->input('ids', '[]'), true);
-        if (empty($ids)) return back()->with('error', 'No se seleccionaron registros.');
+
+        if (empty($ids)) {
+            return back()->with('error', 'No se seleccionaron registros.');
+        }
+
         Schedule::whereIn('id', $ids)->update(['is_active' => true]);
-        return back()->with('success', count($ids) . ' turnos han sido reactivados.');
+        Cache::tags(['schedules'])->flush();
+
+        return back()->with('success', count($ids).' turnos han sido reactivados.');
     }
 
     public function exportExcel(Request $request)
     {
         $ids = json_decode($request->input('ids', '[]'), true);
+
         return Excel::download(new ScheduleExport($ids), 'turnos.xlsx');
     }
 
     public function exportCSV(Request $request)
     {
         $ids = json_decode($request->input('ids', '[]'), true);
+
         return Excel::download(new ScheduleExport($ids), 'turnos.csv', \Maatwebsite\Excel\Excel::CSV);
     }
 
@@ -124,7 +162,9 @@ class ScheduleController extends Controller
     {
         $ids = json_decode($request->input('ids', '[]'), true);
         $items = count($ids) > 0 ? Schedule::whereIn('id', $ids)->orderBy('id')->get() : Schedule::orderBy('id')->get();
+
         $pdf = Pdf::loadView('modules.medical.schedules.print', compact('items'));
+
         return $pdf->download('turnos.pdf');
     }
 
@@ -132,6 +172,7 @@ class ScheduleController extends Controller
     {
         $ids = json_decode($request->input('ids', '[]'), true);
         $items = count($ids) > 0 ? Schedule::whereIn('id', $ids)->orderBy('id')->get() : Schedule::orderBy('id')->get();
+
         return view('modules.medical.schedules.print', compact('items'));
     }
 }
