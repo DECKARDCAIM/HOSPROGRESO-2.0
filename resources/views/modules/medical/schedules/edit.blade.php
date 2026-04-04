@@ -2,7 +2,8 @@
 @section('title', 'Editar Turno')
 @section('content')
 <main id="content" role="main" class="main"><div class="content container-fluid">
-    <div class="page-header"><div class="row align-items-end">
+
+        <div class="page-header"><div class="row align-items-end">
         <div class="col-sm mb-2 mb-sm-0"><nav aria-label="breadcrumb"><ol class="breadcrumb breadcrumb-no-gutter">
             <li class="breadcrumb-item"><a class="breadcrumb-link" href="{{ route('home') }}">Inicio</a></li>
             <li class="breadcrumb-item"><a class="breadcrumb-link" href="{{ route('home') }}">Mantenimiento</a></li>
@@ -11,7 +12,6 @@
         </ol></nav><h1 class="page-header-title">Editar turno</h1></div>
         <div class="col-auto"><a href="{{ route('schedules.index') }}" class="btn btn-primary"><i class="bi-arrow-left"></i> Regresar</a></div>
     </div></div>
-    <div class="row justify-content-lg-center"><div class="col-lg-9">
 @if ($errors->any())
                 <div class="alert alert-danger text-white mb-4" role="alert">
                     <strong>¡Ups! Ha ocurrido un problema:</strong>
@@ -22,6 +22,10 @@
                     </ul>
                 </div>
             @endif
+
+
+
+    <div class="row justify-content-lg-center"><div class="col-lg-9">
 
             <form action="{{ route('schedules.update', $item->id) }}" method="POST" id="itemForm" class="needs-validation" novalidate>
             @csrf @method('PUT')

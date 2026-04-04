@@ -3,6 +3,7 @@
 @section('content')
 <main id="content" role="main" class="main">
     <div class="content container-fluid">
+
         <div class="page-header">
             <div class="row align-items-end">
                 <div class="col-sm mb-2 mb-sm-0">
@@ -23,8 +24,6 @@
                 </div>
             </div>
         </div>
-        <div class="row justify-content-lg-center">
-            <div class="col-lg-10">
 @if ($errors->any())
                 <div class="alert alert-danger text-white mb-4" role="alert">
                     <strong>¡Ups! Ha ocurrido un problema:</strong>
@@ -35,6 +34,11 @@
                     </ul>
                 </div>
             @endif
+
+
+
+        <div class="row justify-content-lg-center">
+            <div class="col-lg-10">
 
             <form action="{{ route('patient-relatives.store') }}" method="POST" id="mainForm" class="needs-validation" novalidate>
                     @csrf
@@ -131,7 +135,7 @@
             if (!form.checkValidity()) {
                 event.preventDefault();
                 event.stopPropagation();
-                
+
             }
             form.classList.add('was-validated');
         }, false);

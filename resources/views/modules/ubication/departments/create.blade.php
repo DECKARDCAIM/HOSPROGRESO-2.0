@@ -3,6 +3,7 @@
 @section('content')
 <main id="content" role="main" class="main">
     <div class="content container-fluid">
+
         <div class="page-header">
             <div class="row align-items-end">
                 <div class="col-sm mb-2 mb-sm-0">
@@ -23,8 +24,6 @@
                 </div>
             </div>
         </div>
-        <div class="row justify-content-lg-center">
-            <div class="col-lg-9">
 @if ($errors->any())
                 <div class="alert alert-danger text-white mb-4" role="alert">
                     <strong>¡Ups! Ha ocurrido un problema:</strong>
@@ -35,6 +34,11 @@
                     </ul>
                 </div>
             @endif
+
+
+
+        <div class="row justify-content-lg-center">
+            <div class="col-lg-9">
 
             <form action="{{ route('departments.store') }}" method="POST" id="departmentForm" class="needs-validation" novalidate>
                     @csrf
@@ -84,23 +88,21 @@
         HSCore.components.HSTomSelect.init('.js-select')
 
         const form = document.querySelector('#departmentForm');
-        
+
         form.addEventListener('submit', function (event) {
             if (!form.checkValidity()) {
                 event.preventDefault();
                 event.stopPropagation();
-                
+
                 const preloader = document.getElementById('loading-spinner');
                 if (preloader) {
                     preloader.style.setProperty('display', 'none', 'important');
                     preloader.style.opacity = '0';
                 }
-                
-                
+
             }
             form.classList.add('was-validated');
         }, false);
-
 
     });
 </script>

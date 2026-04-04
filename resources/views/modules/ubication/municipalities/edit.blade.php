@@ -3,7 +3,8 @@
 @section('content')
     <main id="content" role="main" class="main">
         <div class="content container-fluid">
-            <div class="page-header">
+
+        <div class="page-header">
                 <div class="row align-items-end">
                     <div class="col-sm mb-2 mb-sm-0">
                         <nav aria-label="breadcrumb">
@@ -23,8 +24,6 @@
                     </div>
                 </div>
             </div>
-            <div class="row justify-content-lg-center">
-                <div class="col-lg-9">
 @if ($errors->any())
                 <div class="alert alert-danger text-white mb-4" role="alert">
                     <strong>¡Ups! Ha ocurrido un problema:</strong>
@@ -35,6 +34,11 @@
                     </ul>
                 </div>
             @endif
+
+
+
+            <div class="row justify-content-lg-center">
+                <div class="col-lg-9">
 
             <form action="{{ route('municipalities.update', $municipality->id) }}" method="POST" id="municipalityForm" class="needs-validation" novalidate>
                         @csrf
@@ -167,7 +171,7 @@
                     .catch(error => {
                         console.error('Error fetching departments:', error);
                         resetSelect(departmentSelect, 'Error al cargar');
-                        
+
                     });
             });
 
@@ -186,7 +190,6 @@
                         preloader.style.opacity = '0';
                     }
 
-                    
                 }
                 form.classList.add('was-validated');
             }, false);

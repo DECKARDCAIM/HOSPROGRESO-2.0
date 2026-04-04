@@ -3,6 +3,16 @@
 @section('content')
     <main id="content" role="main" class="main">
         <div class="content container-fluid">
+@if ($errors->any())
+                            <div class="alert alert-danger text-white" role="alert">
+                                <strong>¡Ups! Ha ocurrido un problema:</strong>
+                                <ul class="mb-0 mt-2">
+                                    @foreach ($errors->all() as $error)
+                                        <li>{{ $error }}</li>
+                                    @endforeach
+                                </ul>
+                            </div>
+                        @endif
             <div class="row justify-content-lg-center">
                 <div class="col-lg-10">
                     <div class="profile-cover">
@@ -81,16 +91,7 @@
                         </ul>
                     </div>
                     <div class="row">
-                        @if ($errors->any())
-                            <div class="alert alert-danger text-white" role="alert">
-                                <strong>¡Ups! Ha ocurrido un problema:</strong>
-                                <ul class="mb-0 mt-2">
-                                    @foreach ($errors->all() as $error)
-                                        <li>{{ $error }}</li>
-                                    @endforeach
-                                </ul>
-                            </div>
-                        @endif
+
                         <div class="col-lg-12">
                             <div class="card mb-3 mb-lg-5">
                                 <div class="card-header card-header-content-between">

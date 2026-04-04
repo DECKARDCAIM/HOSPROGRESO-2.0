@@ -116,7 +116,8 @@
 @section('content')
     <main id="content" role="main" class="main">
         <div class="content container-fluid py-4">
-            <div class="page-header">
+            
+        <div class="page-header">
                 <div class="row align-items-end">
                     <div class="col-sm mb-2 mb-sm-0">
                         <nav aria-label="breadcrumb">
@@ -132,8 +133,7 @@
                     </div>
                 </div>
             </div>
-            
-            @if ($errors->any())
+@if ($errors->any())
                 <div class="alert alert-danger text-white mb-4" role="alert">
                     <strong>¡Ups! Ha ocurrido un problema:</strong>
                     <ul class="mb-0 mt-2">
@@ -143,6 +143,9 @@
                     </ul>
                 </div>
             @endif
+
+
+
 
             <form action="{{ route('releases.update', $release->id) }}" method="POST" enctype="multipart/form-data" id="releaseForm">
                 @csrf
