@@ -2,13 +2,14 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\Allergy;
-use Illuminate\Http\Request;
+use App\Exports\AllergyExport;
 use App\Http\Requests\StoreAllergyRequest;
 use App\Http\Requests\UpdateAllergyRequest;
-use App\Exports\AllergyExport;
-use Maatwebsite\Excel\Facades\Excel;
+use App\Models\Allergy;
 use Barryvdh\DomPDF\Facade\Pdf;
+use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Cache;
+use Maatwebsite\Excel\Facades\Excel;
 
 class AllergyController extends Controller
 {
@@ -19,29 +20,36 @@ class AllergyController extends Controller
 
     public function index(Request $request)
     {
-        $query = Allergy::query();
+        $cacheKey = 'allergies_index_'.md5(json_encode($request->all()));
 
-        if ($request->filled('search')) {
-            $search = $request->search;
-            $query->where('name', 'LIKE', "%{$search}%");
-        }
+        $data = Cache::tags(['allergies'])->remember($cacheKey, now()->addDays(1), function () use ($request) {
+            $query = Allergy::query();
 
-        $status = $request->input('status', 'active');
-        if ($status === 'active') {
-            $query->where('is_active', true);
-        } elseif ($status === 'inactive') {
-            $query->where('is_active', false);
-        }
+            if ($request->filled('search')) {
+                $query->where('name', 'LIKE', "%{$request->search}%");
+            }
 
-        $perPage        = $request->input('per_page', 25);
-        $allFilteredIds = (clone $query)->pluck('id')->toArray();
-        $items          = $query->orderBy('id')->paginate($perPage)->appends($request->query());
+            $status = $request->input('status', 'active');
 
-        $total    = Allergy::count();
-        $active   = Allergy::where('is_active', true)->count();
-        $inactive = Allergy::where('is_active', false)->count();
+            if ($status === 'active') {
+                $query->where('is_active', true);
+            } elseif ($status === 'inactive') {
+                $query->where('is_active', false);
+            }
 
-        return view('modules.patient.allergies.index', compact('items', 'allFilteredIds', 'total', 'active', 'inactive'));
+            $perPage = $request->input('per_page', 25);
+
+            $allFilteredIds = (clone $query)->pluck('id')->toArray();
+            $items = $query->orderBy('id')->paginate($perPage)->appends($request->query());
+
+            $total = Allergy::count();
+            $active = Allergy::where('is_active', true)->count();
+            $inactive = Allergy::where('is_active', false)->count();
+
+            return compact('items', 'allFilteredIds', 'total', 'active', 'inactive');
+        });
+
+        return view('modules.patient.allergies.index', $data);
     }
 
     public function create()
@@ -51,11 +59,13 @@ class AllergyController extends Controller
 
     public function store(StoreAllergyRequest $request)
     {
-        $item = new Allergy();
-        $item->name = $request->input('name');
-        $item->save();
+        $item = Allergy::create($request->validated());
 
-        $notification = ['message' => 'La alergia "' . $item->name . '" se ha creado correctamente.', 'alert-type' => 'success'];
+        $notification = [
+            'message' => 'La alergia "'.$item->name.'" se ha creado correctamente.',
+            'alert-type' => 'success',
+        ];
+
         return redirect()->route('allergies.index')->with(compact('notification'));
     }
 
@@ -68,56 +78,83 @@ class AllergyController extends Controller
 
     public function update(UpdateAllergyRequest $request, Allergy $allergy)
     {
-        $allergy->name = $request->input('name');
-        $allergy->save();
+        $allergy->update($request->validated());
 
-        $notification = ['message' => 'La alergia "' . $allergy->name . '" se ha actualizado correctamente.', 'alert-type' => 'info'];
+        $notification = [
+            'message' => 'La alergia "'.$allergy->name.'" se ha actualizado correctamente.',
+            'alert-type' => 'info',
+        ];
+
         return redirect()->route('allergies.index')->with(compact('notification'));
     }
 
     public function destroy(Allergy $allergy)
     {
-        $allergy->is_active = false;
-        $allergy->save();
+        $allergy->update(['is_active' => false]);
 
-        $notification = ['message' => 'La alergia "' . $allergy->name . '" ha sido desactivada.', 'alert-type' => 'warning'];
+        Cache::tags(['allergies'])->flush();
+
+        $notification = [
+            'message' => 'La alergia "'.$allergy->name.'" ha sido desactivada.',
+            'alert-type' => 'warning',
+        ];
+
         return redirect()->route('allergies.index')->with(compact('notification'));
     }
 
     public function restore(Allergy $allergy)
     {
-        $allergy->is_active = true;
-        $allergy->save();
+        $allergy->update(['is_active' => true]);
 
-        $notification = ['message' => 'La alergia "' . $allergy->name . '" ha sido reactivada.', 'alert-type' => 'success'];
+        Cache::tags(['allergies'])->flush();
+
+        $notification = [
+            'message' => 'La alergia "'.$allergy->name.'" ha sido reactivada.',
+            'alert-type' => 'success',
+        ];
+
         return redirect()->route('allergies.index')->with(compact('notification'));
     }
 
     public function destroyMultiple(Request $request)
     {
         $ids = json_decode($request->input('ids', '[]'), true);
-        if (empty($ids)) return back()->with('error', 'No se seleccionaron alergias.');
+
+        if (empty($ids)) {
+            return back()->with('error', 'No se seleccionaron alergias.');
+        }
+
         Allergy::whereIn('id', $ids)->update(['is_active' => false]);
-        return back()->with('success', count($ids) . ' alergias han sido desactivadas.');
+        Cache::tags(['allergies'])->flush();
+
+        return back()->with('success', count($ids).' alergias han sido desactivadas.');
     }
 
     public function restoreMultiple(Request $request)
     {
         $ids = json_decode($request->input('ids', '[]'), true);
-        if (empty($ids)) return back()->with('error', 'No se seleccionaron alergias.');
+
+        if (empty($ids)) {
+            return back()->with('error', 'No se seleccionaron alergias.');
+        }
+
         Allergy::whereIn('id', $ids)->update(['is_active' => true]);
-        return back()->with('success', count($ids) . ' alergias han sido reactivadas.');
+        Cache::tags(['allergies'])->flush();
+
+        return back()->with('success', count($ids).' alergias han sido reactivadas.');
     }
 
     public function exportExcel(Request $request)
     {
         $ids = json_decode($request->input('ids', '[]'), true);
+
         return Excel::download(new AllergyExport($ids), 'alergias.xlsx');
     }
 
     public function exportCSV(Request $request)
     {
         $ids = json_decode($request->input('ids', '[]'), true);
+
         return Excel::download(new AllergyExport($ids), 'alergias.csv', \Maatwebsite\Excel\Excel::CSV);
     }
 
@@ -125,7 +162,9 @@ class AllergyController extends Controller
     {
         $ids = json_decode($request->input('ids', '[]'), true);
         $items = count($ids) > 0 ? Allergy::whereIn('id', $ids)->orderBy('id')->get() : Allergy::orderBy('id')->get();
+
         $pdf = Pdf::loadView('modules.patient.allergies.print', compact('items'));
+
         return $pdf->download('alergias.pdf');
     }
 
@@ -133,6 +172,7 @@ class AllergyController extends Controller
     {
         $ids = json_decode($request->input('ids', '[]'), true);
         $items = count($ids) > 0 ? Allergy::whereIn('id', $ids)->orderBy('id')->get() : Allergy::orderBy('id')->get();
+
         return view('modules.patient.allergies.print', compact('items'));
     }
 }
