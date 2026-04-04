@@ -20,6 +20,11 @@ use App\Http\Controllers\DisabilityController;
 use App\Http\Controllers\ScheduleController;
 use App\Http\Controllers\SpecialtyController;
 use App\Http\Controllers\ReleaseController;
+use App\Http\Controllers\WorkDepartmentController;
+use App\Http\Controllers\UnityExecutionController;
+use App\Http\Controllers\RoleController;
+use App\Http\Controllers\RelationshipTypeController;
+use App\Http\Controllers\PatientRelativeController;
 
 Route::get('/', function () {
     if (Auth::check()) {
@@ -99,15 +104,25 @@ Route::middleware(['auth', 'PreventBackHistory'])->group(function () {
     // ==========================================
     // MÓDULO: PACIENTES Y FAMILIARES
     // ==========================================
-    Route::get('/patients/relatives/search', [PatientController::class , 'searchRelatives'])->name('patients.relatives.search');
-    Route::post('/patients/relatives/store-ajax', [PatientController::class , 'storeRelativeAjax'])->name('patients.relatives.store-ajax');
-    // Rutas Resource de Pacientes
+    Route::controller(PatientController::class)->prefix('patients')->name('patients.')->group(function () {
+        Route::get('export/excel', 'exportExcel')->name('export.excel');
+        Route::get('export/csv', 'exportCSV')->name('export.csv');
+        Route::get('export/pdf', 'exportPDF')->name('export.pdf');
+        Route::post('destroy-multiple', 'destroyMultiple')->name('destroy-multiple');
+        Route::post('{id}/restore', 'restore')->name('restore');
+        Route::get('relatives/search', 'searchRelatives')->name('relatives.search');
+        Route::post('relatives/store-ajax', 'storeRelativeAjax')->name('relatives.store-ajax');
+    });
     Route::resource('patients', PatientController::class);
-    Route::get('/patients/export/excel', [PatientController::class , 'exportExcel'])->name('patients.export.excel');
-    Route::get('/patients/export/csv', [PatientController::class , 'exportCSV'])->name('patients.export.csv');
-    Route::get('/patients/export/pdf', [PatientController::class , 'exportPDF'])->name('patients.export.pdf');
-    Route::post('/patients/destroy-multiple', [PatientController::class , 'destroyMultiple'])->name('patients.destroy-multiple');
-    Route::post('/patients/{id}/restore', [PatientController::class , 'restore'])->name('patients.restore');
+
+    Route::controller(PatientRelativeController::class)->prefix('patient-relatives')->name('patient-relatives.')->group(function () {
+        Route::post('export/excel', 'exportExcel')->name('export.excel');
+        Route::post('export/csv', 'exportCSV')->name('export.csv');
+        Route::post('export/pdf', 'exportPDF')->name('export.pdf');
+        Route::post('print', 'print')->name('print');
+        Route::post('destroy-multiple', 'destroyMultiple')->name('destroy-multiple');
+    });
+    Route::resource('patient-relatives', PatientRelativeController::class);
 
 
     // ==========================================
@@ -238,5 +253,46 @@ Route::middleware(['auth', 'PreventBackHistory'])->group(function () {
         Route::post('{specialty}/restore', 'restore')->name('restore');
     });
     Route::resource('specialties', SpecialtyController::class);
+
+    // ==========================================
+    // MÓDULO: MANTENIMIENTO GENERAL
+    // ==========================================
+    Route::controller(WorkDepartmentController::class)->prefix('work-departments')->name('work-departments.')->group(function () {
+        Route::post('export/excel', 'exportExcel')->name('export.excel');
+        Route::post('export/csv', 'exportCSV')->name('export.csv');
+        Route::post('export/pdf', 'exportPDF')->name('export.pdf');
+        Route::post('print', 'print')->name('print');
+        Route::post('destroy-multiple', 'destroyMultiple')->name('destroy-multiple');
+        Route::post('restore-multiple', 'restoreMultiple')->name('restore-multiple');
+        Route::post('{work_department}/restore', 'restore')->name('restore');
+    });
+    Route::resource('work-departments', WorkDepartmentController::class);
+
+    Route::controller(UnityExecutionController::class)->prefix('unity-executions')->name('unity-executions.')->group(function () {
+        Route::post('export/excel', 'exportExcel')->name('export.excel');
+        Route::post('export/csv', 'exportCSV')->name('export.csv');
+        Route::post('export/pdf', 'exportPDF')->name('export.pdf');
+        Route::post('print', 'print')->name('print');
+    });
+    Route::resource('unity-executions', UnityExecutionController::class)->only(['index']);
+
+    Route::controller(RoleController::class)->prefix('roles')->name('roles.')->group(function () {
+        Route::post('export/excel', 'exportExcel')->name('export.excel');
+        Route::post('export/csv', 'exportCSV')->name('export.csv');
+        Route::post('export/pdf', 'exportPDF')->name('export.pdf');
+        Route::post('print', 'print')->name('print');
+    });
+    Route::resource('roles', RoleController::class)->only(['index']);
+
+    Route::controller(RelationshipTypeController::class)->prefix('relationship-types')->name('relationship-types.')->group(function () {
+        Route::post('export/excel', 'exportExcel')->name('export.excel');
+        Route::post('export/csv', 'exportCSV')->name('export.csv');
+        Route::post('export/pdf', 'exportPDF')->name('export.pdf');
+        Route::post('print', 'print')->name('print');
+        Route::post('destroy-multiple', 'destroyMultiple')->name('destroy-multiple');
+        Route::post('restore-multiple', 'restoreMultiple')->name('restore-multiple');
+        Route::post('{relationship_type}/restore', 'restore')->name('restore');
+    });
+    Route::resource('relationship-types', RelationshipTypeController::class);
 
 });
