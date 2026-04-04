@@ -4,6 +4,7 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Support\Facades\Cache;
 
 class Specialty extends Model
 {
@@ -11,10 +12,18 @@ class Specialty extends Model
 
     protected $fillable = [
         'name',
-        'code',
-        'description',
         'is_active',
     ];
+
+    protected $casts = [
+        'is_active' => 'boolean',
+    ];
+
+    protected static function booted()
+    {
+        static::saved(fn () => Cache::tags(['specialties'])->flush());
+        static::deleted(fn () => Cache::tags(['specialties'])->flush());
+    }
 
     public function users()
     {
