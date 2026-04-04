@@ -2,13 +2,14 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\LinguisticCommunity;
-use Illuminate\Http\Request;
+use App\Exports\LinguisticCommunityExport;
 use App\Http\Requests\StoreLinguisticCommunityRequest;
 use App\Http\Requests\UpdateLinguisticCommunityRequest;
-use App\Exports\LinguisticCommunityExport;
-use Maatwebsite\Excel\Facades\Excel;
+use App\Models\LinguisticCommunity;
 use Barryvdh\DomPDF\Facade\Pdf;
+use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Cache;
+use Maatwebsite\Excel\Facades\Excel;
 
 class LinguisticCommunityController extends Controller
 {
@@ -19,28 +20,36 @@ class LinguisticCommunityController extends Controller
 
     public function index(Request $request)
     {
-        $query = LinguisticCommunity::query();
+        $cacheKey = 'linguistic_communities_index_'.md5(json_encode($request->all()));
 
-        if ($request->filled('search')) {
-            $query->where('name', 'LIKE', "%{$request->search}%");
-        }
+        $data = Cache::tags(['linguistic_communities'])->remember($cacheKey, now()->addDays(1), function () use ($request) {
+            $query = LinguisticCommunity::query();
 
-        $status = $request->input('status', 'active');
-        if ($status === 'active') {
-            $query->where('is_active', true);
-        } elseif ($status === 'inactive') {
-            $query->where('is_active', false);
-        }
+            if ($request->filled('search')) {
+                $query->where('name', 'LIKE', "%{$request->search}%");
+            }
 
-        $perPage        = $request->input('per_page', 25);
-        $allFilteredIds = (clone $query)->pluck('id')->toArray();
-        $items          = $query->orderBy('id')->paginate($perPage)->appends($request->query());
+            $status = $request->input('status', 'active');
 
-        $total    = LinguisticCommunity::count();
-        $active   = LinguisticCommunity::where('is_active', true)->count();
-        $inactive = LinguisticCommunity::where('is_active', false)->count();
+            if ($status === 'active') {
+                $query->where('is_active', true);
+            } elseif ($status === 'inactive') {
+                $query->where('is_active', false);
+            }
 
-        return view('modules.patient.linguistic-communities.index', compact('items', 'allFilteredIds', 'total', 'active', 'inactive'));
+            $perPage = $request->input('per_page', 25);
+
+            $allFilteredIds = (clone $query)->pluck('id')->toArray();
+            $items = $query->orderBy('id')->paginate($perPage)->appends($request->query());
+
+            $total = LinguisticCommunity::count();
+            $active = LinguisticCommunity::where('is_active', true)->count();
+            $inactive = LinguisticCommunity::where('is_active', false)->count();
+
+            return compact('items', 'allFilteredIds', 'total', 'active', 'inactive');
+        });
+
+        return view('modules.patient.linguistic-communities.index', $data);
     }
 
     public function create()
@@ -50,11 +59,13 @@ class LinguisticCommunityController extends Controller
 
     public function store(StoreLinguisticCommunityRequest $request)
     {
-        $item = new LinguisticCommunity();
-        $item->name = $request->input('name');
-        $item->save();
+        $item = LinguisticCommunity::create($request->validated());
 
-        $notification = ['message' => 'El idioma "' . $item->name . '" se ha creado correctamente.', 'alert-type' => 'success'];
+        $notification = [
+            'message' => 'El idioma "'.$item->name.'" se ha creado correctamente.',
+            'alert-type' => 'success',
+        ];
+
         return redirect()->route('linguistic-communities.index')->with(compact('notification'));
     }
 
@@ -67,56 +78,83 @@ class LinguisticCommunityController extends Controller
 
     public function update(UpdateLinguisticCommunityRequest $request, LinguisticCommunity $linguisticCommunity)
     {
-        $linguisticCommunity->name = $request->input('name');
-        $linguisticCommunity->save();
+        $linguisticCommunity->update($request->validated());
 
-        $notification = ['message' => 'El idioma "' . $linguisticCommunity->name . '" se ha actualizado correctamente.', 'alert-type' => 'info'];
+        $notification = [
+            'message' => 'El idioma "'.$linguisticCommunity->name.'" se ha actualizado correctamente.',
+            'alert-type' => 'info',
+        ];
+
         return redirect()->route('linguistic-communities.index')->with(compact('notification'));
     }
 
     public function destroy(LinguisticCommunity $linguisticCommunity)
     {
-        $linguisticCommunity->is_active = false;
-        $linguisticCommunity->save();
+        $linguisticCommunity->update(['is_active' => false]);
 
-        $notification = ['message' => 'El idioma "' . $linguisticCommunity->name . '" ha sido desactivado.', 'alert-type' => 'warning'];
+        Cache::tags(['linguistic_communities'])->flush();
+
+        $notification = [
+            'message' => 'El idioma "'.$linguisticCommunity->name.'" ha sido desactivado.',
+            'alert-type' => 'warning',
+        ];
+
         return redirect()->route('linguistic-communities.index')->with(compact('notification'));
     }
 
     public function restore(LinguisticCommunity $linguisticCommunity)
     {
-        $linguisticCommunity->is_active = true;
-        $linguisticCommunity->save();
+        $linguisticCommunity->update(['is_active' => true]);
 
-        $notification = ['message' => 'El idioma "' . $linguisticCommunity->name . '" ha sido reactivado.', 'alert-type' => 'success'];
+        Cache::tags(['linguistic_communities'])->flush();
+
+        $notification = [
+            'message' => 'El idioma "'.$linguisticCommunity->name.'" ha sido reactivado.',
+            'alert-type' => 'success',
+        ];
+
         return redirect()->route('linguistic-communities.index')->with(compact('notification'));
     }
 
     public function destroyMultiple(Request $request)
     {
         $ids = json_decode($request->input('ids', '[]'), true);
-        if (empty($ids)) return back()->with('error', 'No se seleccionaron registros.');
+
+        if (empty($ids)) {
+            return back()->with('error', 'No se seleccionaron registros.');
+        }
+
         LinguisticCommunity::whereIn('id', $ids)->update(['is_active' => false]);
-        return back()->with('success', count($ids) . ' idiomas han sido desactivados.');
+        Cache::tags(['linguistic_communities'])->flush();
+
+        return back()->with('success', count($ids).' idiomas han sido desactivados.');
     }
 
     public function restoreMultiple(Request $request)
     {
         $ids = json_decode($request->input('ids', '[]'), true);
-        if (empty($ids)) return back()->with('error', 'No se seleccionaron registros.');
+
+        if (empty($ids)) {
+            return back()->with('error', 'No se seleccionaron registros.');
+        }
+
         LinguisticCommunity::whereIn('id', $ids)->update(['is_active' => true]);
-        return back()->with('success', count($ids) . ' idiomas han sido reactivados.');
+        Cache::tags(['linguistic_communities'])->flush();
+
+        return back()->with('success', count($ids).' idiomas han sido reactivados.');
     }
 
     public function exportExcel(Request $request)
     {
         $ids = json_decode($request->input('ids', '[]'), true);
+
         return Excel::download(new LinguisticCommunityExport($ids), 'idiomas.xlsx');
     }
 
     public function exportCSV(Request $request)
     {
         $ids = json_decode($request->input('ids', '[]'), true);
+
         return Excel::download(new LinguisticCommunityExport($ids), 'idiomas.csv', \Maatwebsite\Excel\Excel::CSV);
     }
 
@@ -124,7 +162,9 @@ class LinguisticCommunityController extends Controller
     {
         $ids = json_decode($request->input('ids', '[]'), true);
         $items = count($ids) > 0 ? LinguisticCommunity::whereIn('id', $ids)->orderBy('id')->get() : LinguisticCommunity::orderBy('id')->get();
+
         $pdf = Pdf::loadView('modules.patient.linguistic-communities.print', compact('items'));
+
         return $pdf->download('idiomas.pdf');
     }
 
@@ -132,6 +172,7 @@ class LinguisticCommunityController extends Controller
     {
         $ids = json_decode($request->input('ids', '[]'), true);
         $items = count($ids) > 0 ? LinguisticCommunity::whereIn('id', $ids)->orderBy('id')->get() : LinguisticCommunity::orderBy('id')->get();
+
         return view('modules.patient.linguistic-communities.print', compact('items'));
     }
 }
