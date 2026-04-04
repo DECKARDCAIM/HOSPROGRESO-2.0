@@ -9,7 +9,7 @@
                     <div class="w-100 content-space-t-4 content-space-t-lg-2 content-space-b-1" style="max-width: 25rem;">
                         <div id="login-form-wrapper">
                             @if ($errors->any())
-                                <div class="alert alert-danger text-white" role="alert">
+                                <div class="alert alert-danger text-white mb-4" role="alert">
                                     <strong>¡Ups! Ha ocurrido un problema:</strong>
                                     <ul class="mb-0 mt-2">
                                         @foreach ($errors->all() as $error)
@@ -35,12 +35,11 @@
                                 </div>
                                 <div class="mb-4">
                                     <label class="form-label" for="signinSrEmail">Correo electrónico</label>
-                                    <input type="email" autocomplete="off" class="form-control form-control-lg" name="email" id="signinSrEmail" placeholder="Ingrese su correo electrónico" aria-label="Ingrese su correo electrónico" required>
-                                    <span class="invalid-feedback">Por favor, ingrese un correo electrónico válido.</span>
+                                    <input type="email" autocomplete="off" class="form-control form-control-lg @error('email') is-invalid @enderror" value="{{ old('email') }}" name="email" id="signinSrEmail" placeholder="Ingrese su correo electrónico" aria-label="Ingrese su correo electrónico" required>
                                 </div>
                                 <div class="mb-4">
                                     <label class="form-label w-100" for="signupSrPassword">Contraseña</label>
-                                    <input type="password" class="form-control form-control-lg" name="password" id="signupSrPassword" placeholder="Ingrese su contraseña" aria-label="Ingrese su contraseña" required minlength="8" autocomplete="off">
+                                    <input type="password" class="form-control form-control-lg @error('password') is-invalid @enderror" name="password" id="signupSrPassword" placeholder="Ingrese su contraseña" aria-label="Ingrese su contraseña" required autocomplete="off">
                                 </div>
                                 <div class="d-grid">
                                     <button type="submit" class="btn btn-primary btn-lg">Iniciar Sesión</button>
