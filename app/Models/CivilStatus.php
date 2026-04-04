@@ -4,6 +4,7 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Support\Facades\Cache;
 
 class CivilStatus extends Model
 {
@@ -17,6 +18,12 @@ class CivilStatus extends Model
     protected $casts = [
         'is_active' => 'boolean',
     ];
+
+    protected static function booted()
+    {
+        static::saved(fn () => Cache::tags(['civil_statuses'])->flush());
+        static::deleted(fn () => Cache::tags(['civil_statuses'])->flush());
+    }
 
     public function patients()
     {

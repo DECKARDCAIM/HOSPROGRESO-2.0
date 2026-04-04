@@ -2,13 +2,14 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\CivilStatus;
-use Illuminate\Http\Request;
+use App\Exports\CivilStatusExport;
 use App\Http\Requests\StoreCivilStatusRequest;
 use App\Http\Requests\UpdateCivilStatusRequest;
-use App\Exports\CivilStatusExport;
-use Maatwebsite\Excel\Facades\Excel;
+use App\Models\CivilStatus;
 use Barryvdh\DomPDF\Facade\Pdf;
+use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Cache;
+use Maatwebsite\Excel\Facades\Excel;
 
 class CivilStatusController extends Controller
 {
@@ -19,28 +20,36 @@ class CivilStatusController extends Controller
 
     public function index(Request $request)
     {
-        $query = CivilStatus::query();
+        $cacheKey = 'civil_statuses_index_'.md5(json_encode($request->all()));
 
-        if ($request->filled('search')) {
-            $query->where('name', 'LIKE', "%{$request->search}%");
-        }
+        $data = Cache::tags(['civil_statuses'])->remember($cacheKey, now()->addDays(1), function () use ($request) {
+            $query = CivilStatus::query();
 
-        $status = $request->input('status', 'active');
-        if ($status === 'active') {
-            $query->where('is_active', true);
-        } elseif ($status === 'inactive') {
-            $query->where('is_active', false);
-        }
+            if ($request->filled('search')) {
+                $query->where('name', 'LIKE', "%{$request->search}%");
+            }
 
-        $perPage        = $request->input('per_page', 25);
-        $allFilteredIds = (clone $query)->pluck('id')->toArray();
-        $items          = $query->orderBy('id')->paginate($perPage)->appends($request->query());
+            $status = $request->input('status', 'active');
 
-        $total    = CivilStatus::count();
-        $active   = CivilStatus::where('is_active', true)->count();
-        $inactive = CivilStatus::where('is_active', false)->count();
+            if ($status === 'active') {
+                $query->where('is_active', true);
+            } elseif ($status === 'inactive') {
+                $query->where('is_active', false);
+            }
 
-        return view('modules.patient.civil-statuses.index', compact('items', 'allFilteredIds', 'total', 'active', 'inactive'));
+            $perPage = $request->input('per_page', 25);
+
+            $allFilteredIds = (clone $query)->pluck('id')->toArray();
+            $items = $query->orderBy('id')->paginate($perPage)->appends($request->query());
+
+            $total = CivilStatus::count();
+            $active = CivilStatus::where('is_active', true)->count();
+            $inactive = CivilStatus::where('is_active', false)->count();
+
+            return compact('items', 'allFilteredIds', 'total', 'active', 'inactive');
+        });
+
+        return view('modules.patient.civil-statuses.index', $data);
     }
 
     public function create()
@@ -50,11 +59,13 @@ class CivilStatusController extends Controller
 
     public function store(StoreCivilStatusRequest $request)
     {
-        $item = new CivilStatus();
-        $item->name = $request->input('name');
-        $item->save();
+        $item = CivilStatus::create($request->validated());
 
-        $notification = ['message' => 'El estado civil "' . $item->name . '" se ha creado correctamente.', 'alert-type' => 'success'];
+        $notification = [
+            'message' => 'El estado civil "'.$item->name.'" se ha creado correctamente.',
+            'alert-type' => 'success',
+        ];
+
         return redirect()->route('civil-statuses.index')->with(compact('notification'));
     }
 
@@ -67,56 +78,83 @@ class CivilStatusController extends Controller
 
     public function update(UpdateCivilStatusRequest $request, CivilStatus $civilStatus)
     {
-        $civilStatus->name = $request->input('name');
-        $civilStatus->save();
+        $civilStatus->update($request->validated());
 
-        $notification = ['message' => 'El estado civil "' . $civilStatus->name . '" se ha actualizado correctamente.', 'alert-type' => 'info'];
+        $notification = [
+            'message' => 'El estado civil "'.$civilStatus->name.'" se ha actualizado correctamente.',
+            'alert-type' => 'info',
+        ];
+
         return redirect()->route('civil-statuses.index')->with(compact('notification'));
     }
 
     public function destroy(CivilStatus $civilStatus)
     {
-        $civilStatus->is_active = false;
-        $civilStatus->save();
+        $civilStatus->update(['is_active' => false]);
 
-        $notification = ['message' => 'El estado civil "' . $civilStatus->name . '" ha sido desactivado.', 'alert-type' => 'warning'];
+        Cache::tags(['civil_statuses'])->flush();
+
+        $notification = [
+            'message' => 'El estado civil "'.$civilStatus->name.'" ha sido desactivado.',
+            'alert-type' => 'warning',
+        ];
+
         return redirect()->route('civil-statuses.index')->with(compact('notification'));
     }
 
     public function restore(CivilStatus $civilStatus)
     {
-        $civilStatus->is_active = true;
-        $civilStatus->save();
+        $civilStatus->update(['is_active' => true]);
 
-        $notification = ['message' => 'El estado civil "' . $civilStatus->name . '" ha sido reactivado.', 'alert-type' => 'success'];
+        Cache::tags(['civil_statuses'])->flush();
+
+        $notification = [
+            'message' => 'El estado civil "'.$civilStatus->name.'" ha sido reactivado.',
+            'alert-type' => 'success',
+        ];
+
         return redirect()->route('civil-statuses.index')->with(compact('notification'));
     }
 
     public function destroyMultiple(Request $request)
     {
         $ids = json_decode($request->input('ids', '[]'), true);
-        if (empty($ids)) return back()->with('error', 'No se seleccionaron registros.');
+
+        if (empty($ids)) {
+            return back()->with('error', 'No se seleccionaron registros.');
+        }
+
         CivilStatus::whereIn('id', $ids)->update(['is_active' => false]);
-        return back()->with('success', count($ids) . ' estados civiles han sido desactivados.');
+        Cache::tags(['civil_statuses'])->flush();
+
+        return back()->with('success', count($ids).' estados civiles han sido desactivados.');
     }
 
     public function restoreMultiple(Request $request)
     {
         $ids = json_decode($request->input('ids', '[]'), true);
-        if (empty($ids)) return back()->with('error', 'No se seleccionaron registros.');
+
+        if (empty($ids)) {
+            return back()->with('error', 'No se seleccionaron registros.');
+        }
+
         CivilStatus::whereIn('id', $ids)->update(['is_active' => true]);
-        return back()->with('success', count($ids) . ' estados civiles han sido reactivados.');
+        Cache::tags(['civil_statuses'])->flush();
+
+        return back()->with('success', count($ids).' estados civiles han sido reactivados.');
     }
 
     public function exportExcel(Request $request)
     {
         $ids = json_decode($request->input('ids', '[]'), true);
+
         return Excel::download(new CivilStatusExport($ids), 'estados-civiles.xlsx');
     }
 
     public function exportCSV(Request $request)
     {
         $ids = json_decode($request->input('ids', '[]'), true);
+
         return Excel::download(new CivilStatusExport($ids), 'estados-civiles.csv', \Maatwebsite\Excel\Excel::CSV);
     }
 
@@ -124,7 +162,9 @@ class CivilStatusController extends Controller
     {
         $ids = json_decode($request->input('ids', '[]'), true);
         $items = count($ids) > 0 ? CivilStatus::whereIn('id', $ids)->orderBy('id')->get() : CivilStatus::orderBy('id')->get();
+
         $pdf = Pdf::loadView('modules.patient.civil-statuses.print', compact('items'));
+
         return $pdf->download('estados-civiles.pdf');
     }
 
@@ -132,6 +172,7 @@ class CivilStatusController extends Controller
     {
         $ids = json_decode($request->input('ids', '[]'), true);
         $items = count($ids) > 0 ? CivilStatus::whereIn('id', $ids)->orderBy('id')->get() : CivilStatus::orderBy('id')->get();
+
         return view('modules.patient.civil-statuses.print', compact('items'));
     }
 }
