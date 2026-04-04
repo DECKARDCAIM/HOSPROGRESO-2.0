@@ -5,6 +5,7 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
+use Illuminate\Support\Facades\Cache;
 
 class Release extends Model
 {
@@ -25,6 +26,14 @@ class Release extends Model
         'published_at' => 'datetime',
         'document_path' => 'array',
     ];
+
+    protected static function booted()
+    {
+        $flushCache = fn () => Cache::tags(['releases'])->flush();
+        static::saved($flushCache);
+        static::deleted($flushCache);
+        static::restored($flushCache);
+    }
 
     public function author()
     {

@@ -3,10 +3,13 @@
 namespace App\Http\Controllers;
 
 use App\Events\ReleaseCreated;
-use App\Models\Release; // 🔥 1. IMPORTAMOS TU NUEVO EVENTO AQUÍ
+use App\Http\Requests\StoreReleaseRequest;
+use App\Http\Requests\UpdateReleaseRequest;
+use App\Models\Release;
 use Carbon\Carbon;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Storage;
@@ -14,130 +17,108 @@ use Illuminate\Support\Str;
 
 class ReleaseController extends Controller
 {
-    /**
-     * Display a listing of the resource.
-     */
     public function index(Request $request)
     {
-        $query = Release::with('author');
+        $cacheKey = 'releases_index_'.md5(json_encode($request->all()));
 
-        if ($request->input('record_status', 'active') === 'inactive') {
-            $query->onlyTrashed();
-        }
+        $data = Cache::tags(['releases'])->remember($cacheKey, now()->addHours(2), function () use ($request) {
+            $query = Release::with('author');
 
-        if ($request->filled('date_from') || $request->filled('date_to')) {
-            if ($request->filled('date_from')) {
-                $query->whereDate('published_at', '>=', $request->date_from);
+            if ($request->input('record_status', 'active') === 'inactive') {
+                $query->onlyTrashed();
             }
-            if ($request->filled('date_to')) {
-                $query->whereDate('published_at', '<=', $request->date_to);
+
+            if ($request->filled('date_from') || $request->filled('date_to')) {
+                if ($request->filled('date_from')) {
+                    $query->whereDate('published_at', '>=', $request->date_from);
+                }
+                if ($request->filled('date_to')) {
+                    $query->whereDate('published_at', '<=', $request->date_to);
+                }
+            } else {
+                $query->whereDate('published_at', now()->toDateString());
             }
-        } else {
-            $query->whereDate('published_at', now()->toDateString());
-        }
 
-        if ($request->filled('search')) {
-            $query->where(function ($q) use ($request) {
-                $q->where('title', 'like', '%'.$request->search.'%')
-                    ->orWhere('content', 'like', '%'.$request->search.'%');
-            });
-        }
+            if ($request->filled('search')) {
+                $query->where(function ($q) use ($request) {
+                    $q->where('title', 'like', '%'.$request->search.'%')
+                        ->orWhere('content', 'like', '%'.$request->search.'%');
+                });
+            }
 
-        if ($request->filled('type')) {
-            $query->where('type', $request->type);
-        }
+            if ($request->filled('type')) {
+                $query->where('type', $request->type);
+            }
 
-        if ($request->filled('status') && in_array($request->status, ['draft', 'published', 'archived'])) {
-            $query->where('status', $request->status);
-        }
+            if ($request->filled('status') && in_array($request->status, ['draft', 'published', 'archived'])) {
+                $query->where('status', $request->status);
+            }
 
-        $query->orderBy('published_at', 'desc');
+            $query->orderBy('published_at', 'desc');
 
-        $allFilteredIds = $query->pluck('id')->toArray();
-        $perPage = $request->input('per_page', 5);
-        $releases = $query->paginate($perPage);
+            $allFilteredIds = $query->pluck('id')->toArray();
+            $perPage = $request->input('per_page', 5);
+            $releases = $query->paginate($perPage)->appends($request->query());
 
-        // Metrics for the cards
-        $allTotal = Release::count();
-        $allPublished = Release::published()->count();
-        $allDrafts = Release::where('status', 'draft')->count();
-        $allThisMonth = Release::whereMonth('created_at', now()->month)->count();
+            $allTotal = Release::count();
+            $allPublished = Release::published()->count();
+            $allDrafts = Release::where('status', 'draft')->count();
+            $allThisMonth = Release::whereMonth('created_at', now()->month)->count();
 
-        $activeFilters = 0;
-        if ($request->filled('status')) {
-            $activeFilters++;
-        }
-        if ($request->filled('type')) {
-            $activeFilters++;
-        }
-        if ($request->filled('date_from') || $request->filled('date_to')) {
-            $activeFilters++;
-        }
+            $activeFilters = 0;
+            if ($request->filled('status')) {
+                $activeFilters++;
+            }
+            if ($request->filled('type')) {
+                $activeFilters++;
+            }
+            if ($request->filled('date_from') || $request->filled('date_to')) {
+                $activeFilters++;
+            }
 
-        // For the calendar: get counts and titles of releases per day
-        $calendarData = Release::published()
-            ->select('id', 'title', 'published_at')
-            ->get()
-            ->groupBy(function ($item) {
-                return $item->published_at->format('Y-m-d');
-            })
-            ->map(function ($dayReleases) {
-                return [
+            $calendarData = Release::published()
+                ->select('id', 'title', 'published_at')
+                ->get()
+                ->groupBy(fn ($item) => $item->published_at->format('Y-m-d'))
+                ->map(fn ($dayReleases) => [
                     'count' => $dayReleases->count(),
                     'titles' => $dayReleases->take(3)->pluck('title')->toArray(),
                     'has_more' => $dayReleases->count() > 3,
-                ];
-            });
+                ]);
 
-        return view('modules.administration.release.index', compact(
-            'releases',
-            'calendarData',
-            'allTotal',
-            'allPublished',
-            'allDrafts',
-            'allThisMonth',
-            'activeFilters',
-            'allFilteredIds'
-        ));
+            return compact(
+                'releases', 'calendarData', 'allTotal', 'allPublished',
+                'allDrafts', 'allThisMonth', 'activeFilters', 'allFilteredIds'
+            );
+        });
+
+        return view('modules.administration.release.index', $data);
     }
 
-    /**
-     * Show the form for creating a new resource.
-     */
     public function create()
     {
         return view('modules.administration.release.create');
     }
 
-    /**
-     * Store a newly created resource in storage.
-     */
-    public function store(Request $request)
+    public function store(StoreReleaseRequest $request)
     {
-        $request->validate([
-            'title' => 'required|string|max:255',
-            'content' => 'required|string',
-            'status' => 'required|in:draft,published,archived',
-            'type' => 'required|in:actualizacion,comunicado',
-            'published_at' => 'nullable|date',
-            'background_image' => 'nullable|image|mimes:jpeg,png,jpg,webp|max:5120',
-            'documents' => 'nullable|array',
-            'documents.*' => 'file|mimes:pdf,doc,docx,jpg,jpeg,png|max:51200',
-        ]);
+        $validated = $request->validated();
 
         $data = [
-            'title' => $request->title,
-            'content' => $request->content,
-            'status' => $request->status,
-            'type' => $request->type,
+            'title' => $validated['title'],
+            'content' => $validated['content'],
+            'status' => $validated['status'],
+            'type' => $validated['type'],
             'author_id' => auth()->id(),
-            'published_at' => $request->published_at ? Carbon::parse($request->published_at) : ($request->status == 'published' ? now() : null),
+            'published_at' => $request->filled('published_at')
+                                ? Carbon::parse($validated['published_at'])
+                                : ($validated['status'] == 'published' ? now() : null),
         ];
 
         if ($request->hasFile('documents')) {
             $paths = [];
             foreach ($request->file('documents') as $file) {
-                $fileName = Str::slug($request->title).'-'.time().'-'.uniqid().'.'.$file->getClientOriginalExtension();
+                $fileName = Str::slug($validated['title']).'-'.time().'-'.uniqid().'.'.$file->getClientOriginalExtension();
                 $paths[] = $file->storeAs('releases', $fileName, 'public');
             }
             $data['document_path'] = $paths;
@@ -148,25 +129,16 @@ class ReleaseController extends Controller
             $data['background_image'] = $request->file('background_image')->storeAs('releases/backgrounds', $bgName, 'public');
         }
 
-        // Guardamos en Base de Datos
         $release = Release::create($data);
 
-        // 🔥 2. AVISAMOS A TODOS LOS NAVEGADORES CONECTADOS 🔥
-        // Solo enviamos la notificación si el comunicado se guardó como "Publicado" (no tiene sentido notificar borradores)
         if ($release->status === 'published') {
-            // El texto que le aparecerá al usuario en el Toast
             $mensajeToast = 'Se ha publicado un nuevo comunicado: '.$release->title;
-
-            // Disparamos el evento a Reverb/WebSockets
             broadcast(new ReleaseCreated('Nuevo Comunicado', $mensajeToast, 'info'));
         }
 
         return redirect()->route('releases.index')->with('success', 'Comunicado creado exitosamente.');
     }
 
-    /**
-     * Display the specified resource.
-     */
     public function show($id)
     {
         $release = Release::withTrashed()->findOrFail($id);
@@ -174,40 +146,26 @@ class ReleaseController extends Controller
         return view('modules.administration.release.show', compact('release'));
     }
 
-    /**
-     * Show the form for editing the specified resource.
-     */
     public function edit(Release $release)
     {
         return view('modules.administration.release.edit', compact('release'));
     }
 
-    /**
-     * Update the specified resource in storage.
-     */
-    public function update(Request $request, Release $release)
+    public function update(UpdateReleaseRequest $request, Release $release)
     {
-        $request->validate([
-            'title' => 'required|string|max:255',
-            'content' => 'required|string',
-            'status' => 'required|in:draft,published,archived',
-            'type' => 'required|in:actualizacion,comunicado',
-            'published_at' => 'nullable|date',
-            'background_image' => 'nullable|image|mimes:jpeg,png,jpg,webp|max:5120',
-            'documents' => 'nullable|array',
-            'documents.*' => 'file|mimes:pdf,doc,docx,jpg,jpeg,png|max:51200',
-        ]);
+        $validated = $request->validated();
 
         $data = [
-            'title' => $request->title,
-            'content' => $request->content,
-            'status' => $request->status,
-            'type' => $request->type,
-            'published_at' => $request->published_at ? Carbon::parse($request->published_at) : (($request->status == 'published' && ! $release->published_at) ? now() : $release->published_at),
+            'title' => $validated['title'],
+            'content' => $validated['content'],
+            'status' => $validated['status'],
+            'type' => $validated['type'],
+            'published_at' => $request->filled('published_at')
+                                ? Carbon::parse($validated['published_at'])
+                                : (($validated['status'] == 'published' && ! $release->published_at) ? now() : $release->published_at),
         ];
 
         if ($request->hasFile('documents')) {
-            // Delete old files if they exist
             if ($release->document_path && is_array($release->document_path)) {
                 foreach ($release->document_path as $oldPath) {
                     Storage::disk('public')->delete($oldPath);
@@ -216,7 +174,7 @@ class ReleaseController extends Controller
 
             $paths = [];
             foreach ($request->file('documents') as $file) {
-                $fileName = Str::slug($request->title).'-'.time().'-'.uniqid().'.'.$file->getClientOriginalExtension();
+                $fileName = Str::slug($validated['title']).'-'.time().'-'.uniqid().'.'.$file->getClientOriginalExtension();
                 $paths[] = $file->storeAs('releases', $fileName, 'public');
             }
             $data['document_path'] = $paths;
@@ -231,9 +189,9 @@ class ReleaseController extends Controller
         }
 
         $wasDraft = $release->status === 'draft';
+
         $release->update($data);
 
-        // 🔥 3. OPCIONAL: Notificar si pasó de Borrador a Publicado 🔥
         if ($wasDraft && $release->status === 'published') {
             broadcast(new ReleaseCreated('Nuevo Comunicado', 'Se ha publicado un nuevo comunicado: '.$release->title, 'info'));
         }
@@ -241,9 +199,6 @@ class ReleaseController extends Controller
         return redirect()->route('releases.index')->with('success', 'Comunicado actualizado exitosamente.');
     }
 
-    /**
-     * Remove the specified resource from storage.
-     */
     public function destroy(Release $release)
     {
         $release->delete();
@@ -251,58 +206,38 @@ class ReleaseController extends Controller
         return redirect()->route('releases.index')->with('success', 'Comunicado eliminado exitosamente.');
     }
 
-    /**
-     * Mark a release as read for the current user.
-     */
     public function markAsRead(Request $request, $id)
     {
         $user = auth()->user();
-        $user->readReleases()->syncWithoutDetaching([
-            $id => ['read_at' => now()],
-        ]);
+        $user->readReleases()->syncWithoutDetaching([$id => ['read_at' => now()]]);
 
         return response()->json(['success' => true]);
     }
 
-    /**
-     * Mark all releases as read for the current user.
-     */
     public function markAllAsRead()
     {
         $user = auth()->user();
         $unreadReleases = Release::published()
             ->where('published_at', '<=', now())
-            ->whereDoesntHave('readByUsers', function ($query) use ($user) {
-                $query->where('user_id', $user->id);
-            })
+            ->whereDoesntHave('readByUsers', fn ($query) => $query->where('user_id', $user->id))
             ->get();
 
         foreach ($unreadReleases as $release) {
-            $user->readReleases()->syncWithoutDetaching([
-                $release->id => ['read_at' => now()],
-            ]);
+            $user->readReleases()->syncWithoutDetaching([$release->id => ['read_at' => now()]]);
         }
 
         return response()->json(['success' => true]);
     }
 
-    /**
-     * Get unread notifications since a specific time.
-     */
     public function getUnread(Request $request)
     {
-        // Esta función ya no la necesitas para "escuchar" nuevos anuncios en tiempo real,
-        // pero puedes dejarla si la usas para cargar la campanita la primera vez que entras a la página.
         $user = auth()->user();
-        $sinceParam = $request->input('since');
-        $since = $sinceParam ? Carbon::parse($sinceParam) : now()->subMinutes(1);
+        $since = $request->input('since') ? Carbon::parse($request->input('since')) : now()->subMinutes(1);
 
         $unread = Release::published()
             ->where('published_at', '>', $since)
             ->where('published_at', '<=', now())
-            ->whereDoesntHave('readByUsers', function ($query) use ($user) {
-                $query->where('user_id', $user->id);
-            })
+            ->whereDoesntHave('readByUsers', fn ($query) => $query->where('user_id', $user->id))
             ->count();
 
         $notifications = [];
@@ -325,15 +260,9 @@ class ReleaseController extends Controller
         ]);
     }
 
-    /**
-     * Generar contenido usando ISAAC (IA del sistema).
-     */
     public function generateAiContent(Request $request): JsonResponse
     {
-        // ... (Tu código de ISAAC se mantiene idéntico, no hace falta tocarlo)
-        $validated = $request->validate([
-            'prompt' => 'required|string|max:1000',
-        ]);
+        $validated = $request->validate(['prompt' => 'required|string|max:1000']);
 
         $user = auth()->user();
         $userName = $user ? trim("{$user->first_name} {$user->first_last_name}") : 'Usuario';
@@ -370,7 +299,6 @@ class ReleaseController extends Controller
             if ($response->successful()) {
                 $rawContent = $response->json('message.content', 'Error al generar contenido.');
 
-                // Limpiar posibles bloques markdown "```json" y "```"
                 $rawContent = preg_replace('/^```json/i', '', $rawContent);
                 $rawContent = preg_replace('/^```/i', '', $rawContent);
                 $rawContent = preg_replace('/```$/i', '', $rawContent);
@@ -385,7 +313,6 @@ class ReleaseController extends Controller
                         'html' => $dataDecoded['html'],
                     ]);
                 } else {
-                    // Fallback si no retornó JSON válido
                     return response()->json([
                         'success' => true,
                         'title' => 'Comunicado Generado por ISAAC',
@@ -396,18 +323,12 @@ class ReleaseController extends Controller
 
             Log::error("Error de Ollama API al generar comunicado: {$response->body()}");
 
-            return response()->json([
-                'success' => false,
-                'message' => "Lo siento {$userName}, no pude generar el contenido. Código: {$response->status()}",
-            ], 500);
+            return response()->json(['success' => false, 'message' => "Lo siento {$userName}, no pude generar el contenido. Código: {$response->status()}"], 500);
 
         } catch (\Exception $e) {
             Log::error("Excepción al conectar con Ollama en generador de comunicados: {$e->getMessage()}");
 
-            return response()->json([
-                'success' => false,
-                'message' => 'Error de conexión con ISAAC. Verifica que el servicio esté activo.',
-            ], 500);
+            return response()->json(['success' => false, 'message' => 'Error de conexión con ISAAC. Verifica que el servicio esté activo.'], 500);
         }
     }
 }

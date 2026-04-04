@@ -32,7 +32,6 @@ class ReleaseCreated implements ShouldBroadcastNow
         ];
     }
 
-    // 🔥 ESTO ES NUEVO: Obliga a que el evento se llame exactamente así para Javascript
     public function broadcastAs(): string
     {
         return 'ReleaseCreated';
