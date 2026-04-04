@@ -127,7 +127,7 @@
                             </ol>
                         </nav>
                         <h1 class="page-header-title"> Editar comunicado 
-                            <span id="typeBadgeDisplay" class="badge bg-soft-primary text-primary ms-2"> {{ $release->type === 'actualizacion' ? 'Actualización' : 'Comunicado' }} </span>
+                            <span id="typeBadgeDisplay" class="badge bg-soft-primary text-primary ms-2"> {{ $release->type === 'update' ? 'Actualización' : 'Comunicado' }} </span>
                         </h1>
                     </div>
                 </div>
@@ -193,8 +193,8 @@
                                 <div class="mb-4">
                                     <label class="form-label text-muted text-uppercase fw-bold" style="font-size: .75rem;">Clasificación</label>
                                     <div class="d-flex gap-2">
-                                        <div class="btn border type-opt w-100 {{ old('type', $release->type) == 'comunicado' ? 'active' : '' }}" data-val="comunicado" onclick="setType(this)">Comunicado</div>
-                                        <div class="btn border type-opt w-100 {{ old('type', $release->type) == 'actualizacion' ? 'active' : '' }}" data-val="actualizacion" onclick="setType(this)">Actualización</div>
+                                        <div class="btn border type-opt w-100 {{ old('type', $release->type) == 'release' ? 'active' : '' }}" data-val="release" onclick="setType(this)">Comunicado</div>
+                                        <div class="btn border type-opt w-100 {{ old('type', $release->type) == 'update' ? 'active' : '' }}" data-val="update" onclick="setType(this)">Actualización</div>
                                     </div>
                                 </div>
                                 <div class="mb-4">
@@ -340,8 +340,8 @@
                 el.classList.add('active');
                 const val = el.dataset.val;
                 const labels = {
-                    comunicado: 'Comunicado',
-                    actualizacion: 'Actualización'
+                    release: 'Comunicado',
+                    update: 'Actualización'
                 };
                 document.getElementById('type_hidden').value = val;
                 document.getElementById('typeBadgeDisplay').textContent = labels[val] || val;

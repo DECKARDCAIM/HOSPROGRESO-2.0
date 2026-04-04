@@ -146,7 +146,7 @@
                                 </li>
                                 <li class="d-flex justify-content-between align-items-center border-bottom py-2">
                                     <span class="text-muted">Tipo</span>
-                                    <span class="fw-semibold text-dark">{{ $release->type === 'actualizacion' ? 'Actualización' : 'Comunicado' }}</span>
+                                    <span class="fw-semibold text-dark">{{ $release->type === 'update' ? 'Actualización' : 'Comunicado' }}</span>
                                 </li>
                                 <li class="d-flex justify-content-between align-items-center border-bottom py-2">
                                     <span class="text-muted">Autor</span>

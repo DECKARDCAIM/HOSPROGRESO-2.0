@@ -16,8 +16,8 @@ class StoreReleaseRequest extends FormRequest
         return [
             'title' => 'required|string|max:255',
             'content' => 'required|string',
-            'status' => 'required|in:draft,published,archived',
-            'type' => 'required|in:actualizacion,comunicado',
+            'status' => 'required|in:draft,published',
+            'type' => 'required|in:update,release',
             'published_at' => 'nullable|date',
             'background_image' => 'nullable|image|mimes:jpeg,png,jpg,webp|max:5120',
             'documents' => 'nullable|array',

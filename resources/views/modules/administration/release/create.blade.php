@@ -133,7 +133,7 @@
             <form action="{{ route('releases.store') }}" method="POST" enctype="multipart/form-data" id="releaseForm">
                 @csrf
                 <input type="hidden" name="content" id="content_hidden">
-                <input type="hidden" name="type" id="type_hidden" value="{{ old('type', 'comunicado') }}">
+                <input type="hidden" name="type" id="type_hidden" value="{{ old('type', 'release') }}">
                 <input type="hidden" name="status" id="status_hidden" value="{{ old('status', 'published') }}">
                 <div class="row">
                     <div class="col-lg-8 mb-4 mb-lg-0">
@@ -207,8 +207,8 @@
                                 <div class="mb-4">
                                     <label class="form-label text-muted text-uppercase fw-bold" style="font-size: .75rem;">Clasificación</label>
                                     <div class="d-flex gap-2">
-                                        <div class="btn border type-opt w-100 {{ old('type', 'comunicado') == 'comunicado' ? 'active' : '' }}" data-val="comunicado" onclick="setType(this)">Comunicado</div>
-                                        <div class="btn border type-opt w-100 {{ old('type') == 'actualizacion' ? 'active' : '' }}" data-val="actualizacion" onclick="setType(this)">Actualización</div>
+                                        <div class="btn border type-opt w-100 {{ old('type', 'release') == 'release' ? 'active' : '' }}" data-val="release" onclick="setType(this)">Comunicado</div>
+                                        <div class="btn border type-opt w-100 {{ old('type') == 'update' ? 'active' : '' }}" data-val="update" onclick="setType(this)">Actualización</div>
                                     </div>
                                 </div>
                                 <div class="mb-4">
@@ -345,8 +345,8 @@
                 el.classList.add('active');
                 const val = el.dataset.val;
                 const labels = {
-                    comunicado: 'Comunicado',
-                    actualizacion: 'Actualización'
+                    release: 'Comunicado',
+                    update: 'Actualización'
                 };
                 document.getElementById('type_hidden').value = val;
                 document.getElementById('typeBadgeDisplay').textContent = labels[val] || val;

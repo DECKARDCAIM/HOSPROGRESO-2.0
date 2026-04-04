@@ -133,8 +133,8 @@
                                                             <label class="form-label">Tipo</label>
                                                             <select name="type" class="form-select form-select-sm">
                                                                 <option value="">Todos</option>
-                                                                <option value="comunicado" {{ request('type') == 'comunicado' ? 'selected' : '' }}>Comunicado</option>
-                                                                <option value="actualizacion" {{ request('type') == 'actualizacion' ? 'selected' : '' }}>Actualización</option>
+                                                                <option value="release" {{ request('type') == 'release' ? 'selected' : '' }}>Comunicado</option>
+                                                                <option value="update" {{ request('type') == 'update' ? 'selected' : '' }}>Actualización</option>
                                                             </select>
                                                         </div>
                                                         <div class="col-12 mb-3">
@@ -176,7 +176,7 @@
                                         @php
                                             $pubDate = $release->published_at ?? $release->created_at;
                                             $isDraft = $release->status === 'draft';
-                                            $isActual = $release->type === 'actualizacion';
+                                            $isActual = $release->type === 'update';
                                         @endphp
                                         <tr>
                                             <td>

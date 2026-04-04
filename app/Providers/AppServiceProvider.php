@@ -28,7 +28,7 @@ class AppServiceProvider extends ServiceProvider
             $latestComunicados = \App\Models\Release::with(['author', 'readByUsers' => function($q) use ($user) {
                 if ($user) $q->where('user_id', $user->id);
             }])
-                ->where('type', 'comunicado')
+                ->where('type', 'release')
                 ->published()
                 ->where('published_at', '<=', now())
                 ->latest('published_at')
@@ -38,7 +38,7 @@ class AppServiceProvider extends ServiceProvider
             $latestActualizaciones = \App\Models\Release::with(['author', 'readByUsers' => function($q) use ($user) {
                 if ($user) $q->where('user_id', $user->id);
             }])
-                ->where('type', 'actualizacion')
+                ->where('type', 'update')
                 ->published()
                 ->where('published_at', '<=', now())
                 ->latest('published_at')

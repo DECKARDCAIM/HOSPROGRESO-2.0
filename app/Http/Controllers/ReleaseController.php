@@ -50,7 +50,7 @@ class ReleaseController extends Controller
                 $query->where('type', $request->type);
             }
 
-            if ($request->filled('status') && in_array($request->status, ['draft', 'published', 'archived'])) {
+            if ($request->filled('status') && in_array($request->status, ['draft', 'published'])) {
                 $query->where('status', $request->status);
             }
 
@@ -132,8 +132,12 @@ class ReleaseController extends Controller
         $release = Release::create($data);
 
         if ($release->status === 'published') {
-            $mensajeToast = 'Se ha publicado un nuevo comunicado: '.$release->title;
-            broadcast(new ReleaseCreated('Nuevo Comunicado', $mensajeToast, 'info'));
+            try {
+                $mensajeToast = 'Se ha publicado un nuevo comunicado: '.$release->title;
+                broadcast(new ReleaseCreated('Nuevo Comunicado', $mensajeToast, 'info'));
+            } catch (\Exception $e) {
+                Log::error('Fallo en la transmisión de comunicado (Reverb): '.$e->getMessage());
+            }
         }
 
         return redirect()->route('releases.index')->with('success', 'Comunicado creado exitosamente.');
@@ -193,7 +197,11 @@ class ReleaseController extends Controller
         $release->update($data);
 
         if ($wasDraft && $release->status === 'published') {
-            broadcast(new ReleaseCreated('Nuevo Comunicado', 'Se ha publicado un nuevo comunicado: '.$release->title, 'info'));
+            try {
+                broadcast(new ReleaseCreated('Nuevo Comunicado', 'Se ha publicado un nuevo comunicado: '.$release->title, 'info'));
+            } catch (\Exception $e) {
+                Log::error('Fallo en la transmisión de comunicado (Reverb): '.$e->getMessage());
+            }
         }
 
         return redirect()->route('releases.index')->with('success', 'Comunicado actualizado exitosamente.');
