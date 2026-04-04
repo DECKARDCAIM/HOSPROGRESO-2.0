@@ -4,6 +4,7 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Support\Facades\Cache;
 
 class Staff extends Model
 {
@@ -28,6 +29,12 @@ class Staff extends Model
         'schedule_id',
     ];
 
+    protected static function booted()
+    {
+        static::saved(fn () => Cache::tags(['users', 'profiles'])->flush());
+        static::deleted(fn () => Cache::tags(['users', 'profiles'])->flush());
+    }
+
     public function user()
     {
         return $this->belongsTo(User::class);
@@ -48,10 +55,10 @@ class Staff extends Model
         return $this->hasOneThrough(
             Department::class,
             Municipality::class,
-            'id', // ID on municipalities table
-            'id', // ID on departments table
-            'municipality_id', // Local key on staff table
-            'department_id' // Local key on municipalities table
+            'id',
+            'id',
+            'municipality_id',
+            'department_id'
         );
     }
 

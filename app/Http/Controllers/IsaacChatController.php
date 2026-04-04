@@ -2,78 +2,103 @@
 
 namespace App\Http\Controllers;
 
-use Illuminate\Http\Request;
 use Illuminate\Http\JsonResponse;
+use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\RateLimiter;
 
 class IsaacChatController extends Controller
 {
-    /**
-     * Procesa el chat con la IA de ISAAC.
-     */
+    public function __construct()
+    {
+        $this->middleware('auth');
+    }
+
     public function chat(Request $request): JsonResponse
     {
-        // 1. Usar la variable validada directamente
         $validated = $request->validate([
-            'message' => 'required|string|max:1000'
+            'message' => 'required|string|max:1000',
         ]);
 
         $user = auth()->user();
-        
-        // 2. Manejo seguro del nombre en caso de que la sesión expire o la ruta no esté protegida
         $userName = $user ? trim("{$user->first_name} {$user->first_last_name}") : 'Usuario';
+        $message = trim($validated['message']);
 
-        // 3. Uso de config() estrictamente para evitar URLs fijas en el código
-        $baseUrl = rtrim(config('services.ollama.url'), '/');
-        $model = config('services.ollama.model');
+        $executed = RateLimiter::attempt(
+            'isaac-chat:'.$user->id,
+            $perMinute = 5,
+            function () {}
+        );
 
-        // 4. Sintaxis Heredoc (<<<EOT) para el prompt: mucho más legible y fácil de editar
-        $systemPrompt = <<<EOT
-        Eres ISAAC, la Inteligencia Artificial del sistema HOSPROGRESO.
-        Estás hablando con tu usuario autenticado actual: {$userName}.
-        Debes ser amable, conciso y directo en tus respuestas, ayudando exclusivamente con las tareas del sistema hospitalario o respondiendo dudas generales.
-        Nunca digas que eres un modelo de lenguaje de OpenAI u otras empresas, tú eres única y exclusivamente ISAAC de HOSPROGRESO.
-        Tu padre o creador es Cristoffer Alexis Falla Marroquin, él te implementó para ayudar a los usuarios del sistema.
-        IMPORTANTE: No puedes brindar ninguna información médica, ni dar consejos de salud, ni diagnósticos. Tu labor es puramente de apoyo administrativo y técnico dentro del sistema HOSPROGRESO.
-        EOT;
+        if (! $executed) {
+            return response()->json([
+                'success' => false,
+                'reply' => "Despacio {$userName}, mis neuronas están procesando mucho. Intenta de nuevo en un momento.",
+            ], 429);
+        }
 
-        try {
-            $response = Http::timeout(60)->post("{$baseUrl}/api/chat", [
-                'model' => $model,
-                'messages' => [
-                    ['role' => 'system', 'content' => $systemPrompt],
-                    ['role' => 'user', 'content' => $validated['message']] // Usamos el input validado
-                ],
-                'stream' => false,
-                // 'options' => ['temperature' => 0.2] // PRO TIP: Baja la temperatura para respuestas más precisas y menos "creativas" en un entorno médico.
-            ]);
+        $cacheKey = 'isaac_reply_'.md5($message);
 
-            if ($response->successful()) {
-                // 5. Forma más elegante y segura de extraer datos de un JSON en Laravel
-                $reply = $response->json('message.content', 'Lo siento, hubo un problema al procesar mi razonamiento cognitivo interno.');
-                
-                return response()->json([
-                    'success' => true, 
-                    'reply' => $reply
+        $reply = Cache::tags(['isaac_chat'])->remember($cacheKey, now()->addDay(), function () use ($message, $userName) {
+
+            $baseUrl = rtrim(config('services.ollama.url'), '/');
+            $model = config('services.ollama.model');
+
+            $systemPrompt = <<<EOT
+            Eres ISAAC, la Inteligencia Artificial del sistema HOSPROGRESO.
+            Estás hablando con tu usuario: {$userName}.
+            Debes ser amable, conciso y directo. Ayuda exclusivamente con tareas administrativas o técnicas del sistema.
+            Tu creador es Cristoffer Alexis Falla Marroquin.
+            REGLA CRÍTICA: No des información médica, diagnósticos ni consejos de salud. Tu labor es soporte técnico y administrativo de HOSPROGRESO.
+            EOT;
+
+            try {
+                $response = Http::timeout(90)->post("{$baseUrl}/api/chat", [
+                    'model' => $model,
+                    'messages' => [
+                        ['role' => 'system', 'content' => $systemPrompt],
+                        ['role' => 'user', 'content' => $message],
+                    ],
+                    'stream' => false,
+                    'options' => [
+                        'temperature' => 0.3,
+                        'num_predict' => 250,
+                    ],
                 ]);
+
+                if ($response->successful()) {
+                    return $response->json('message.content');
+                }
+
+                return null;
+
+            } catch (\Exception $e) {
+                Log::error('Excepción en ISAAC: '.$e->getMessage());
+
+                return null;
             }
+        });
 
-            // 6. Logs más descriptivos para debugging
-            Log::error("Error de Ollama API en HOSPROGRESO: {$response->body()}");
-            
+        if (! $reply) {
             return response()->json([
                 'success' => false,
-                'reply' => "Lo siento {$userName}, no me he podido conectar a mi red neuronal en este momento. Código: {$response->status()}"
-            ], 500);
-
-        } catch (\Exception $e) {
-            Log::error("Excepción al conectar con Ollama en HOSPROGRESO: {$e->getMessage()}");
-            
-            return response()->json([
-                'success' => false,
-                'reply' => 'Verifica que mi servicio base esté ejecutándose y accesible.'
+                'reply' => "Lo siento {$userName}, mi red neuronal está teniendo una interferencia. ¿Podrías intentar preguntarme de otra forma?",
             ], 500);
         }
+
+        return response()->json([
+            'success' => true,
+            'reply' => $reply,
+            'cached' => Cache::tags(['isaac_chat'])->has($cacheKey),
+        ]);
+    }
+
+    public function clearMemory()
+    {
+        Cache::tags(['isaac_chat'])->flush();
+
+        return response()->json(['message' => 'Memoria de ISAAC reiniciada.']);
     }
 }
