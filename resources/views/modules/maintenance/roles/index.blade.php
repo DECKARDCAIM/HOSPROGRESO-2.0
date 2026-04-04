@@ -189,7 +189,7 @@
 </main>
 @endsection
 @push('scripts')
-<script>
+<script type="module">
     document.addEventListener('DOMContentLoaded', function () {
         function sendExportRequest(url) {
             const form = document.createElement('form');

@@ -38,7 +38,7 @@
             </div>
         </div>
     </main>
-    <script>
+    <script type="module">
         document.addEventListener('DOMContentLoaded', function() {
             if (typeof Chart === 'undefined') {
                 console.error("Chart.js no cargó. Verifica la ruta local.");

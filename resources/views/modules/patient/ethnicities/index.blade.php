@@ -155,7 +155,7 @@
 </main>
 @endsection
 @push('scripts')
-<script>
+<script type="module">
 document.addEventListener('DOMContentLoaded',function(){
     const storageKey='selectedEthnicities';let selectedIds=JSON.parse(sessionStorage.getItem(storageKey)||'[]');
     const checkAll=document.getElementById('datatableCheckAll'),checkboxes=document.querySelectorAll('input[id^="itemCheck"]'),selectedCountSpan=document.getElementById('selectedCount'),countWrapper=document.getElementById('selectedCountWrapper'),actionsWrapper=document.getElementById('actionsDropdownWrapper'),btnClear=document.getElementById('clearSelection');

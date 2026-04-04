@@ -31,7 +31,8 @@
 <body class="d-flex align-items-center min-h-100">
     <script src="{{ asset('dist/js/hs.theme-appearance.js') }}"></script>
     @yield('content')
-    <script src="{{ asset('dist/js/vendor.min.js') }}"></script>
+    <script src="{{ asset('dist/js/vendor-core.min.js') }}"></script>
+    <script src="{{ asset('dist/js/vendor-ui.min.js') }}"></script>
     <script src="{{ asset('dist/js/theme.min.js') }}"></script>
     <script src="{{ asset('dist/js/hs.theme-appearance-helper.js') }}"></script>
 </body>

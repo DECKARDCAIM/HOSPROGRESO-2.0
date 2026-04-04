@@ -508,7 +508,7 @@
     </main>
 @endsection
 @push('scripts')
-    <script>
+    <script type="module">
         (function() {
             window.addEventListener('load', function() {
                 HSCore.components.HSTomSelect.init('.js-select')

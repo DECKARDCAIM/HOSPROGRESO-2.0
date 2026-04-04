@@ -266,7 +266,7 @@
     </main>
 @endsection
 @push('scripts')
-    <script>
+    <script type="module">
         document.addEventListener('DOMContentLoaded', function() {
 
             var quill = new Quill('#editor', {

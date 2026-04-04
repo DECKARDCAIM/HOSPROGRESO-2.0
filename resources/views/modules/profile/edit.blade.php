@@ -242,7 +242,7 @@
     </main>
 @endsection
 @push('scripts')
-    <script>
+    <script type="module">
         document.addEventListener('DOMContentLoaded', function() {
             const bannerInput = document.getElementById('profileCoverUplaoder');
             const bannerImg = document.getElementById('profileCoverImg');

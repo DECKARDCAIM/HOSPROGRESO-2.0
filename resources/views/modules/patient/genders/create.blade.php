@@ -60,7 +60,7 @@
 </main>
 @endsection
 @push('scripts')
-<script>
+<script type="module">
 document.addEventListener('DOMContentLoaded', function () {
     const form = document.querySelector('#itemForm');
     form.addEventListener('submit', function (event) {

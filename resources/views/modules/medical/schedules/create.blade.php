@@ -49,5 +49,5 @@
 </div></main>
 @endsection
 @push('scripts')
-<script>document.addEventListener('DOMContentLoaded',function(){const form=document.querySelector('#itemForm');form.addEventListener('submit',function(event){if(!form.checkValidity()){event.preventDefault();event.stopPropagation();const p=document.getElementById('loading-spinner');if(p){p.style.setProperty('display','none','important');p.style.opacity='0';}}form.classList.add('was-validated');},false);});</script>
+<script type="module">document.addEventListener('DOMContentLoaded',function(){const form=document.querySelector('#itemForm');form.addEventListener('submit',function(event){if(!form.checkValidity()){event.preventDefault();event.stopPropagation();const p=document.getElementById('loading-spinner');if(p){p.style.setProperty('display','none','important');p.style.opacity='0';}}form.classList.add('was-validated');},false);});</script>
 @endpush

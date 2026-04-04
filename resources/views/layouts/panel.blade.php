@@ -36,7 +36,9 @@
     @include('includes.panel.menu')
     @yield('content')
     @include('includes.panel.IsaacChat')
-    <script src="{{ asset('dist/js/vendor.min.js') }}"></script>
+    <script src="{{ asset('dist/js/vendor-core.min.js') }}"></script>
+    <script src="{{ asset('dist/js/vendor-ui.min.js') }}"></script>
+    <script src="{{ asset('dist/js/vendor-charts.min.js') }}"></script>
     <script src="{{ asset('dist/js/theme.min.js') }}"></script>
     <script src="{{ asset('dist/js/hs.theme-appearance-helper.js') }}"></script>
     @stack('scripts')

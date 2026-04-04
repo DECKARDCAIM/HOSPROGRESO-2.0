@@ -356,7 +356,7 @@
 </main>
 @endsection
 @push('scripts')
-<script>
+<script type="module">
     document.addEventListener('DOMContentLoaded', function () {
         let currentHistoryPage = 1;
         const historyModal = document.getElementById('sessionHistoryModal');
@@ -455,7 +455,7 @@
     });
 </script>
 @if ($errors->has('password'))
-<script>
+<script type="module">
     document.addEventListener('DOMContentLoaded', function () {
         var modal = new bootstrap.Modal(document.getElementById('logoutOtherBrowserSessionsModal'));
         modal.show();

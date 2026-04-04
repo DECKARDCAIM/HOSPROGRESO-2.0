@@ -427,7 +427,7 @@
     </main>
 @endsection
 @push('scripts')
-    <script>
+    <script type="module">
         $(document).ready(function() {
             $('#filter_country_id').on('change', function() {
                 var countryId = $(this).val();
@@ -465,7 +465,7 @@
             });
         });
     </script>
-    <script>
+    <script type="module">
         $(document).ready(function() {
             $('#export-copy').on('click', function() {
                 var selectedPatients = $('.patient-checkbox:checked').map(function() {

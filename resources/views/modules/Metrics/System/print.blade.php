@@ -72,7 +72,7 @@
         <p>Sistema HOSPROGRESO - Módulo de Métricas</p>
     </div>
 
-    <script>
+    <script type="module">
         // Si no es PDF (es decir, es la vista de impresión en navegador)
         window.onload = function() {
             if (!window.location.search.includes('pdf=1')) {

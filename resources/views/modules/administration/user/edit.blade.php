@@ -413,7 +413,7 @@
                                         </div>
                                     </div>
                                 </div>
-                                <script>
+                                <script type="module">
                                     window.addEventListener('load', function() {
                                         document.getElementById("addUserStepFormProgress").style.display = 'none';
                                         document.getElementById("addUserStepFormContent").style.display = 'none';
@@ -429,7 +429,7 @@
     </main>
 @endsection
 @push('scripts')
-    <script>
+    <script type="module">
         (function() {
             window.onload = function() {
                 const getVal = id => {

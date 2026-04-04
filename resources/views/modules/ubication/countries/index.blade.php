@@ -293,7 +293,7 @@
 </main>
 @endsection
 @push('scripts')
-<script>
+<script type="module">
     document.addEventListener('DOMContentLoaded', function () {
         const storageKey = 'selectedCountries';
         let selectedIds = JSON.parse(sessionStorage.getItem(storageKey) || '[]');

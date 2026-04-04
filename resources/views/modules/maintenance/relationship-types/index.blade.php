@@ -233,7 +233,7 @@
 </main>
 @endsection
 @push('scripts')
-<script>
+<script type="module">
     document.addEventListener('DOMContentLoaded', function () {
         const storageKey = 'selectedRelationshipTypes';
         let selectedIds = JSON.parse(sessionStorage.getItem(storageKey) || '[]');

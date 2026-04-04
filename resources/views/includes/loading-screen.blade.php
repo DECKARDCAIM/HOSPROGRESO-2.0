@@ -16,7 +16,7 @@
         </div>
     </div>
 </div>
-<script>
+<script type="module">
 (function(){
     'use strict';
     var overlay=document.getElementById('gpl'),bar=document.getElementById('gpl-bar'),txt=document.getElementById('gpl-txt'),pct=0,loaded=0,total=0,syncDone=false,hiding=false;

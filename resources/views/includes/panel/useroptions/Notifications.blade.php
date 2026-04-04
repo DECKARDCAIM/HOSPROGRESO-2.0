@@ -183,7 +183,7 @@
     </div>
 </li>
 @push('scripts')
-<script>
+<script type="module">
 $(function() {
     window.updateBadge = function() {
         const count = $('.mark-read-check:checked').length;

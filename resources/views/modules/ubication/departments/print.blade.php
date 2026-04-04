@@ -35,7 +35,7 @@
             @endforeach
         </tbody>
     </table>
-    <script>
+    <script type="module">
         window.onload = function() {
             if (typeof window.print === 'function') {
                 window.print();

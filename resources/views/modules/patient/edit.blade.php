@@ -515,7 +515,7 @@
     </main>
 @endsection
 @push('scripts')
-    <script>
+    <script type="module">
         (function() {
             window.addEventListener('load', function() {
                 new HSFileAttach('.js-file-attach')

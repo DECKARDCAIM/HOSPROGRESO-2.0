@@ -409,7 +409,7 @@
     </main>
 @endsection
 @push('scripts')
-    <script>
+    <script type="module">
         $(document).ready(function() {
             $('#filter_country_id').on('change', function() {
                 var countryId = $(this).val();

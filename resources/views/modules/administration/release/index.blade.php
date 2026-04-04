@@ -320,7 +320,7 @@
                 ];
             });
     @endphp
-    <script>
+    <script type="module">
         document.addEventListener('DOMContentLoaded', function() {
             const releaseEvents = @json($calendarEvents);
             const today = new Date();
