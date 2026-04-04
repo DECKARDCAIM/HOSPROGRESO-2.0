@@ -5,7 +5,7 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
-use Carbon\Carbon;
+use Illuminate\Support\Facades\Cache;
 
 class Patient extends Model
 {
@@ -32,36 +32,33 @@ class Patient extends Model
         'place',
     ];
 
-    /**
-     * Get the clinical record associated with the patient.
-     */
+    protected $casts = [
+        'birth_date' => 'date',
+    ];
+
+    protected static function booted()
+    {
+        $flushCache = fn () => Cache::tags(['patients'])->flush();
+        static::saved($flushCache);
+        static::deleted($flushCache);
+        static::restored($flushCache);
+    }
+
     public function clinicalRecord()
     {
         return $this->hasOne(ClinicalRecord::class);
     }
 
-    /**
-     * Get the relatives for the patient.
-     */
     public function relatives()
     {
         return $this->hasMany(PatientRelative::class);
     }
 
-    /**
-     * Get the mother of the patient from relatives table.
-     */
     public function mother()
     {
         return $this->hasOne(PatientRelative::class)
-            ->whereHas('relationshipType', function($q) {
-                $q->where('name', 'Madre');
-            });
+            ->whereHas('relationshipType', fn ($q) => $q->where('name', 'Madre'));
     }
-
-    protected $casts = [
-        'birth_date' => 'date',
-    ];
 
     public function gender()
     {
@@ -88,10 +85,10 @@ class Patient extends Model
         return $this->hasOneThrough(
             Department::class,
             Municipality::class,
-            'id', // ID on municipalities table
-            'id', // ID on departments table
-            'municipality_id', // Local key on patients table
-            'department_id' // Local key on municipalities table
+            'id',
+            'id',
+            'municipality_id',
+            'department_id'
         );
     }
 
@@ -100,17 +97,11 @@ class Patient extends Model
         return $this->belongsTo(Municipality::class);
     }
 
-    /**
-     * The allergies associated with the patient.
-     */
     public function allergies()
     {
         return $this->belongsToMany(Allergy::class);
     }
 
-    /**
-     * The disabilities associated with the patient.
-     */
     public function disabilities()
     {
         return $this->belongsToMany(Disability::class);
@@ -118,11 +109,7 @@ class Patient extends Model
 
     public function getAgeAttribute()
     {
-        if (!$this->birth_date) {
-            return null;
-        }
-        
-        return $this->birth_date->age;
+        return $this->birth_date?->age;
     }
 
     public function isMinor(): bool
@@ -130,42 +117,28 @@ class Patient extends Model
         return $this->age !== null && $this->age < 18;
     }
 
-
     public function getFullNameAttribute()
     {
         $motherFullName = $this->mother_full_name;
-        if (!$this->first_name && $motherFullName) {
+        if (! $this->first_name && $motherFullName) {
             return "Hijo de {$motherFullName}";
         }
-        
-        $names = array_filter([
-            $this->first_name,
-            $this->second_name,
-            $this->third_name,
-        ]);
-        
-        $lastNames = array_filter([
-            $this->first_last_name,
-            $this->second_last_name,
-        ]);
-        
+
+        $names = array_filter([$this->first_name, $this->second_name, $this->third_name]);
+        $lastNames = array_filter([$this->first_last_name, $this->second_last_name]);
         $marriedLastName = $this->married_last_name ? " de {$this->married_last_name}" : '';
-        
-        return trim(implode(' ', $names) . ' ' . implode(' ', $lastNames) . $marriedLastName);
+
+        return trim(implode(' ', $names).' '.implode(' ', $lastNames).$marriedLastName);
     }
 
     public function getOnlyNamesAttribute()
     {
         $mother = $this->mother;
-        if (!$this->first_name && $mother) {
+        if (! $this->first_name && $mother) {
             return "Hijo de {$mother->first_name} {$mother->second_name} {$mother->third_name}";
         }
 
-        $names = array_filter([
-            $this->first_name,
-            $this->second_name,
-            $this->third_name,
-        ]);
+        $names = array_filter([$this->first_name, $this->second_name, $this->third_name]);
 
         return trim(implode(' ', $names));
     }
@@ -173,72 +146,56 @@ class Patient extends Model
     public function getOnlyLastNamesAttribute()
     {
         $mother = $this->mother;
-        if (!$this->first_name && $mother) {
-            $lastNames = array_filter([
-                $mother->first_last_name,
-                $mother->second_last_name,
-            ]);
+        if (! $this->first_name && $mother) {
+            $lastNames = array_filter([$mother->first_last_name, $mother->second_last_name]);
             $married = $mother->married_last_name ? " de {$mother->married_last_name}" : '';
-            return trim(implode(' ', $lastNames) . $married);
+
+            return trim(implode(' ', $lastNames).$married);
         }
 
-        $lastNames = array_filter([
-            $this->first_last_name,
-            $this->second_last_name,
-        ]);
-
+        $lastNames = array_filter([$this->first_last_name, $this->second_last_name]);
         $marriedLastName = $this->married_last_name ? " de {$this->married_last_name}" : '';
 
-        return trim(implode(' ', $lastNames) . $marriedLastName);
+        return trim(implode(' ', $lastNames).$marriedLastName);
     }
 
     public function getMotherFullNameAttribute()
     {
         $mother = $this->mother;
-        if (!$mother) {
+        if (! $mother) {
             return null;
         }
-        
-        $names = array_filter([
-            $mother->first_name,
-            $mother->second_name,
-            $mother->third_name,
-        ]);
-        
-        $lastNames = array_filter([
-            $mother->first_last_name,
-            $mother->second_last_name,
-        ]);
-        
+
+        $names = array_filter([$mother->first_name, $mother->second_name, $mother->third_name]);
+        $lastNames = array_filter([$mother->first_last_name, $mother->second_last_name]);
         $marriedLastName = $mother->married_last_name ? " de {$mother->married_last_name}" : '';
-        
-        return trim(implode(' ', $names) . ' ' . implode(' ', $lastNames) . $marriedLastName);
+
+        return trim(implode(' ', $names).' '.implode(' ', $lastNames).$marriedLastName);
     }
 
     public function scopeSearch($query, $search)
     {
-        if (!$search) {
+        if (! $search) {
             return $query;
         }
 
         return $query->where(function ($q) use ($search) {
             $q->where('first_name', 'like', "%{$search}%")
-            ->orWhere('second_name', 'like', "%{$search}%")
-            ->orWhere('third_name', 'like', "%{$search}%")
-            ->orWhere('first_last_name', 'like', "%{$search}%")
-            ->orWhere('second_last_name', 'like', "%{$search}%")
-            ->orWhere('cui', 'like', "%{$search}%")
-            ->orWhereHas('relatives', function ($sub) use ($search) {
-                $sub->where('first_name', 'like', "%{$search}%")
                 ->orWhere('second_name', 'like', "%{$search}%")
                 ->orWhere('third_name', 'like', "%{$search}%")
                 ->orWhere('first_last_name', 'like', "%{$search}%")
                 ->orWhere('second_last_name', 'like', "%{$search}%")
-                ->orWhere('cui', 'like', "%{$search}%");
-            });
+                ->orWhere('cui', 'like', "%{$search}%")
+                ->orWhereHas('relatives', function ($sub) use ($search) {
+                    $sub->where('first_name', 'like', "%{$search}%")
+                        ->orWhere('second_name', 'like', "%{$search}%")
+                        ->orWhere('third_name', 'like', "%{$search}%")
+                        ->orWhere('first_last_name', 'like', "%{$search}%")
+                        ->orWhere('second_last_name', 'like', "%{$search}%")
+                        ->orWhere('cui', 'like', "%{$search}%");
+                });
         });
     }
-
 
     public function scopeByGender($query, $genderId)
     {
@@ -262,16 +219,12 @@ class Patient extends Model
 
     public function scopeByCountry($query, $countryId)
     {
-        return $query->whereHas('municipality.department', function ($q) use ($countryId) {
-            $q->where('country_id', $countryId);
-        });
+        return $query->whereHas('municipality.department', fn ($q) => $q->where('country_id', $countryId));
     }
 
     public function scopeByDepartment($query, $departmentId)
     {
-        return $query->whereHas('municipality', function ($q) use ($departmentId) {
-            $q->where('department_id', $departmentId);
-        });
+        return $query->whereHas('municipality', fn ($q) => $q->where('department_id', $departmentId));
     }
 
     public function scopeByMunicipality($query, $municipalityId)
