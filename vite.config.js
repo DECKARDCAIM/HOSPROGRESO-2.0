@@ -222,10 +222,6 @@ export default defineConfig({
         { src: 'resources/assets/Fonts/*', dest: 'Fonts' },
         // JSON data files
         { src: 'resources/assets/json/*', dest: 'json' },
-        // Sound files
-        { src: 'resources/assets/sound/*', dest: 'sound' },
-        // Video files
-        { src: 'resources/assets/video/*', dest: 'video' },
         // Document files
         { src: 'resources/assets/doc/*', dest: 'doc' },
         // All 52 vendor library directories (each copied individually)
