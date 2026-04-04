@@ -2,13 +2,14 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\Disability;
-use Illuminate\Http\Request;
+use App\Exports\DisabilityExport;
 use App\Http\Requests\StoreDisabilityRequest;
 use App\Http\Requests\UpdateDisabilityRequest;
-use App\Exports\DisabilityExport;
-use Maatwebsite\Excel\Facades\Excel;
+use App\Models\Disability;
 use Barryvdh\DomPDF\Facade\Pdf;
+use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Cache;
+use Maatwebsite\Excel\Facades\Excel;
 
 class DisabilityController extends Controller
 {
@@ -19,28 +20,36 @@ class DisabilityController extends Controller
 
     public function index(Request $request)
     {
-        $query = Disability::query();
+        $cacheKey = 'disabilities_index_'.md5(json_encode($request->all()));
 
-        if ($request->filled('search')) {
-            $query->where('name', 'LIKE', "%{$request->search}%");
-        }
+        $data = Cache::tags(['disabilities'])->remember($cacheKey, now()->addDays(1), function () use ($request) {
+            $query = Disability::query();
 
-        $status = $request->input('status', 'active');
-        if ($status === 'active') {
-            $query->where('is_active', true);
-        } elseif ($status === 'inactive') {
-            $query->where('is_active', false);
-        }
+            if ($request->filled('search')) {
+                $query->where('name', 'LIKE', "%{$request->search}%");
+            }
 
-        $perPage        = $request->input('per_page', 25);
-        $allFilteredIds = (clone $query)->pluck('id')->toArray();
-        $items          = $query->orderBy('id')->paginate($perPage)->appends($request->query());
+            $status = $request->input('status', 'active');
 
-        $total    = Disability::count();
-        $active   = Disability::where('is_active', true)->count();
-        $inactive = Disability::where('is_active', false)->count();
+            if ($status === 'active') {
+                $query->where('is_active', true);
+            } elseif ($status === 'inactive') {
+                $query->where('is_active', false);
+            }
 
-        return view('modules.patient.disabilities.index', compact('items', 'allFilteredIds', 'total', 'active', 'inactive'));
+            $perPage = $request->input('per_page', 25);
+
+            $allFilteredIds = (clone $query)->pluck('id')->toArray();
+            $items = $query->orderBy('id')->paginate($perPage)->appends($request->query());
+
+            $total = Disability::count();
+            $active = Disability::where('is_active', true)->count();
+            $inactive = Disability::where('is_active', false)->count();
+
+            return compact('items', 'allFilteredIds', 'total', 'active', 'inactive');
+        });
+
+        return view('modules.patient.disabilities.index', $data);
     }
 
     public function create()
@@ -50,11 +59,13 @@ class DisabilityController extends Controller
 
     public function store(StoreDisabilityRequest $request)
     {
-        $item = new Disability();
-        $item->name = $request->input('name');
-        $item->save();
+        $item = Disability::create($request->validated());
 
-        $notification = ['message' => 'La discapacidad "' . $item->name . '" se ha creado correctamente.', 'alert-type' => 'success'];
+        $notification = [
+            'message' => 'La discapacidad "'.$item->name.'" se ha creado correctamente.',
+            'alert-type' => 'success',
+        ];
+
         return redirect()->route('disabilities.index')->with(compact('notification'));
     }
 
@@ -67,56 +78,83 @@ class DisabilityController extends Controller
 
     public function update(UpdateDisabilityRequest $request, Disability $disability)
     {
-        $disability->name = $request->input('name');
-        $disability->save();
+        $disability->update($request->validated());
 
-        $notification = ['message' => 'La discapacidad "' . $disability->name . '" se ha actualizado correctamente.', 'alert-type' => 'info'];
+        $notification = [
+            'message' => 'La discapacidad "'.$disability->name.'" se ha actualizado correctamente.',
+            'alert-type' => 'info',
+        ];
+
         return redirect()->route('disabilities.index')->with(compact('notification'));
     }
 
     public function destroy(Disability $disability)
     {
-        $disability->is_active = false;
-        $disability->save();
+        $disability->update(['is_active' => false]);
 
-        $notification = ['message' => 'La discapacidad "' . $disability->name . '" ha sido desactivada.', 'alert-type' => 'warning'];
+        Cache::tags(['disabilities'])->flush();
+
+        $notification = [
+            'message' => 'La discapacidad "'.$disability->name.'" ha sido desactivada.',
+            'alert-type' => 'warning',
+        ];
+
         return redirect()->route('disabilities.index')->with(compact('notification'));
     }
 
     public function restore(Disability $disability)
     {
-        $disability->is_active = true;
-        $disability->save();
+        $disability->update(['is_active' => true]);
 
-        $notification = ['message' => 'La discapacidad "' . $disability->name . '" ha sido reactivada.', 'alert-type' => 'success'];
+        Cache::tags(['disabilities'])->flush();
+
+        $notification = [
+            'message' => 'La discapacidad "'.$disability->name.'" ha sido reactivada.',
+            'alert-type' => 'success',
+        ];
+
         return redirect()->route('disabilities.index')->with(compact('notification'));
     }
 
     public function destroyMultiple(Request $request)
     {
         $ids = json_decode($request->input('ids', '[]'), true);
-        if (empty($ids)) return back()->with('error', 'No se seleccionaron registros.');
+
+        if (empty($ids)) {
+            return back()->with('error', 'No se seleccionaron registros.');
+        }
+
         Disability::whereIn('id', $ids)->update(['is_active' => false]);
-        return back()->with('success', count($ids) . ' discapacidades han sido desactivadas.');
+        Cache::tags(['disabilities'])->flush();
+
+        return back()->with('success', count($ids).' discapacidades han sido desactivadas.');
     }
 
     public function restoreMultiple(Request $request)
     {
         $ids = json_decode($request->input('ids', '[]'), true);
-        if (empty($ids)) return back()->with('error', 'No se seleccionaron registros.');
+
+        if (empty($ids)) {
+            return back()->with('error', 'No se seleccionaron registros.');
+        }
+
         Disability::whereIn('id', $ids)->update(['is_active' => true]);
-        return back()->with('success', count($ids) . ' discapacidades han sido reactivadas.');
+        Cache::tags(['disabilities'])->flush();
+
+        return back()->with('success', count($ids).' discapacidades han sido reactivadas.');
     }
 
     public function exportExcel(Request $request)
     {
         $ids = json_decode($request->input('ids', '[]'), true);
+
         return Excel::download(new DisabilityExport($ids), 'discapacidades.xlsx');
     }
 
     public function exportCSV(Request $request)
     {
         $ids = json_decode($request->input('ids', '[]'), true);
+
         return Excel::download(new DisabilityExport($ids), 'discapacidades.csv', \Maatwebsite\Excel\Excel::CSV);
     }
 
@@ -124,7 +162,9 @@ class DisabilityController extends Controller
     {
         $ids = json_decode($request->input('ids', '[]'), true);
         $items = count($ids) > 0 ? Disability::whereIn('id', $ids)->orderBy('id')->get() : Disability::orderBy('id')->get();
+
         $pdf = Pdf::loadView('modules.patient.disabilities.print', compact('items'));
+
         return $pdf->download('discapacidades.pdf');
     }
 
@@ -132,6 +172,7 @@ class DisabilityController extends Controller
     {
         $ids = json_decode($request->input('ids', '[]'), true);
         $items = count($ids) > 0 ? Disability::whereIn('id', $ids)->orderBy('id')->get() : Disability::orderBy('id')->get();
+
         return view('modules.patient.disabilities.print', compact('items'));
     }
 }
