@@ -2,33 +2,39 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Requests\UpdateProfileRequest;
+use App\Models\Gender;
+use App\Models\SessionHistory;
+use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
-use Illuminate\Support\Facades\Storage;
-use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\File;
+use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Session;
 use Illuminate\Support\Str;
+use Jenssegers\Agent\Agent;
 
 class ProfileController extends Controller
 {
-    /**
-     * Mostrar el perfil del usuario
-     */
     public function index()
     {
         $user = Auth::user();
 
-        // Obtener solo sesiones activas de nuestro historial
-        $sessions = \App\Models\SessionHistory::where('user_id', $user->id)
+        $sessions = SessionHistory::where('user_id', $user->id)
             ->where('is_active', true)
             ->orderBy('last_active_at', 'desc')
             ->get();
 
-        $activeSessions = $sessions->map(function ($session) {
-            $agent = new \Jenssegers\Agent\Agent();
+        $sessionHandler = Session::getHandler();
+        $currentSessionId = request()->session()->getId();
+
+        $activeSessions = $sessions->map(function ($session) use ($currentSessionId, $sessionHandler) {
+            $agent = new Agent;
             $agent->setUserAgent($session->user_agent);
 
-            $currentSessionId = request()->session()->getId();
+            $sessionExists = $session->session_id === $currentSessionId || $sessionHandler->read($session->session_id) !== '';
 
             return (object) [
                 'agent' => [
@@ -41,17 +47,11 @@ class ProfileController extends Controller
                 'is_current_device' => $session->session_id === $currentSessionId,
                 'login_at' => $session->login_at->translatedFormat('d M Y, h:i A'),
                 'last_active' => $session->last_active_at->diffForHumans(),
-                'is_active' => true,
+                'is_active' => $sessionExists,
             ];
-        });
+        })->filter(fn ($s) => $s->is_active);
 
-        // Filtrar aquellas que físicamente ya expiraron en la sesion real de laravel para no engañar a la vista
-        $activeSessions = $activeSessions->filter(function ($s) {
-            return $s->is_current_device || \Illuminate\Support\Facades\DB::table('sessions')->where('id', $s->session_id)->exists();
-        });
-
-        // Miembros del departamento del usuario
-        $departamentMembers = \App\Models\User::where('id', '!=', $user->id)
+        $departamentMembers = User::where('id', '!=', $user->id)
             ->where('is_active', true)
             ->where(function ($query) use ($user) {
                 if ($user->unity_execution_id) {
@@ -68,23 +68,20 @@ class ProfileController extends Controller
         return view('modules.profile.index', compact('user', 'activeSessions', 'departamentMembers'));
     }
 
-    /**
-     * Obtener el historial completo paginado (AJAX)
-     */
     public function sessionHistory(Request $request)
     {
-        $history = \App\Models\SessionHistory::where('user_id', Auth::id())
+        $history = SessionHistory::where('user_id', Auth::id())
             ->orderBy('login_at', 'desc')
             ->paginate(20);
 
         $currentSessionId = $request->session()->getId();
+        $sessionHandler = Session::getHandler();
 
-        $history->getCollection()->transform(function ($session) use ($currentSessionId) {
-            $agent = new \Jenssegers\Agent\Agent();
+        $history->getCollection()->transform(function ($session) use ($currentSessionId, $sessionHandler) {
+            $agent = new Agent;
             $agent->setUserAgent($session->user_agent);
 
-            // Verificamos de nuevo si en realidad la sesión "activa" ya caducó físicamente
-            $isPhysicallyActive = $session->is_active && ($session->session_id === $currentSessionId || \Illuminate\Support\Facades\DB::table('sessions')->where('id', $session->session_id)->exists());
+            $isPhysicallyActive = $session->is_active && ($session->session_id === $currentSessionId || $sessionHandler->read($session->session_id) !== '');
 
             return [
                 'id' => $session->id,
@@ -102,378 +99,192 @@ class ProfileController extends Controller
         return response()->json($history);
     }
 
-    /**
-     * Cerrar otras sesiones del usuario
-     */
     public function destroyOtherSessions(Request $request)
     {
-        $request->validate([
-            'password' => 'required|current_password',
-        ]);
+        $request->validate(['password' => 'required|current_password']);
 
         try {
+            Auth::logoutOtherDevices($request->password);
+
             $currentSessionId = $request->session()->getId();
 
-            // 1. Eliminar de la base de datos de sesiones de Laravel para cerrar las conexiones
-            \Illuminate\Support\Facades\DB::table('sessions')
-                ->where('user_id', Auth::id())
-                ->where('id', '!=', $currentSessionId)
-                ->delete();
-
-            // 2. Marcar como "inactivas" en nuestro historial personalizado
-            \App\Models\SessionHistory::where('user_id', Auth::id())
+            SessionHistory::where('user_id', Auth::id())
                 ->where('session_id', '!=', $currentSessionId)
                 ->update(['is_active' => false]);
 
             return redirect()->route('profile.index')->with('success', 'Las demás sesiones han sido cerradas exitosamente.');
         } catch (\Exception $e) {
-            \Illuminate\Support\Facades\Log::error('Error al cerrar otras sesiones: ' . $e->getMessage());
-            return redirect()->route('profile.index')->withErrors(['error' => 'Error al cerrar las sesiones: ' . $e->getMessage()]);
+            Log::error('Error al cerrar otras sesiones: '.$e->getMessage());
+
+            return redirect()->route('profile.index')->withErrors(['error' => 'Error al cerrar las sesiones.']);
         }
     }
 
-    /**
-     * Mostrar formulario de edición del perfil
-     */
     public function edit()
     {
         $user = Auth::user();
-        $genders = \App\Models\Gender::where('is_active', true)->orderBy('name')->get();
+        $genders = Cache::tags(['genders'])->remember('active_genders', now()->addDays(1), fn () => Gender::where('is_active', true)->orderBy('name')->get());
+
         return view('modules.profile.edit', compact('user', 'genders'));
     }
 
-    /**
-     * Actualizar el perfil del usuario (o contraseña, si se está enviando desde el formulario de seguridad)
-     */
-    public function update(Request $request)
+    public function update(UpdateProfileRequest $request)
     {
         $user = Auth::user();
 
-        // 1. Manejo exclusivo de cambio de contraseña
         if ($request->has('update_password_only')) {
-            $request->validate([
-                'current_password' => 'required|current_password',
-                'password' => 'required|min:8|confirmed',
-            ]);
-
             try {
-                DB::table('users')->where('id', $user->id)->update([
-                    'password' => \Illuminate\Support\Facades\Hash::make($request->password)
-                ]);
+                $user->update(['password' => Hash::make($request->password)]);
 
                 return redirect()->route('profile.index')->with('success', 'Contraseña actualizada correctamente');
             } catch (\Exception $e) {
-                \Illuminate\Support\Facades\Log::error('Error al actualizar contraseña: ' . $e->getMessage());
-                return redirect()->back()->withErrors(['error' => 'Error al actualizar contraseña: ' . $e->getMessage()])->withInput();
+                Log::error('Error al actualizar contraseña: '.$e->getMessage());
+
+                return redirect()->back()->withErrors(['error' => 'Error al actualizar contraseña.'])->withInput();
             }
         }
 
-        // 2. Manejo de información demográfica normal
-        $request->validate([
-            'first_name' => 'required|string|max:255',
-            'second_name' => 'nullable|string|max:255',
-            'third_name' => 'nullable|string|max:255',
-            'first_last_name' => 'required|string|max:255',
-            'second_last_name' => 'nullable|string|max:255',
-            'married_last_name' => 'nullable|string|max:255',
-
-            // Correo no se actualiza desde aquí, se omite.
-            'cui' => 'nullable|string|max:13|unique:users,cui,' . Auth::id(),
-            'nit' => 'nullable|string|max:9|unique:users,nit,' . Auth::id(),
-
-            'marital_status' => 'nullable|string|in:soltero,casado,divorciado,viudo,union_libre',
-            'phone' => 'nullable|string|max:15', // phone is string
-            'address' => 'nullable|string|max:500', // max 500 para dirección
-            'birth_date' => 'nullable|date',
-            'gender_id' => 'nullable|exists:genders,id',
-            
-            // Imágenes
-            'profile_photo' => 'nullable|image|mimes:jpeg,png,jpg|max:4096',
-            'banner_photo' => 'nullable|image|mimes:jpeg,png,jpg|max:4096',
-        ]);
-
         try {
-            $updateData = [
-                'first_name' => $request->first_name,
-                'second_name' => $request->second_name,
-                'third_name' => $request->third_name,
-                'first_last_name' => $request->first_last_name,
-                'second_last_name' => $request->second_last_name,
-                'married_last_name' => $request->married_last_name,
-                'cui' => $request->cui,
-                'nit' => $request->nit,
-                'marital_status' => $request->marital_status,
-                'phone' => $request->phone,
-                'address' => $request->address,
-                'birth_date' => $request->birth_date,
-                'gender_id' => $request->gender_id,
-            ];
+            $updateData = $request->except(['profile_photo', 'banner_photo', 'update_password_only']);
 
-            // Subir Avatar
             if ($request->hasFile('profile_photo')) {
-                if ($user->profile_photo_path) {
-                    $oldPublicFile = public_path('storage/' . $user->profile_photo_path);
-                    if (\Illuminate\Support\Facades\File::exists($oldPublicFile)) {
-                        try {
-                            \Illuminate\Support\Facades\File::delete($oldPublicFile);
-                        } catch (\Exception $e) {} // Ignorar si está bloqueado por otro proceso
-                    }
-                }
+                $this->deleteOldFile($user->profile_photo_path);
 
-                $avatarFile = $request->file('profile_photo');
-                $avatarName = \Illuminate\Support\Str::random(40) . '.' . $avatarFile->getClientOriginalExtension();
-                $avatarPath = 'profile_photos/' . $avatarName;
-                
-                $avatarFile->move(public_path('storage/profile_photos'), $avatarName);
-                $updateData['profile_photo_path'] = $avatarPath;
+                $file = $request->file('profile_photo');
+                $name = Str::random(40).'.'.$file->getClientOriginalExtension();
+                $file->move(public_path('storage/profile_photos'), $name);
+                $updateData['profile_photo_path'] = 'profile_photos/'.$name;
             }
 
-            // Subir Banner
             if ($request->hasFile('banner_photo')) {
-                if ($user->banner_photo_path) {
-                    $oldPublicFile = public_path('storage/' . $user->banner_photo_path);
-                    if (\Illuminate\Support\Facades\File::exists($oldPublicFile)) {
-                        try {
-                            \Illuminate\Support\Facades\File::delete($oldPublicFile);
-                        } catch (\Exception $e) {} // Ignorar si está bloqueado por otro proceso
-                    }
-                }
+                $this->deleteOldFile($user->banner_photo_path);
 
-                $bannerFile = $request->file('banner_photo');
-                $bannerName = \Illuminate\Support\Str::random(40) . '.' . $bannerFile->getClientOriginalExtension();
-                $bannerPath = 'banner_photos/' . $bannerName;
-                
-                $bannerFile->move(public_path('storage/banner_photos'), $bannerName);
-                $updateData['banner_photo_path'] = $bannerPath;
+                $file = $request->file('banner_photo');
+                $name = Str::random(40).'.'.$file->getClientOriginalExtension();
+                $file->move(public_path('storage/banner_photos'), $name);
+                $updateData['banner_photo_path'] = 'banner_photos/'.$name;
             }
 
-            DB::table('users')->where('id', $user->id)->update($updateData);
-            
-            $user->refresh();
+            $user->update($updateData);
 
-            // Si es una petición AJAX, devolver JSON
-            if ($request->ajax() || $request->wantsJson()) {
-                return response()->json([
-                    'success' => true,
-                    'message' => 'Perfil actualizado correctamente'
-                ]);
+            if ($request->wantsJson()) {
+                return response()->json(['success' => true, 'message' => 'Perfil actualizado correctamente']);
             }
 
-            // Si no es AJAX, redirigir
             return redirect()->route('profile.index')->with('success', 'Perfil actualizado correctamente');
         } catch (\Exception $e) {
-            \Illuminate\Support\Facades\Log::error('Error al actualizar perfil: ' . $e->getMessage());
-            
-            // Si es una petición AJAX, devolver JSON
-            if ($request->ajax() || $request->wantsJson()) {
-                return response()->json([
-                    'success' => false,
-                    'message' => 'Error al actualizar el perfil: ' . $e->getMessage()
-                ], 500);
+            Log::error('Error al actualizar perfil: '.$e->getMessage());
+
+            if ($request->wantsJson()) {
+                return response()->json(['success' => false, 'message' => 'Error al actualizar el perfil.'], 500);
             }
 
-            // Si no es AJAX, redirigir con error
-            return redirect()->back()->withErrors(['error' => 'Error al actualizar el perfil: ' . $e->getMessage()])->withInput();
+            return redirect()->back()->withErrors(['error' => 'Error al actualizar el perfil.'])->withInput();
         }
     }
 
-    /**
-     * Actualizar el avatar del usuario
-     */
     public function updateAvatar(Request $request)
     {
-        // Validar que haya un archivo (puede ser 'avatar' o 'profile_photo')
-        $file = $request->hasFile('avatar') ? $request->file('avatar') : $request->file('profile_photo');
-        
-        if (!$file) {
-            return response()->json([
-                'success' => false,
-                'message' => 'No se proporcionó ningún archivo'
-            ], 422);
+        $file = $request->file('avatar') ?? $request->file('profile_photo');
+
+        if (! $file) {
+            return response()->json(['success' => false, 'message' => 'No se proporcionó ningún archivo'], 422);
         }
 
         try {
             $user = Auth::user();
-            
-            // Eliminar anterior si existe
-            if ($user->profile_photo_path) {
-                $oldPublicFile = public_path('storage/' . $user->profile_photo_path);
-                if (File::exists($oldPublicFile)) {
-                    try {
-                        File::delete($oldPublicFile);
-                    } catch (\Exception $e) {}
-                }
-            }
+            $this->deleteOldFile($user->profile_photo_path);
 
-            // Guardar nuevo avatar
-            $avatarName = Str::random(40) . '.' . $file->getClientOriginalExtension();
-            $avatarPath = 'profile_photos/' . $avatarName;
-            
-            $file->move(public_path('storage/profile_photos'), $avatarName);
-            
-            // Actualizar en la base de datos
-            DB::table('users')
-                ->where('id', $user->id)
-                ->update([
-                    'profile_photo_path' => $avatarPath
-                ]);
-            
-            $user->refresh();
+            $name = Str::random(40).'.'.$file->getClientOriginalExtension();
+            $path = 'profile_photos/'.$name;
+            $file->move(public_path('storage/profile_photos'), $name);
+
+            $user->update(['profile_photo_path' => $path]);
 
             return response()->json([
                 'success' => true,
                 'message' => 'Avatar actualizado correctamente',
-                'avatar_url' => $user->avatar_url
+                'avatar_url' => $user->avatar_url,
             ]);
         } catch (\Exception $e) {
-            \Log::error('Error al actualizar avatar: ' . $e->getMessage());
-            return response()->json([
-                'success' => false,
-                'message' => 'Error al actualizar el avatar: ' . $e->getMessage()
-            ], 500);
+            Log::error('Error al actualizar avatar: '.$e->getMessage());
+
+            return response()->json(['success' => false, 'message' => 'Error al actualizar el avatar.'], 500);
         }
     }
 
-    /**
-     * Actualizar el banner del usuario
-     */
     public function updateBanner(Request $request)
     {
-        $file = $request->hasFile('banner') ? $request->file('banner') : $request->file('banner_photo');
-        
-        if (!$file) {
-            return response()->json([
-                'success' => false,
-                'message' => 'No se proporcionó ningún archivo'
-            ], 422);
+        $file = $request->file('banner') ?? $request->file('banner_photo');
+
+        if (! $file) {
+            return response()->json(['success' => false, 'message' => 'No se proporcionó ningún archivo'], 422);
         }
 
         try {
             $user = Auth::user();
-            
-            // Eliminar anterior si existe
-            if ($user->banner_photo_path) {
-                $oldPublicFile = public_path('storage/' . $user->banner_photo_path);
-                if (File::exists($oldPublicFile)) {
-                    try {
-                        File::delete($oldPublicFile);
-                    } catch (\Exception $e) {}
-                }
-            }
+            $this->deleteOldFile($user->banner_photo_path);
 
-            // Guardar nuevo banner
-            $bannerName = Str::random(40) . '.' . $file->getClientOriginalExtension();
-            $bannerPath = 'banner_photos/' . $bannerName;
-            
-            $file->move(public_path('storage/banner_photos'), $bannerName);
-            
-            // Actualizar en la base de datos
-            DB::table('users')
-                ->where('id', $user->id)
-                ->update([
-                    'banner_photo_path' => $bannerPath
-                ]);
-            
-            $user->refresh();
+            $name = Str::random(40).'.'.$file->getClientOriginalExtension();
+            $path = 'banner_photos/'.$name;
+            $file->move(public_path('storage/banner_photos'), $name);
+
+            $user->update(['banner_photo_path' => $path]);
 
             return response()->json([
                 'success' => true,
                 'message' => 'Banner actualizado correctamente',
-                'banner_url' => $user->banner_url
+                'banner_url' => $user->banner_url,
             ]);
         } catch (\Exception $e) {
-            \Log::error('Error al actualizar banner: ' . $e->getMessage());
-            return response()->json([
-                'success' => false,
-                'message' => 'Error al actualizar el banner: ' . $e->getMessage()
-            ], 500);
+            Log::error('Error al actualizar banner: '.$e->getMessage());
+
+            return response()->json(['success' => false, 'message' => 'Error al actualizar el banner.'], 500);
         }
     }
 
-    /**
-     * Eliminar el avatar del usuario
-     */
     public function deleteAvatar(Request $request)
     {
         try {
             $user = Auth::user();
-            
-            if ($user->profile_photo_path) {
-                // Eliminar de storage
-                if (Storage::disk('public')->exists($user->profile_photo_path)) {
-                    Storage::disk('public')->delete($user->profile_photo_path);
-                }
-                // Eliminar de public/storage
-                $oldFileName = basename($user->profile_photo_path);
-                $oldPublicFile = public_path('storage/avatars/' . $oldFileName);
-                if (File::exists($oldPublicFile)) {
-                    File::delete($oldPublicFile);
-                }
-            }
-            
-            // Limpiar en la base de datos
-            DB::table('users')
-                ->where('id', $user->id)
-                ->update([
-                    'profile_photo_path' => null
-                ]);
-            
-            $user->refresh();
+            $this->deleteOldFile($user->profile_photo_path);
 
-            return response()->json([
-                'success' => true,
-                'message' => 'Foto de perfil eliminada correctamente'
-            ]);
+            $user->update(['profile_photo_path' => null]);
+
+            return response()->json(['success' => true, 'message' => 'Foto de perfil eliminada correctamente']);
         } catch (\Exception $e) {
-            \Log::error('Error al eliminar avatar: ' . $e->getMessage());
-            return response()->json([
-                'success' => false,
-                'message' => 'Error al eliminar el avatar: ' . $e->getMessage()
-            ], 500);
+            Log::error('Error al eliminar avatar: '.$e->getMessage());
+
+            return response()->json(['success' => false, 'message' => 'Error al eliminar el avatar.'], 500);
         }
     }
 
-    /**
-     * Eliminar el banner del usuario
-     */
     public function deleteBanner(Request $request)
     {
         try {
             $user = Auth::user();
-            
-            if ($user->banner_photo_path) {
-                // Eliminar de storage
-                if (Storage::disk('public')->exists($user->banner_photo_path)) {
-                    Storage::disk('public')->delete($user->banner_photo_path);
-                }
-                // Eliminar de public/storage
-                $oldFileName = basename($user->banner);
-                $oldPublicFile = public_path('storage/banners/' . $oldFileName);
-                if (File::exists($oldPublicFile)) {
-                    File::delete($oldPublicFile);
+            $this->deleteOldFile($user->banner_photo_path);
+
+            $user->update(['banner_photo_path' => null]);
+
+            return response()->json(['success' => true, 'message' => 'Banner eliminado correctamente']);
+        } catch (\Exception $e) {
+            Log::error('Error al eliminar banner: '.$e->getMessage());
+
+            return response()->json(['success' => false, 'message' => 'Error al eliminar el banner.'], 500);
+        }
+    }
+
+    private function deleteOldFile($path)
+    {
+        if ($path) {
+            $publicPath = public_path('storage/'.$path);
+            if (File::exists($publicPath)) {
+                try {
+                    File::delete($publicPath);
+                } catch (\Exception $e) {
                 }
             }
-            
-            // Limpiar en la base de datos
-            DB::table('users')
-                ->where('id', $user->id)
-                ->update([
-                    'banner_photo_path' => null
-                ]);
-            
-            $user->refresh();
-
-            return response()->json([
-                'success' => true,
-                'message' => 'Banner eliminado correctamente'
-            ]);
-        } catch (\Exception $e) {
-            \Log::error('Error al eliminar banner: ' . $e->getMessage());
-            return response()->json([
-                'success' => false,
-                'message' => 'Error al eliminar el banner: ' . $e->getMessage()
-            ], 500);
         }
     }
 }
-
