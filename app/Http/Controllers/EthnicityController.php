@@ -2,13 +2,14 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\Ethnicity;
-use Illuminate\Http\Request;
+use App\Exports\EthnicityExport;
 use App\Http\Requests\StoreEthnicityRequest;
 use App\Http\Requests\UpdateEthnicityRequest;
-use App\Exports\EthnicityExport;
-use Maatwebsite\Excel\Facades\Excel;
+use App\Models\Ethnicity;
 use Barryvdh\DomPDF\Facade\Pdf;
+use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Cache;
+use Maatwebsite\Excel\Facades\Excel;
 
 class EthnicityController extends Controller
 {
@@ -19,28 +20,36 @@ class EthnicityController extends Controller
 
     public function index(Request $request)
     {
-        $query = Ethnicity::query();
+        $cacheKey = 'ethnicities_index_'.md5(json_encode($request->all()));
 
-        if ($request->filled('search')) {
-            $query->where('name', 'LIKE', "%{$request->search}%");
-        }
+        $data = Cache::tags(['ethnicities'])->remember($cacheKey, now()->addDays(1), function () use ($request) {
+            $query = Ethnicity::query();
 
-        $status = $request->input('status', 'active');
-        if ($status === 'active') {
-            $query->where('is_active', true);
-        } elseif ($status === 'inactive') {
-            $query->where('is_active', false);
-        }
+            if ($request->filled('search')) {
+                $query->where('name', 'LIKE', "%{$request->search}%");
+            }
 
-        $perPage        = $request->input('per_page', 25);
-        $allFilteredIds = (clone $query)->pluck('id')->toArray();
-        $items          = $query->orderBy('id')->paginate($perPage)->appends($request->query());
+            $status = $request->input('status', 'active');
 
-        $total    = Ethnicity::count();
-        $active   = Ethnicity::where('is_active', true)->count();
-        $inactive = Ethnicity::where('is_active', false)->count();
+            if ($status === 'active') {
+                $query->where('is_active', true);
+            } elseif ($status === 'inactive') {
+                $query->where('is_active', false);
+            }
 
-        return view('modules.patient.ethnicities.index', compact('items', 'allFilteredIds', 'total', 'active', 'inactive'));
+            $perPage = $request->input('per_page', 25);
+
+            $allFilteredIds = (clone $query)->pluck('id')->toArray();
+            $items = $query->orderBy('id')->paginate($perPage)->appends($request->query());
+
+            $total = Ethnicity::count();
+            $active = Ethnicity::where('is_active', true)->count();
+            $inactive = Ethnicity::where('is_active', false)->count();
+
+            return compact('items', 'allFilteredIds', 'total', 'active', 'inactive');
+        });
+
+        return view('modules.patient.ethnicities.index', $data);
     }
 
     public function create()
@@ -50,11 +59,13 @@ class EthnicityController extends Controller
 
     public function store(StoreEthnicityRequest $request)
     {
-        $item = new Ethnicity();
-        $item->name = $request->input('name');
-        $item->save();
+        $item = Ethnicity::create($request->validated());
 
-        $notification = ['message' => 'La etnia "' . $item->name . '" se ha creado correctamente.', 'alert-type' => 'success'];
+        $notification = [
+            'message' => 'La etnia "'.$item->name.'" se ha creado correctamente.',
+            'alert-type' => 'success',
+        ];
+
         return redirect()->route('ethnicities.index')->with(compact('notification'));
     }
 
@@ -67,56 +78,83 @@ class EthnicityController extends Controller
 
     public function update(UpdateEthnicityRequest $request, Ethnicity $ethnicity)
     {
-        $ethnicity->name = $request->input('name');
-        $ethnicity->save();
+        $ethnicity->update($request->validated());
 
-        $notification = ['message' => 'La etnia "' . $ethnicity->name . '" se ha actualizado correctamente.', 'alert-type' => 'info'];
+        $notification = [
+            'message' => 'La etnia "'.$ethnicity->name.'" se ha actualizado correctamente.',
+            'alert-type' => 'info',
+        ];
+
         return redirect()->route('ethnicities.index')->with(compact('notification'));
     }
 
     public function destroy(Ethnicity $ethnicity)
     {
-        $ethnicity->is_active = false;
-        $ethnicity->save();
+        $ethnicity->update(['is_active' => false]);
 
-        $notification = ['message' => 'La etnia "' . $ethnicity->name . '" ha sido desactivada.', 'alert-type' => 'warning'];
+        Cache::tags(['ethnicities'])->flush();
+
+        $notification = [
+            'message' => 'La etnia "'.$ethnicity->name.'" ha sido desactivada.',
+            'alert-type' => 'warning',
+        ];
+
         return redirect()->route('ethnicities.index')->with(compact('notification'));
     }
 
     public function restore(Ethnicity $ethnicity)
     {
-        $ethnicity->is_active = true;
-        $ethnicity->save();
+        $ethnicity->update(['is_active' => true]);
 
-        $notification = ['message' => 'La etnia "' . $ethnicity->name . '" ha sido reactivada.', 'alert-type' => 'success'];
+        Cache::tags(['ethnicities'])->flush();
+
+        $notification = [
+            'message' => 'La etnia "'.$ethnicity->name.'" ha sido reactivada.',
+            'alert-type' => 'success',
+        ];
+
         return redirect()->route('ethnicities.index')->with(compact('notification'));
     }
 
     public function destroyMultiple(Request $request)
     {
         $ids = json_decode($request->input('ids', '[]'), true);
-        if (empty($ids)) return back()->with('error', 'No se seleccionaron registros.');
+
+        if (empty($ids)) {
+            return back()->with('error', 'No se seleccionaron registros.');
+        }
+
         Ethnicity::whereIn('id', $ids)->update(['is_active' => false]);
-        return back()->with('success', count($ids) . ' etnias han sido desactivadas.');
+        Cache::tags(['ethnicities'])->flush();
+
+        return back()->with('success', count($ids).' etnias han sido desactivadas.');
     }
 
     public function restoreMultiple(Request $request)
     {
         $ids = json_decode($request->input('ids', '[]'), true);
-        if (empty($ids)) return back()->with('error', 'No se seleccionaron registros.');
+
+        if (empty($ids)) {
+            return back()->with('error', 'No se seleccionaron registros.');
+        }
+
         Ethnicity::whereIn('id', $ids)->update(['is_active' => true]);
-        return back()->with('success', count($ids) . ' etnias han sido reactivadas.');
+        Cache::tags(['ethnicities'])->flush();
+
+        return back()->with('success', count($ids).' etnias han sido reactivadas.');
     }
 
     public function exportExcel(Request $request)
     {
         $ids = json_decode($request->input('ids', '[]'), true);
+
         return Excel::download(new EthnicityExport($ids), 'etnias.xlsx');
     }
 
     public function exportCSV(Request $request)
     {
         $ids = json_decode($request->input('ids', '[]'), true);
+
         return Excel::download(new EthnicityExport($ids), 'etnias.csv', \Maatwebsite\Excel\Excel::CSV);
     }
 
@@ -124,7 +162,9 @@ class EthnicityController extends Controller
     {
         $ids = json_decode($request->input('ids', '[]'), true);
         $items = count($ids) > 0 ? Ethnicity::whereIn('id', $ids)->orderBy('id')->get() : Ethnicity::orderBy('id')->get();
+
         $pdf = Pdf::loadView('modules.patient.ethnicities.print', compact('items'));
+
         return $pdf->download('etnias.pdf');
     }
 
@@ -132,6 +172,7 @@ class EthnicityController extends Controller
     {
         $ids = json_decode($request->input('ids', '[]'), true);
         $items = count($ids) > 0 ? Ethnicity::whereIn('id', $ids)->orderBy('id')->get() : Ethnicity::orderBy('id')->get();
+
         return view('modules.patient.ethnicities.print', compact('items'));
     }
 }
