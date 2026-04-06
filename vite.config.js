@@ -63,8 +63,8 @@ function buildManifestTargets(manifest) {
     for (const asset of assets) {
       const destDir = path.dirname(asset.dest);
       targets.push({
-        src:  asset.src,
-        dest: destDir,
+        src:  asset.src.replace(/\\/g, '/'),
+        dest: destDir.replace(/\\/g, '/'),
       });
     }
   }

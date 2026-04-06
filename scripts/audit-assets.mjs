@@ -61,7 +61,7 @@ function buildAssetIndex() {
   const index = {};
   for (const [category, rootDir] of Object.entries(ASSET_ROOTS)) {
     index[category] = walkDir(rootDir).map(f => ({
-      abs:     f,
+      abs:     f.replace(/\\/g, '/'),
       rel:     path.relative(rootDir, f),           // e.g. "160x160/img1.jpg"
       distKey: `${category}/${path.relative(rootDir, f)}`.replace(/\\/g, '/'),
       // e.g. "img/160x160/img1.jpg"
