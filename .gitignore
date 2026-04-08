@@ -16,6 +16,8 @@
 /public/build
 /public/dist
 /public/hot
+/resources/assets-manifest.json
+/resources/assets-manifest.js
 /public/storage
 /storage/*.key
 /storage/pail
