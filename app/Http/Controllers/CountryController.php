@@ -51,33 +51,33 @@ class CountryController extends Controller
             return compact('countries', 'allFilteredIds', 'totalCountries', 'activeCountries', 'inactiveCountries');
         });
 
-        return view('modules.ubication.countries.index', $data);
+        return view('modules.maintenance.ubication.countries.index', $data);
     }
 
     public function create()
     {
-        return view('modules.ubication.countries.create');
+        return view('modules.maintenance.ubication.countries.create');
     }
 
     public function store(StoreCountryRequest $request)
     {
         $country = Country::create($request->validated());
 
-        return redirect()->route('countries.index')->with('success', 'El país '.$country->name.' se ha creado correctamente.');
+        return redirect()->route('maintenance.countries.index')->with('success', 'El país '.$country->name.' se ha creado correctamente.');
     }
 
     public function show(Country $country) {}
 
     public function edit(Country $country)
     {
-        return view('modules.ubication.countries.edit', compact('country'));
+        return view('modules.maintenance.ubication.countries.edit', compact('country'));
     }
 
     public function update(UpdateCountryRequest $request, Country $country)
     {
         $country->update($request->validated());
 
-        return redirect()->route('countries.index')->with('success', 'El país '.$country->name.' se ha actualizado correctamente.');
+        return redirect()->route('maintenance.countries.index')->with('success', 'El país '.$country->name.' se ha actualizado correctamente.');
     }
 
     public function destroy(Country $country)
@@ -90,7 +90,7 @@ class CountryController extends Controller
 
         Cache::tags(['countries'])->flush();
 
-        return redirect()->route('countries.index')->with('success', 'El país '.$country->name.' ha sido desactivado correctamente.');
+        return redirect()->route('maintenance.countries.index')->with('success', 'El país '.$country->name.' ha sido desactivado correctamente.');
     }
 
     public function restore(Country $country)
@@ -103,7 +103,7 @@ class CountryController extends Controller
 
         Cache::tags(['countries'])->flush();
 
-        return redirect()->route('countries.index')->with('success', 'El país '.$country->name.' ha sido reactivado correctamente.');
+        return redirect()->route('maintenance.countries.index')->with('success', 'El país '.$country->name.' ha sido reactivado correctamente.');
     }
 
     public function destroyMultiple(Request $request)
@@ -171,7 +171,7 @@ class CountryController extends Controller
         $ids = json_decode($request->input('ids', '[]'), true);
         $countries = count($ids) > 0 ? Country::whereIn('id', $ids)->orderBy('id')->get() : Country::orderBy('id')->get();
 
-        $pdf = Pdf::loadView('modules.ubication.countries.print', compact('countries'));
+        $pdf = Pdf::loadView('modules.maintenance.ubication.countries.print', compact('countries'));
 
         return $pdf->download('paises.pdf');
     }
@@ -181,6 +181,6 @@ class CountryController extends Controller
         $ids = json_decode($request->input('ids', '[]'), true);
         $countries = count($ids) > 0 ? Country::whereIn('id', $ids)->orderBy('id')->get() : Country::orderBy('id')->get();
 
-        return view('modules.ubication.countries.print', compact('countries'));
+        return view('modules.maintenance.ubication.countries.print', compact('countries'));
     }
 }

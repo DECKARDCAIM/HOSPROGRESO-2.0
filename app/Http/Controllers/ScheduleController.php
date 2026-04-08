@@ -49,33 +49,33 @@ class ScheduleController extends Controller
             return compact('items', 'allFilteredIds', 'total', 'active', 'inactive');
         });
 
-        return view('modules.medical.schedules.index', $data);
+        return view('modules.maintenance.schedules.index', $data);
     }
 
     public function create()
     {
-        return view('modules.medical.schedules.create');
+        return view('modules.maintenance.schedules.create');
     }
 
     public function store(StoreScheduleRequest $request)
     {
         $item = Schedule::create($request->validated());
 
-        return redirect()->route('schedules.index')->with('success', 'El turno "'.$item->name.'" se ha creado correctamente.');
+        return redirect()->route('maintenance.schedules.index')->with('success', 'El turno "'.$item->name.'" se ha creado correctamente.');
     }
 
     public function show(Schedule $schedule) {}
 
     public function edit(Schedule $schedule)
     {
-        return view('modules.medical.schedules.edit', ['item' => $schedule]);
+        return view('modules.maintenance.schedules.edit', ['item' => $schedule]);
     }
 
     public function update(UpdateScheduleRequest $request, Schedule $schedule)
     {
         $schedule->update($request->validated());
 
-        return redirect()->route('schedules.index')->with('success', 'El turno "'.$schedule->name.'" se ha actualizado correctamente.');
+        return redirect()->route('maintenance.schedules.index')->with('success', 'El turno "'.$schedule->name.'" se ha actualizado correctamente.');
     }
 
     public function destroy(Schedule $schedule)
@@ -84,7 +84,7 @@ class ScheduleController extends Controller
 
         Cache::tags(['schedules'])->flush();
 
-        return redirect()->route('schedules.index')->with('success', 'El turno "'.$schedule->name.'" ha sido desactivado.');
+        return redirect()->route('maintenance.schedules.index')->with('success', 'El turno "'.$schedule->name.'" ha sido desactivado.');
     }
 
     public function restore(Schedule $schedule)
@@ -93,7 +93,7 @@ class ScheduleController extends Controller
 
         Cache::tags(['schedules'])->flush();
 
-        return redirect()->route('schedules.index')->with('success', 'El turno "'.$schedule->name.'" ha sido reactivado.');
+        return redirect()->route('maintenance.schedules.index')->with('success', 'El turno "'.$schedule->name.'" ha sido reactivado.');
     }
 
     public function destroyMultiple(Request $request)
@@ -143,7 +143,7 @@ class ScheduleController extends Controller
         $ids = json_decode($request->input('ids', '[]'), true);
         $items = count($ids) > 0 ? Schedule::whereIn('id', $ids)->orderBy('id')->get() : Schedule::orderBy('id')->get();
 
-        $pdf = Pdf::loadView('modules.medical.schedules.print', compact('items'));
+        $pdf = Pdf::loadView('modules.maintenance.schedules.print', compact('items'));
 
         return $pdf->download('turnos.pdf');
     }
@@ -153,6 +153,6 @@ class ScheduleController extends Controller
         $ids = json_decode($request->input('ids', '[]'), true);
         $items = count($ids) > 0 ? Schedule::whereIn('id', $ids)->orderBy('id')->get() : Schedule::orderBy('id')->get();
 
-        return view('modules.medical.schedules.print', compact('items'));
+        return view('modules.maintenance.schedules.print', compact('items'));
     }
 }

@@ -49,33 +49,33 @@ class LinguisticCommunityController extends Controller
             return compact('items', 'allFilteredIds', 'total', 'active', 'inactive');
         });
 
-        return view('modules.patient.linguistic-communities.index', $data);
+        return view('modules.maintenance.linguistic-communities.index', $data);
     }
 
     public function create()
     {
-        return view('modules.patient.linguistic-communities.create');
+        return view('modules.maintenance.linguistic-communities.create');
     }
 
     public function store(StoreLinguisticCommunityRequest $request)
     {
         $item = LinguisticCommunity::create($request->validated());
 
-        return redirect()->route('linguistic-communities.index')->with('success', 'El idioma "'.$item->name.'" se ha creado correctamente.');
+        return redirect()->route('maintenance.linguistic-communities.index')->with('success', 'El idioma "'.$item->name.'" se ha creado correctamente.');
     }
 
     public function show(LinguisticCommunity $linguisticCommunity) {}
 
     public function edit(LinguisticCommunity $linguisticCommunity)
     {
-        return view('modules.patient.linguistic-communities.edit', ['item' => $linguisticCommunity]);
+        return view('modules.maintenance.linguistic-communities.edit', ['item' => $linguisticCommunity]);
     }
 
     public function update(UpdateLinguisticCommunityRequest $request, LinguisticCommunity $linguisticCommunity)
     {
         $linguisticCommunity->update($request->validated());
 
-        return redirect()->route('linguistic-communities.index')->with('success', 'El idioma "'.$linguisticCommunity->name.'" se ha actualizado correctamente.');
+        return redirect()->route('maintenance.linguistic-communities.index')->with('success', 'El idioma "'.$linguisticCommunity->name.'" se ha actualizado correctamente.');
     }
 
     public function destroy(LinguisticCommunity $linguisticCommunity)
@@ -84,7 +84,7 @@ class LinguisticCommunityController extends Controller
 
         Cache::tags(['linguistic_communities'])->flush();
 
-        return redirect()->route('linguistic-communities.index')->with('success', 'El idioma "'.$linguisticCommunity->name.'" ha sido desactivado.');
+        return redirect()->route('maintenance.linguistic-communities.index')->with('success', 'El idioma "'.$linguisticCommunity->name.'" ha sido desactivado.');
     }
 
     public function restore(LinguisticCommunity $linguisticCommunity)
@@ -93,7 +93,7 @@ class LinguisticCommunityController extends Controller
 
         Cache::tags(['linguistic_communities'])->flush();
 
-        return redirect()->route('linguistic-communities.index')->with('success', 'El idioma "'.$linguisticCommunity->name.'" ha sido reactivado.');
+        return redirect()->route('maintenance.linguistic-communities.index')->with('success', 'El idioma "'.$linguisticCommunity->name.'" ha sido reactivado.');
     }
 
     public function destroyMultiple(Request $request)
@@ -143,7 +143,7 @@ class LinguisticCommunityController extends Controller
         $ids = json_decode($request->input('ids', '[]'), true);
         $items = count($ids) > 0 ? LinguisticCommunity::whereIn('id', $ids)->orderBy('id')->get() : LinguisticCommunity::orderBy('id')->get();
 
-        $pdf = Pdf::loadView('modules.patient.linguistic-communities.print', compact('items'));
+        $pdf = Pdf::loadView('modules.maintenance.linguistic-communities.print', compact('items'));
 
         return $pdf->download('idiomas.pdf');
     }
@@ -153,6 +153,6 @@ class LinguisticCommunityController extends Controller
         $ids = json_decode($request->input('ids', '[]'), true);
         $items = count($ids) > 0 ? LinguisticCommunity::whereIn('id', $ids)->orderBy('id')->get() : LinguisticCommunity::orderBy('id')->get();
 
-        return view('modules.patient.linguistic-communities.print', compact('items'));
+        return view('modules.maintenance.linguistic-communities.print', compact('items'));
     }
 }

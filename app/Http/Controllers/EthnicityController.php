@@ -49,33 +49,33 @@ class EthnicityController extends Controller
             return compact('items', 'allFilteredIds', 'total', 'active', 'inactive');
         });
 
-        return view('modules.patient.ethnicities.index', $data);
+        return view('modules.maintenance.ethnicities.index', $data);
     }
 
     public function create()
     {
-        return view('modules.patient.ethnicities.create');
+        return view('modules.maintenance.ethnicities.create');
     }
 
     public function store(StoreEthnicityRequest $request)
     {
         $item = Ethnicity::create($request->validated());
 
-        return redirect()->route('ethnicities.index')->with('success', 'La etnia "'.$item->name.'" se ha creado correctamente.');
+        return redirect()->route('maintenance.ethnicities.index')->with('success', 'La etnia "'.$item->name.'" se ha creado correctamente.');
     }
 
     public function show(Ethnicity $ethnicity) {}
 
     public function edit(Ethnicity $ethnicity)
     {
-        return view('modules.patient.ethnicities.edit', ['item' => $ethnicity]);
+        return view('modules.maintenance.ethnicities.edit', ['item' => $ethnicity]);
     }
 
     public function update(UpdateEthnicityRequest $request, Ethnicity $ethnicity)
     {
         $ethnicity->update($request->validated());
 
-        return redirect()->route('ethnicities.index')->with('success', 'La etnia "'.$ethnicity->name.'" se ha actualizado correctamente.');
+        return redirect()->route('maintenance.ethnicities.index')->with('success', 'La etnia "'.$ethnicity->name.'" se ha actualizado correctamente.');
     }
 
     public function destroy(Ethnicity $ethnicity)
@@ -84,7 +84,7 @@ class EthnicityController extends Controller
 
         Cache::tags(['ethnicities'])->flush();
 
-        return redirect()->route('ethnicities.index')->with('success', 'La etnia "'.$ethnicity->name.'" ha sido desactivada.');
+        return redirect()->route('maintenance.ethnicities.index')->with('success', 'La etnia "'.$ethnicity->name.'" ha sido desactivada.');
     }
 
     public function restore(Ethnicity $ethnicity)
@@ -93,7 +93,7 @@ class EthnicityController extends Controller
 
         Cache::tags(['ethnicities'])->flush();
 
-        return redirect()->route('ethnicities.index')->with('success', 'La etnia "'.$ethnicity->name.'" ha sido reactivada.');
+        return redirect()->route('maintenance.ethnicities.index')->with('success', 'La etnia "'.$ethnicity->name.'" ha sido reactivada.');
     }
 
     public function destroyMultiple(Request $request)
@@ -143,7 +143,7 @@ class EthnicityController extends Controller
         $ids = json_decode($request->input('ids', '[]'), true);
         $items = count($ids) > 0 ? Ethnicity::whereIn('id', $ids)->orderBy('id')->get() : Ethnicity::orderBy('id')->get();
 
-        $pdf = Pdf::loadView('modules.patient.ethnicities.print', compact('items'));
+        $pdf = Pdf::loadView('modules.maintenance.ethnicities.print', compact('items'));
 
         return $pdf->download('etnias.pdf');
     }
@@ -153,6 +153,6 @@ class EthnicityController extends Controller
         $ids = json_decode($request->input('ids', '[]'), true);
         $items = count($ids) > 0 ? Ethnicity::whereIn('id', $ids)->orderBy('id')->get() : Ethnicity::orderBy('id')->get();
 
-        return view('modules.patient.ethnicities.print', compact('items'));
+        return view('modules.maintenance.ethnicities.print', compact('items'));
     }
 }

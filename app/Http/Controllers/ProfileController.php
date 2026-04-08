@@ -65,7 +65,7 @@ class ProfileController extends Controller
             ->limit(10)
             ->get();
 
-        return view('modules.profile.index', compact('user', 'activeSessions', 'departamentMembers'));
+        return view('modules.administration.user.profile.index', compact('user', 'activeSessions', 'departamentMembers'));
     }
 
     public function sessionHistory(Request $request)
@@ -125,7 +125,7 @@ class ProfileController extends Controller
         $user = Auth::user();
         $genders = Cache::tags(['genders'])->remember('active_genders', now()->addDays(1), fn () => Gender::where('is_active', true)->orderBy('name')->get());
 
-        return view('modules.profile.edit', compact('user', 'genders'));
+        return view('modules.administration.user.profile.edit', compact('user', 'genders'));
     }
 
     public function update(UpdateProfileRequest $request)

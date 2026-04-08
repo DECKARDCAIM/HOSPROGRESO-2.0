@@ -62,7 +62,7 @@ class DepartmentController extends Controller
             return compact('departments', 'allFilteredIds', 'countries', 'totalDepartments', 'activeDepartments', 'inactiveDepartments');
         });
 
-        return view('modules.ubication.departments.index', $data);
+        return view('modules.maintenance.ubication.departments.index', $data);
     }
 
     public function create()
@@ -71,14 +71,14 @@ class DepartmentController extends Controller
             return Country::where('is_active', true)->orderBy('name')->get();
         });
 
-        return view('modules.ubication.departments.create', compact('countries'));
+        return view('modules.maintenance.ubication.departments.create', compact('countries'));
     }
 
     public function store(StoreDepartmentRequest $request)
     {
         $department = Department::create($request->validated());
 
-        return redirect()->route('departments.index')->with('success', 'El departamento '.$department->name.' se ha creado correctamente.');
+        return redirect()->route('maintenance.departments.index')->with('success', 'El departamento '.$department->name.' se ha creado correctamente.');
     }
 
     public function show(Department $department) {}
@@ -89,14 +89,14 @@ class DepartmentController extends Controller
             return Country::where('is_active', true)->orderBy('name')->get();
         });
 
-        return view('modules.ubication.departments.edit', compact('department', 'countries'));
+        return view('modules.maintenance.ubication.departments.edit', compact('department', 'countries'));
     }
 
     public function update(UpdateDepartmentRequest $request, Department $department)
     {
         $department->update($request->validated());
 
-        return redirect()->route('departments.index')->with('success', 'El departamento '.$department->name.' se ha actualizado correctamente.');
+        return redirect()->route('maintenance.departments.index')->with('success', 'El departamento '.$department->name.' se ha actualizado correctamente.');
     }
 
     public function destroy(Department $department)
@@ -106,7 +106,7 @@ class DepartmentController extends Controller
 
         Cache::tags(['departments'])->flush();
 
-        return redirect()->route('departments.index')->with('success', 'El departamento '.$department->name.' ha sido desactivado correctamente.');
+        return redirect()->route('maintenance.departments.index')->with('success', 'El departamento '.$department->name.' ha sido desactivado correctamente.');
     }
 
     public function restore(Department $department)
@@ -116,7 +116,7 @@ class DepartmentController extends Controller
 
         Cache::tags(['departments'])->flush();
 
-        return redirect()->route('departments.index')->with('success', 'El departamento '.$department->name.' ha sido reactivado correctamente.');
+        return redirect()->route('maintenance.departments.index')->with('success', 'El departamento '.$department->name.' ha sido reactivado correctamente.');
     }
 
     public function destroyMultiple(Request $request)
@@ -170,7 +170,7 @@ class DepartmentController extends Controller
         $ids = json_decode($request->input('ids', '[]'), true);
         $departments = count($ids) > 0 ? Department::whereIn('id', $ids)->orderBy('id')->get() : Department::orderBy('id')->get();
 
-        $pdf = Pdf::loadView('modules.ubication.departments.print', compact('departments'));
+        $pdf = Pdf::loadView('modules.maintenance.ubication.departments.print', compact('departments'));
 
         return $pdf->download('departamentos.pdf');
     }
@@ -180,6 +180,6 @@ class DepartmentController extends Controller
         $ids = json_decode($request->input('ids', '[]'), true);
         $departments = count($ids) > 0 ? Department::whereIn('id', $ids)->orderBy('id')->get() : Department::orderBy('id')->get();
 
-        return view('modules.ubication.departments.print', compact('departments'));
+        return view('modules.maintenance.ubication.departments.print', compact('departments'));
     }
 }

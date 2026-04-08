@@ -26,7 +26,7 @@
         }
     </style>
     <script src="{{ asset('dist/js/hs-config.js') }}"></script>
-    @include('includes.loading-screen')
+    @include('includes.Loading-screen')
 </head>
 <body class="d-flex align-items-center min-h-100">
     <script src="{{ asset('dist/js/hs.theme-appearance.js') }}"></script>

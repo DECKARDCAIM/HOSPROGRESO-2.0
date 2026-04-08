@@ -27,15 +27,15 @@
         }
     </style>
     <script src="{{ asset('dist/js/hs-config.js') }}"></script>
-    @include('includes.loading-screen')
+    @include('includes.Loading-screen')
 </head>
 <body class="has-navbar-vertical-aside navbar-vertical-aside-show-xl footer-offset">
     <script src="{{ asset('dist/js/hs.theme-appearance.js') }}"></script>
     <script src="{{ asset('dist/vendor/hs-navbar-vertical-aside/dist/hs-navbar-vertical-aside-mini-cache.js') }}"></script>
-    @include('includes.panel.UserOptions')
-    @include('includes.panel.menu')
+    @include('includes.panel.header.Header')
+    @include('includes.panel.aside.Menu')
     @yield('content')
-    @include('includes.panel.IsaacChat')
+    @include('includes.panel.header.useroptions.IsaacChat')
     <script src="{{ asset('dist/js/vendor-core.min.js') }}"></script>
     <script src="{{ asset('dist/js/vendor-ui.min.js') }}"></script>
     <script src="{{ asset('dist/js/vendor-charts.min.js') }}"></script>

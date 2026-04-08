@@ -49,33 +49,33 @@ class SpecialtyController extends Controller
             return compact('items', 'allFilteredIds', 'total', 'active', 'inactive');
         });
 
-        return view('modules.medical.specialties.index', $data);
+        return view('modules.maintenance.specialties.index', $data);
     }
 
     public function create()
     {
-        return view('modules.medical.specialties.create');
+        return view('modules.maintenance.specialties.create');
     }
 
     public function store(StoreSpecialtyRequest $request)
     {
         $item = Specialty::create($request->validated());
 
-        return redirect()->route('specialties.index')->with('success', 'La especialidad "'.$item->name.'" se ha creado correctamente.');
+        return redirect()->route('maintenance.specialties.index')->with('success', 'La especialidad "'.$item->name.'" se ha creado correctamente.');
     }
 
     public function show(Specialty $specialty) {}
 
     public function edit(Specialty $specialty)
     {
-        return view('modules.medical.specialties.edit', ['item' => $specialty]);
+        return view('modules.maintenance.specialties.edit', ['item' => $specialty]);
     }
 
     public function update(UpdateSpecialtyRequest $request, Specialty $specialty)
     {
         $specialty->update($request->validated());
 
-        return redirect()->route('specialties.index')->with('success', 'La especialidad "'.$specialty->name.'" se ha actualizado correctamente.');
+        return redirect()->route('maintenance.specialties.index')->with('success', 'La especialidad "'.$specialty->name.'" se ha actualizado correctamente.');
     }
 
     public function destroy(Specialty $specialty)
@@ -84,7 +84,7 @@ class SpecialtyController extends Controller
 
         Cache::tags(['specialties'])->flush();
 
-        return redirect()->route('specialties.index')->with('success', 'La especialidad "'.$specialty->name.'" ha sido desactivada.');
+        return redirect()->route('maintenance.specialties.index')->with('success', 'La especialidad "'.$specialty->name.'" ha sido desactivada.');
     }
 
     public function restore(Specialty $specialty)
@@ -93,7 +93,7 @@ class SpecialtyController extends Controller
 
         Cache::tags(['specialties'])->flush();
 
-        return redirect()->route('specialties.index')->with('success', 'La especialidad "'.$specialty->name.'" ha sido reactivada.');
+        return redirect()->route('maintenance.specialties.index')->with('success', 'La especialidad "'.$specialty->name.'" ha sido reactivada.');
     }
 
     public function destroyMultiple(Request $request)
@@ -143,7 +143,7 @@ class SpecialtyController extends Controller
         $ids = json_decode($request->input('ids', '[]'), true);
         $items = count($ids) > 0 ? Specialty::whereIn('id', $ids)->orderBy('id')->get() : Specialty::orderBy('id')->get();
 
-        $pdf = Pdf::loadView('modules.medical.specialties.print', compact('items'));
+        $pdf = Pdf::loadView('modules.maintenance.specialties.print', compact('items'));
 
         return $pdf->download('especialidades.pdf');
     }
@@ -153,6 +153,6 @@ class SpecialtyController extends Controller
         $ids = json_decode($request->input('ids', '[]'), true);
         $items = count($ids) > 0 ? Specialty::whereIn('id', $ids)->orderBy('id')->get() : Specialty::orderBy('id')->get();
 
-        return view('modules.medical.specialties.print', compact('items'));
+        return view('modules.maintenance.specialties.print', compact('items'));
     }
 }

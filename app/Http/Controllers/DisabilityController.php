@@ -49,33 +49,33 @@ class DisabilityController extends Controller
             return compact('items', 'allFilteredIds', 'total', 'active', 'inactive');
         });
 
-        return view('modules.patient.disabilities.index', $data);
+        return view('modules.maintenance.disabilities.index', $data);
     }
 
     public function create()
     {
-        return view('modules.patient.disabilities.create');
+        return view('modules.maintenance.disabilities.create');
     }
 
     public function store(StoreDisabilityRequest $request)
     {
         $item = Disability::create($request->validated());
 
-        return redirect()->route('disabilities.index')->with('success', 'La discapacidad "'.$item->name.'" se ha creado correctamente.');
+        return redirect()->route('maintenance.disabilities.index')->with('success', 'La discapacidad "'.$item->name.'" se ha creado correctamente.');
     }
 
     public function show(Disability $disability) {}
 
     public function edit(Disability $disability)
     {
-        return view('modules.patient.disabilities.edit', ['item' => $disability]);
+        return view('modules.maintenance.disabilities.edit', ['item' => $disability]);
     }
 
     public function update(UpdateDisabilityRequest $request, Disability $disability)
     {
         $disability->update($request->validated());
 
-        return redirect()->route('disabilities.index')->with('success', 'La discapacidad "'.$disability->name.'" se ha actualizado correctamente.');
+        return redirect()->route('maintenance.disabilities.index')->with('success', 'La discapacidad "'.$disability->name.'" se ha actualizado correctamente.');
     }
 
     public function destroy(Disability $disability)
@@ -84,7 +84,7 @@ class DisabilityController extends Controller
 
         Cache::tags(['disabilities'])->flush();
 
-        return redirect()->route('disabilities.index')->with('success', 'La discapacidad "'.$disability->name.'" ha sido desactivada.');
+        return redirect()->route('maintenance.disabilities.index')->with('success', 'La discapacidad "'.$disability->name.'" ha sido desactivada.');
     }
 
     public function restore(Disability $disability)
@@ -93,7 +93,7 @@ class DisabilityController extends Controller
 
         Cache::tags(['disabilities'])->flush();
 
-        return redirect()->route('disabilities.index')->with('success', 'La discapacidad "'.$disability->name.'" ha sido reactivada.');
+        return redirect()->route('maintenance.disabilities.index')->with('success', 'La discapacidad "'.$disability->name.'" ha sido reactivada.');
     }
 
     public function destroyMultiple(Request $request)
@@ -143,7 +143,7 @@ class DisabilityController extends Controller
         $ids = json_decode($request->input('ids', '[]'), true);
         $items = count($ids) > 0 ? Disability::whereIn('id', $ids)->orderBy('id')->get() : Disability::orderBy('id')->get();
 
-        $pdf = Pdf::loadView('modules.patient.disabilities.print', compact('items'));
+        $pdf = Pdf::loadView('modules.maintenance.disabilities.print', compact('items'));
 
         return $pdf->download('discapacidades.pdf');
     }
@@ -153,6 +153,6 @@ class DisabilityController extends Controller
         $ids = json_decode($request->input('ids', '[]'), true);
         $items = count($ids) > 0 ? Disability::whereIn('id', $ids)->orderBy('id')->get() : Disability::orderBy('id')->get();
 
-        return view('modules.patient.disabilities.print', compact('items'));
+        return view('modules.maintenance.disabilities.print', compact('items'));
     }
 }

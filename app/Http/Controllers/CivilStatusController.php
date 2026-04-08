@@ -49,33 +49,33 @@ class CivilStatusController extends Controller
             return compact('items', 'allFilteredIds', 'total', 'active', 'inactive');
         });
 
-        return view('modules.patient.civil-statuses.index', $data);
+        return view('modules.maintenance.civil-statuses.index', $data);
     }
 
     public function create()
     {
-        return view('modules.patient.civil-statuses.create');
+        return view('modules.maintenance.civil-statuses.create');
     }
 
     public function store(StoreCivilStatusRequest $request)
     {
         $item = CivilStatus::create($request->validated());
 
-        return redirect()->route('civil-statuses.index')->with('success', 'El estado civil "'.$item->name.'" se ha creado correctamente.');
+        return redirect()->route('maintenance.civil-statuses.index')->with('success', 'El estado civil "'.$item->name.'" se ha creado correctamente.');
     }
 
     public function show(CivilStatus $civilStatus) {}
 
     public function edit(CivilStatus $civilStatus)
     {
-        return view('modules.patient.civil-statuses.edit', ['item' => $civilStatus]);
+        return view('modules.maintenance.civil-statuses.edit', ['item' => $civilStatus]);
     }
 
     public function update(UpdateCivilStatusRequest $request, CivilStatus $civilStatus)
     {
         $civilStatus->update($request->validated());
 
-        return redirect()->route('civil-statuses.index')->with('success', 'El estado civil "'.$civilStatus->name.'" se ha actualizado correctamente.');
+        return redirect()->route('maintenance.civil-statuses.index')->with('success', 'El estado civil "'.$civilStatus->name.'" se ha actualizado correctamente.');
     }
 
     public function destroy(CivilStatus $civilStatus)
@@ -84,7 +84,7 @@ class CivilStatusController extends Controller
 
         Cache::tags(['civil_statuses'])->flush();
 
-        return redirect()->route('civil-statuses.index')->with('success', 'El estado civil "'.$civilStatus->name.'" ha sido desactivado.');
+        return redirect()->route('maintenance.civil-statuses.index')->with('success', 'El estado civil "'.$civilStatus->name.'" ha sido desactivado.');
     }
 
     public function restore(CivilStatus $civilStatus)
@@ -93,7 +93,7 @@ class CivilStatusController extends Controller
 
         Cache::tags(['civil_statuses'])->flush();
 
-        return redirect()->route('civil-statuses.index')->with('success', 'El estado civil "'.$civilStatus->name.'" ha sido reactivado.');
+        return redirect()->route('maintenance.civil-statuses.index')->with('success', 'El estado civil "'.$civilStatus->name.'" ha sido reactivado.');
     }
 
     public function destroyMultiple(Request $request)
@@ -143,7 +143,7 @@ class CivilStatusController extends Controller
         $ids = json_decode($request->input('ids', '[]'), true);
         $items = count($ids) > 0 ? CivilStatus::whereIn('id', $ids)->orderBy('id')->get() : CivilStatus::orderBy('id')->get();
 
-        $pdf = Pdf::loadView('modules.patient.civil-statuses.print', compact('items'));
+        $pdf = Pdf::loadView('modules.maintenance.civil-statuses.print', compact('items'));
 
         return $pdf->download('estados-civiles.pdf');
     }
@@ -153,6 +153,6 @@ class CivilStatusController extends Controller
         $ids = json_decode($request->input('ids', '[]'), true);
         $items = count($ids) > 0 ? CivilStatus::whereIn('id', $ids)->orderBy('id')->get() : CivilStatus::orderBy('id')->get();
 
-        return view('modules.patient.civil-statuses.print', compact('items'));
+        return view('modules.maintenance.civil-statuses.print', compact('items'));
     }
 }

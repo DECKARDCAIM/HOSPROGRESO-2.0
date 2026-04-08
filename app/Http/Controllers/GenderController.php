@@ -49,33 +49,33 @@ class GenderController extends Controller
             return compact('items', 'allFilteredIds', 'total', 'active', 'inactive');
         });
 
-        return view('modules.patient.genders.index', $data);
+        return view('modules.maintenance.genders.index', $data);
     }
 
     public function create()
     {
-        return view('modules.patient.genders.create');
+        return view('modules.maintenance.genders.create');
     }
 
     public function store(StoreGenderRequest $request)
     {
         $item = Gender::create($request->validated());
 
-        return redirect()->route('genders.index')->with('success', 'El género "'.$item->name.'" se ha creado correctamente.');
+        return redirect()->route('maintenance.genders.index')->with('success', 'El género "'.$item->name.'" se ha creado correctamente.');
     }
 
     public function show(Gender $gender) {}
 
     public function edit(Gender $gender)
     {
-        return view('modules.patient.genders.edit', ['item' => $gender]);
+        return view('modules.maintenance.genders.edit', ['item' => $gender]);
     }
 
     public function update(UpdateGenderRequest $request, Gender $gender)
     {
         $gender->update($request->validated());
 
-        return redirect()->route('genders.index')->with('success', 'El género "'.$gender->name.'" se ha actualizado correctamente.');
+        return redirect()->route('maintenance.genders.index')->with('success', 'El género "'.$gender->name.'" se ha actualizado correctamente.');
     }
 
     public function destroy(Gender $gender)
@@ -84,7 +84,7 @@ class GenderController extends Controller
 
         Cache::tags(['genders'])->flush();
 
-        return redirect()->route('genders.index')->with('success', 'El género "'.$gender->name.'" ha sido desactivado.');
+        return redirect()->route('maintenance.genders.index')->with('success', 'El género "'.$gender->name.'" ha sido desactivado.');
     }
 
     public function restore(Gender $gender)
@@ -93,7 +93,7 @@ class GenderController extends Controller
 
         Cache::tags(['genders'])->flush();
 
-        return redirect()->route('genders.index')->with('success', 'El género "'.$gender->name.'" ha sido reactivado.');
+        return redirect()->route('maintenance.genders.index')->with('success', 'El género "'.$gender->name.'" ha sido reactivado.');
     }
 
     public function destroyMultiple(Request $request)
@@ -143,7 +143,7 @@ class GenderController extends Controller
         $ids = json_decode($request->input('ids', '[]'), true);
         $items = count($ids) > 0 ? Gender::whereIn('id', $ids)->orderBy('id')->get() : Gender::orderBy('id')->get();
 
-        $pdf = Pdf::loadView('modules.patient.genders.print', compact('items'));
+        $pdf = Pdf::loadView('modules.maintenance.genders.print', compact('items'));
 
         return $pdf->download('generos.pdf');
     }
@@ -153,6 +153,6 @@ class GenderController extends Controller
         $ids = json_decode($request->input('ids', '[]'), true);
         $items = count($ids) > 0 ? Gender::whereIn('id', $ids)->orderBy('id')->get() : Gender::orderBy('id')->get();
 
-        return view('modules.patient.genders.print', compact('items'));
+        return view('modules.maintenance.genders.print', compact('items'));
     }
 }

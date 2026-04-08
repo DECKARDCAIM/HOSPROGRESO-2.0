@@ -145,7 +145,7 @@ class UserController extends Controller
             })
             ->limit(10)->get();
 
-        return view('modules.administration.user.profile', compact('user', 'departamentMembers'));
+        return view('modules.administration.user.profile.public_profile.profile', compact('user', 'departamentMembers'));
     }
 
     public function create()

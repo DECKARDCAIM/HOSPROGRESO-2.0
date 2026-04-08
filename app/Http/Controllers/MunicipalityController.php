@@ -78,7 +78,7 @@ class MunicipalityController extends Controller
             return compact('municipalities', 'allFilteredIds', 'countries', 'departments', 'totalMunicipalities', 'activeMunicipalities', 'inactiveMunicipalities');
         });
 
-        return view('modules.ubication.municipalities.index', $data);
+        return view('modules.maintenance.ubication.municipalities.index', $data);
     }
 
     public function create(Request $request)
@@ -95,14 +95,14 @@ class MunicipalityController extends Controller
                 ->get();
         }
 
-        return view('modules.ubication.municipalities.create', compact('departments', 'countries'));
+        return view('modules.maintenance.ubication.municipalities.create', compact('departments', 'countries'));
     }
 
     public function store(StoreMunicipalityRequest $request)
     {
         $municipality = Municipality::create($request->validated());
 
-        return redirect()->route('municipalities.index')->with('success', 'El municipio '.$municipality->name.' se ha creado correctamente.');
+        return redirect()->route('maintenance.municipalities.index')->with('success', 'El municipio '.$municipality->name.' se ha creado correctamente.');
     }
 
     public function show(Municipality $municipality) {}
@@ -117,14 +117,14 @@ class MunicipalityController extends Controller
             return Department::where('is_active', true)->orderBy('name')->get();
         });
 
-        return view('modules.ubication.municipalities.edit', compact('municipality', 'departments', 'countries'));
+        return view('modules.maintenance.ubication.municipalities.edit', compact('municipality', 'departments', 'countries'));
     }
 
     public function update(UpdateMunicipalityRequest $request, Municipality $municipality)
     {
         $municipality->update($request->validated());
 
-        return redirect()->route('municipalities.index')->with('success', 'El municipio '.$municipality->name.' se ha actualizado correctamente.');
+        return redirect()->route('maintenance.municipalities.index')->with('success', 'El municipio '.$municipality->name.' se ha actualizado correctamente.');
     }
 
     public function destroy(Municipality $municipality)
@@ -133,7 +133,7 @@ class MunicipalityController extends Controller
 
         Cache::tags(['municipalities'])->flush();
 
-        return redirect()->route('municipalities.index')->with('success', 'El municipio '.$municipality->name.' ha sido desactivado correctamente.');
+        return redirect()->route('maintenance.municipalities.index')->with('success', 'El municipio '.$municipality->name.' ha sido desactivado correctamente.');
     }
 
     public function restore(Municipality $municipality)
@@ -142,7 +142,7 @@ class MunicipalityController extends Controller
 
         Cache::tags(['municipalities'])->flush();
 
-        return redirect()->route('municipalities.index')->with('success', 'El municipio '.$municipality->name.' ha sido reactivado correctamente.');
+        return redirect()->route('maintenance.municipalities.index')->with('success', 'El municipio '.$municipality->name.' ha sido reactivado correctamente.');
     }
 
     public function destroyMultiple(Request $request)
@@ -194,7 +194,7 @@ class MunicipalityController extends Controller
         $ids = json_decode($request->input('ids', '[]'), true);
         $municipalities = count($ids) > 0 ? Municipality::whereIn('id', $ids)->orderBy('id')->get() : Municipality::orderBy('id')->get();
 
-        $pdf = Pdf::loadView('modules.ubication.municipalities.print', compact('municipalities'));
+        $pdf = Pdf::loadView('modules.maintenance.ubication.municipalities.print', compact('municipalities'));
 
         return $pdf->download('municipios.pdf');
     }
@@ -204,6 +204,6 @@ class MunicipalityController extends Controller
         $ids = json_decode($request->input('ids', '[]'), true);
         $municipalities = count($ids) > 0 ? Municipality::whereIn('id', $ids)->orderBy('id')->get() : Municipality::orderBy('id')->get();
 
-        return view('modules.ubication.municipalities.print', compact('municipalities'));
+        return view('modules.maintenance.ubication.municipalities.print', compact('municipalities'));
     }
 }

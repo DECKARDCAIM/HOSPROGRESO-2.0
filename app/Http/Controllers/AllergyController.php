@@ -49,33 +49,33 @@ class AllergyController extends Controller
             return compact('items', 'allFilteredIds', 'total', 'active', 'inactive');
         });
 
-        return view('modules.patient.allergies.index', $data);
+        return view('modules.maintenance.allergies.index', $data);
     }
 
     public function create()
     {
-        return view('modules.patient.allergies.create');
+        return view('modules.maintenance.allergies.create');
     }
 
     public function store(StoreAllergyRequest $request)
     {
         $item = Allergy::create($request->validated());
 
-        return redirect()->route('allergies.index')->with('success', 'La alergia "'.$item->name.'" se ha creado correctamente.');
+        return redirect()->route('maintenance.allergies.index')->with('success', 'La alergia "'.$item->name.'" se ha creado correctamente.');
     }
 
     public function show(Allergy $allergy) {}
 
     public function edit(Allergy $allergy)
     {
-        return view('modules.patient.allergies.edit', ['item' => $allergy]);
+        return view('modules.maintenance.allergies.edit', ['item' => $allergy]);
     }
 
     public function update(UpdateAllergyRequest $request, Allergy $allergy)
     {
         $allergy->update($request->validated());
 
-        return redirect()->route('allergies.index')->with('success', 'La alergia "'.$allergy->name.'" se ha actualizado correctamente.');
+        return redirect()->route('maintenance.allergies.index')->with('success', 'La alergia "'.$allergy->name.'" se ha actualizado correctamente.');
     }
 
     public function destroy(Allergy $allergy)
@@ -84,7 +84,7 @@ class AllergyController extends Controller
 
         Cache::tags(['allergies'])->flush();
 
-        return redirect()->route('allergies.index')->with('success', 'La alergia "'.$allergy->name.'" ha sido desactivada.');
+        return redirect()->route('maintenance.allergies.index')->with('success', 'La alergia "'.$allergy->name.'" ha sido desactivada.');
     }
 
     public function restore(Allergy $allergy)
@@ -93,7 +93,7 @@ class AllergyController extends Controller
 
         Cache::tags(['allergies'])->flush();
 
-        return redirect()->route('allergies.index')->with('success', 'La alergia "'.$allergy->name.'" ha sido reactivada.');
+        return redirect()->route('maintenance.allergies.index')->with('success', 'La alergia "'.$allergy->name.'" ha sido reactivada.');
     }
 
     public function destroyMultiple(Request $request)
@@ -143,7 +143,7 @@ class AllergyController extends Controller
         $ids = json_decode($request->input('ids', '[]'), true);
         $items = count($ids) > 0 ? Allergy::whereIn('id', $ids)->orderBy('id')->get() : Allergy::orderBy('id')->get();
 
-        $pdf = Pdf::loadView('modules.patient.allergies.print', compact('items'));
+        $pdf = Pdf::loadView('modules.maintenance.allergies.print', compact('items'));
 
         return $pdf->download('alergias.pdf');
     }
@@ -153,6 +153,6 @@ class AllergyController extends Controller
         $ids = json_decode($request->input('ids', '[]'), true);
         $items = count($ids) > 0 ? Allergy::whereIn('id', $ids)->orderBy('id')->get() : Allergy::orderBy('id')->get();
 
-        return view('modules.patient.allergies.print', compact('items'));
+        return view('modules.maintenance.allergies.print', compact('items'));
     }
 }
