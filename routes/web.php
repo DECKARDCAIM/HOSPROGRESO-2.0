@@ -70,7 +70,7 @@ Route::middleware(['auth', 'PreventBackHistory'])->group(function () {
         Route::get('/system', [MetricsController::class, 'system'])->name('system.index');
         Route::get('/system/expand/{chartId}', [MetricsController::class, 'expandSystem'])->name('system.expand');
         Route::post('/system/export-pdf', [MetricsController::class, 'exportPDF'])->name('system.export.pdf');
-        Route::post('/system/print', [MetricsController::class, 'print'])->name('system.print');
+        Route::post('/system/print', [MetricsController::class, 'print'])->name('system.export.print');
     });
 
     // ==========================================
