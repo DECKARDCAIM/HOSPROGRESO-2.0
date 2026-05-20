@@ -152,15 +152,15 @@
                                         </div>
                                         <div class="row mb-4">
                                             <div class="col-md-4">
-                                                <label class="form-label" for="marital_status">Estado Civil</label>
-                                                <select class="form-control" id="marital_status" name="marital_status">
-                                                    <option value="" {{ old('marital_status', $user->marital_status) == '' ? 'selected' : '' }}>Seleccione</option>
-                                                    <option value="soltero" {{ old('marital_status', $user->marital_status) == 'soltero' ? 'selected' : '' }}>Soltero/a</option>
-                                                    <option value="casado" {{ old('marital_status', $user->marital_status) == 'casado' ? 'selected' : '' }}>Casado/a</option>
-                                                    <option value="divorciado" {{ old('marital_status', $user->marital_status) == 'divorciado' ? 'selected' : '' }}>Divorciado/a</option>
-                                                    <option value="viudo" {{ old('marital_status', $user->marital_status) == 'viudo' ? 'selected' : '' }}>Viudo/a</option>
-                                                    <option value="union_libre" {{ old('marital_status', $user->marital_status) == 'union_libre' ? 'selected' : '' }}>Unión Libre</option>
-                                                </select>
+                                                <label class="form-label" for="civil_status">Estado Civil</label>
+                                                <div class="tom-select-custom">
+                                                    <select class="js-select form-select" id="civil_status" name="civil_status_id" data-hs-tom-select-options='{"placeholder": "Seleccione..."}'>
+                                                        <option value="">Seleccione</option>
+                                                        @foreach ($civilStatuses ?? [] as $status)
+                                                            <option value="{{ $status->id }}" {{ old('civil_status_id', $user->civil_status_id) == $status->id ? 'selected' : '' }}>{{ $status->name }}</option>
+                                                        @endforeach
+                                                    </select>
+                                                </div>
                                             </div>
                                             <div class="col-md-4">
                                                 <label class="form-label" for="gender">Género</label>

@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Http\Requests\UpdateProfileRequest;
 use App\Models\Gender;
+use App\Models\CivilStatus;
 use App\Models\SessionHistory;
 use App\Models\User;
 use Illuminate\Http\Request;
@@ -124,8 +125,9 @@ class ProfileController extends Controller
     {
         $user = Auth::user();
         $genders = Cache::tags(['genders'])->remember('active_genders', now()->addDays(1), fn () => Gender::where('is_active', true)->orderBy('name')->get());
+        $civilStatuses = Cache::tags(['civil_statuses'])->remember('active_civil_statuses', now()->addDays(1), fn () => CivilStatus::where('is_active', true)->orderBy('name')->get());
 
-        return view('modules.administration.user.profile.edit', compact('user', 'genders'));
+        return view('modules.administration.user.profile.edit', compact('user', 'genders', 'civilStatuses'));
     }
 
     public function update(UpdateProfileRequest $request)
@@ -166,6 +168,19 @@ class ProfileController extends Controller
             }
 
             $user->update($updateData);
+
+            $user->staff()->updateOrCreate(
+                ['user_id' => $user->id],
+                [
+                    'cui' => $request->cui,
+                    'nit' => $request->nit,
+                    'civil_status_id' => $request->civil_status_id,
+                    'phone' => $request->phone,
+                    'address' => $request->address,
+                    'birth_date' => $request->birth_date,
+                    'gender_id' => $request->gender_id,
+                ]
+            );
 
             if ($request->wantsJson()) {
                 return response()->json(['success' => true, 'message' => 'Perfil actualizado correctamente']);

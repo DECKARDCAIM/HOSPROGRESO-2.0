@@ -67,6 +67,61 @@ class User extends Authenticatable
         return $this->banner_photo_path ? asset('storage/'.$this->banner_photo_path) : null;
     }
 
+    public function getCuiAttribute()
+    {
+        return $this->staff?->cui;
+    }
+
+    public function getNitAttribute()
+    {
+        return $this->staff?->nit;
+    }
+
+    public function getPhoneAttribute()
+    {
+        return $this->staff?->phone;
+    }
+
+    public function getAddressAttribute()
+    {
+        return $this->staff?->address;
+    }
+
+    public function getBirthDateAttribute()
+    {
+        return $this->staff?->birth_date;
+    }
+
+    public function getGenderIdAttribute()
+    {
+        return $this->staff?->gender_id;
+    }
+
+    public function getGenderAttribute()
+    {
+        return $this->staff?->gender;
+    }
+
+    public function getCivilStatusIdAttribute()
+    {
+        return $this->staff?->civil_status_id;
+    }
+
+    public function getMaritalStatusAttribute()
+    {
+        return $this->staff?->civilStatus?->name;
+    }
+
+    public function getWorkDepartmentAttribute()
+    {
+        return $this->staff?->workDepartment;
+    }
+
+    public function getUnityExecutionAttribute()
+    {
+        return $this->staff?->unityExecution;
+    }
+
     public function readReleases()
     {
         return $this->belongsToMany(Release::class, 'release_user')->withPivot('read_at')->withTimestamps();

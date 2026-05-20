@@ -22,6 +22,8 @@ class UpdateProfileRequest extends FormRequest
             ];
         }
 
+        $staffId = $this->user()?->staff?->id ?? 0;
+
         // Reglas para la actualización del perfil
         return [
             'first_name' => 'required|string|max:255',
@@ -30,9 +32,9 @@ class UpdateProfileRequest extends FormRequest
             'first_last_name' => 'required|string|max:255',
             'second_last_name' => 'nullable|string|max:255',
             'married_last_name' => 'nullable|string|max:255',
-            'cui' => ['nullable', 'string', 'max:13', Rule::unique('users')->ignore($this->user()->id)],
-            'nit' => ['nullable', 'string', 'max:9', Rule::unique('users')->ignore($this->user()->id)],
-            'marital_status' => 'nullable|string|in:soltero,casado,divorciado,viudo,union_libre',
+            'cui' => ['nullable', 'string', 'max:13', Rule::unique('staff')->ignore($staffId)],
+            'nit' => ['nullable', 'string', 'max:9', Rule::unique('staff')->ignore($staffId)],
+            'civil_status_id' => 'nullable|exists:civil_statuses,id',
             'phone' => 'nullable|string|max:15',
             'address' => 'nullable|string|max:500',
             'birth_date' => 'nullable|date',
