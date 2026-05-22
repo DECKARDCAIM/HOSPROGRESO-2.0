@@ -1,11 +1,9 @@
 <div class="dropdown ms-2">
     <div class="d-none d-lg-block">
         <div class="input-group input-group-merge input-group-borderless input-group-hover-light navbar-input-group">
-            <div class="input-group-prepend input-group-text">
-                <i class="bi-search"></i>
-            </div>
-            <input type="search" class="js-form-search form-control" placeholder="Buscar" aria-label="Buscar" data-hs-form-search-options='{"clearIcon": "#clearSearchResultsIcon", "dropMenuElement": "#searchDropdownMenu", "dropMenuOffset": 20, "toggleIconOnFocus": true, "activeClass": "focus" }'>
+            <input type="search" class="js-form-search form-control" placeholder="Buscar" aria-label="Buscar" data-hs-form-search-options='{"clearIcon": "#clearSearchResultsIcon", "defaultIcon": "#defaultSearchIcon", "dropMenuElement": "#searchDropdownMenu", "dropMenuOffset": 20, "toggleIconOnFocus": true, "activeClass": "focus" }'>
             <a class="input-group-append input-group-text" href="javascript:;">
+                <i id="defaultSearchIcon" class="bi-search"></i>
                 <i id="clearSearchResultsIcon" class="bi-x-lg" style="display: none;"></i>
             </a>
         </div>
